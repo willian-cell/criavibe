@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CriaVibe - Sistema de Galerias para Fotógrafos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gallery-item {
+            transition: all 0.3s ease;
+        }
+        .gallery-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .lightbox-nav {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+        .lightbox-nav button {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        .lightbox-nav button:hover {
+            background: rgba(255,255,255,0.5);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        .auth-form {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .progress-bar {
+            height: 5px;
+            background-color: #4f46e5;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-camera-retro text-indigo-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-900">CriaVibe</span>
+                    </a>
+                </div>
+                <div class="hidden md:ml-6 md:flex md:items-center space-x-8">
+                    <a href="{{ url_for('index') }}" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Explorar</a>
+                    <a href="{{ url_for('precos') }}" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Preços</a>
+                    <a href="{{ url_for('saiba_mais') }}" class="text-indigo-600 px-3 py-2 text-sm font-medium">Sobre</a>
+                    <button id="loginBtn" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Entrar</button>
+                    <button id="registerBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">Cadastre-se</button>
+                </div>
+                
+                <div class="-mr-2 flex items-center md:hidden">
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menu</span>
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="bg-indigo-700 text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Compartilhe suas fotos com estilo</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">A plataforma perfeita para fotógrafos exibirem e compartilharem seu trabalho com clientes.</p>
+            <div class="flex justify-center space-x-4">
+                <button id="heroRegisterBtn" class="bg-white text-indigo-700 px-6 py-3 rounded-md text-lg font-medium hover:bg-gray-100">Comece grátis</button>
+                <button onclick="window.location.href='saiba_mais.html'" class="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-indigo-800">
+                Saiba mais
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sample Gallery -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Galerias Incríveis</h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Veja exemplos de galerias criadas por nossos fotógrafos</p>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="galeriasReais">
+            <!-- Galerias reais serão inseridas aqui via JS -->
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="bg-gray-100 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Recursos para Fotógrafos</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Tudo que você precisa para compartilhar seu trabalho profissionalmente</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-indigo-600 text-3xl mb-4">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3 class="font-semibold text-xl mb-2">Upload Fácil</h3>
+                    <p class="text-gray-600">Envie suas fotos em lote com nosso sistema de arrastar e soltar. Suportamos arquivos RAW e JPEG.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-indigo-600 text-3xl mb-4">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="font-semibold text-xl mb-2">Privacidade</h3>
+                    <p class="text-gray-600">Controle quem pode ver suas fotos com galerias privadas protegidas por senha.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-indigo-600 text-3xl mb-4">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3 class="font-semibold text-xl mb-2">Venda de Fotos</h3>
+                    <p class="text-gray-600">Ofereça downloads digitais ou impressões profissionais diretamente da sua galeria.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">O que os fotógrafos dizem</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex items-center mb-4">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Fotógrafa" class="w-12 h-12 rounded-full mr-4">
+                    <div>
+                        <h4 class="font-semibold">Carla Mendes</h4>
+                        <p class="text-gray-600 text-sm">Fotógrafa de Casamentos</p>
+                    </div>
+                </div>
+                <p class="text-gray-700">"O CriaVibe revolucionou a forma como compartilho meus trabalhos com os clientes. Eles adoram a experiência de navegar pelas galerias e a facilidade para fazer downloads."</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex items-center mb-4">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Fotógrafo" class="w-12 h-12 rounded-full mr-4">
+                    <div>
+                        <h4 class="font-semibold">Ricardo Almeida</h4>
+                        <p class="text-gray-600 text-sm">Fotógrafo de Eventos</p>
+                    </div>
+                </div>
+                <p class="text-gray-700">"Finalmente encontrei uma plataforma que atende todas as minhas necessidades como fotógrafo profissional. O sistema de vendas integrado é um diferencial incrível!"</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="bg-indigo-700 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Pronto para elevar seu portfólio?</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">Junte-se a milhares de fotógrafos profissionais que já usam o CriaVibe .</p>
+            <button id="ctaRegisterBtn" class="bg-white text-indigo-700 px-8 py-3 rounded-md text-lg font-medium hover:bg-gray-100">Crie sua conta grátis</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">CriaVibe </h3>
+                    <p class="text-gray-400">A plataforma perfeita para fotógrafos compartilharem seu trabalho com o mundo.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Recursos</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Galerias</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacidade</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Vendas</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Clientes</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Empresa</h3>
+                    <ul class="space-y-2">
+                        <li><a href="saiba_mais.html" class="text-gray-400 hover:text-white">Sobre</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Carreiras</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contato</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Redes Sociais</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white text-xl"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white text-xl"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white text-xl"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white text-xl"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 CriaVibe . Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="auth-form bg-white rounded-lg shadow-xl max-w-md w-full p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Entrar na sua conta</h2>
+                <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="loginEmail" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                
+                <div>
+                    <label for="loginPassword" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="loginPassword" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="rememberMe" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <label for="rememberMe" class="ml-2 block text-sm text-gray-700">Lembrar de mim</label>
+                    </div>
+                    
+                    <a href="#" class="text-sm text-indigo-600 hover:text-indigo-500">Esqueceu a senha?</a>
+                </div>
+                
+                <div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Entrar</button>
+                </div>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Não tem uma conta? 
+                    <button id="switchToRegister" class="text-indigo-600 hover:text-indigo-500 font-medium">Cadastre-se</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="auth-form bg-white rounded-lg shadow-xl max-w-md w-full p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Criar uma conta</h2>
+                <button id="closeRegisterModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="registerForm" class="space-y-6">
+                <div>
+                    <label for="registerName" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                    <input type="text" id="registerName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                
+                <div>
+                    <label for="registerEmail" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="registerEmail" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                
+                <div>
+                    <label for="registerPassword" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="registerPassword" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                
+                <div>
+                    <label for="registerConfirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirmar Senha</label>
+                    <input type="password" id="registerConfirmPassword" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                
+                <div class="flex items-center">
+                    <input id="terms" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" required>
+                    <label for="terms" class="ml-2 block text-sm text-gray-700">
+                        Eu concordo com os <a href="#" class="text-indigo-600 hover:text-indigo-500">Termos de Serviço</a> e <a href="#" class="text-indigo-600 hover:text-indigo-500">Política de Privacidade</a>
+                    </label>
+                </div>
+                
+                <div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cadastrar</button>
+                </div>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Já tem uma conta? 
+                    <button id="switchToLogin" class="text-indigo-600 hover:text-indigo-500 font-medium">Entrar</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard (hidden by default) -->
+    <div id="dashboard" class="hidden">
+        <div class="bg-white shadow">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <a href="#" class="flex-shrink-0 flex items-center">
+                            <i class="fas fa-camera-retro text-indigo-600 text-2xl mr-2"></i>
+                            <span class="text-xl font-bold text-gray-900">CriaVibe </span>
+                        </a>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:items-center space-x-8">
+                        <a href="#" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Dashboard</a>
+                        <a href="#" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Galerias</a>
+                        <a href="#" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Clientes</a>
+                        <a href="#" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Configurações</a>
+                        <button id="logoutBtn" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Sair</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-900">Minhas Galerias</h1>
+                <button id="createGalleryBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Nova Galeria
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- User's galleries would be listed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Gallery Modal -->
+    <div id="createGalleryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Criar Nova Galeria</h2>
+                <button id="closeCreateGalleryModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="galleryForm" class="space-y-6">
+                <div>
+                    <label for="galleryName" class="block text-sm font-medium text-gray-700 mb-1">Nome da Galeria</label>
+                    <input type="text" id="galleryName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                
+                <div>
+                    <label for="galleryDescription" class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                    <textarea id="galleryDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                </div>
+                
+                <div>
+                    <label for="galleryPrivacy" class="block text-sm font-medium text-gray-700 mb-1">Privacidade</label>
+                    <select id="galleryPrivacy" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="public">Pública</option>
+                        <option value="private">Privada (com senha)</option>
+                    </select>
+                </div>
+                
+                <div id="passwordField" class="hidden">
+                    <label for="galleryPassword" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="galleryPassword" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Upload de Fotos</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div class="space-y-1 text-center">
+                            <div class="flex text-sm text-gray-600">
+                                <label for="fileUpload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                    <span>Arraste e solte arquivos</span>
+                                    <input id="fileUpload" type="file" class="sr-only" multiple accept="image/*">
+                                </label>
+                                <p class="pl-1">ou arraste e solte</p>
+                            </div>
+                            <p class="text-xs text-gray-500">PNG, JPG, JPEG até 10MB</p>
+                        </div>
+                    </div>
+                    <div id="uploadProgress" class="mt-2 hidden">
+                        <div class="progress-bar"></div>
+                        <p class="text-sm text-gray-500 mt-1">Enviando arquivos...</p>
+                    </div>
+                    <div id="fileList" class="mt-2 hidden">
+                        <p class="text-sm font-medium text-gray-700">Arquivos selecionados:</p>
+                        <ul class="text-sm text-gray-500 mt-1"></ul>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelGalleryBtn" class="bg-white text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50">Cancelar</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">Criar Galeria</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox hidden">
+        <div class="lightbox-nav">
+            <button id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+            <button id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <span class="lightbox-close">&times;</span>
+        <img id="lightboxImg" class="lightbox-content" src="" alt="">
+    </div>
+
+    <script>
+        // Modal handling
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const heroRegisterBtn = document.getElementById('heroRegisterBtn');
+        const ctaRegisterBtn = document.getElementById('ctaRegisterBtn');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closeRegisterModal = document.getElementById('closeRegisterModal');
+        const switchToRegister = document.getElementById('switchToRegister');
+        const switchToLogin = document.getElementById('switchToLogin');
+        
+        // Dashboard elements
+        const dashboard = document.getElementById('dashboard');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const createGalleryBtn = document.getElementById('createGalleryBtn');
+        const createGalleryModal = document.getElementById('createGalleryModal');
+        const closeCreateGalleryModal = document.getElementById('closeCreateGalleryModal');
+        const cancelGalleryBtn = document.getElementById('cancelGalleryBtn');
+        const galleryPrivacy = document.getElementById('galleryPrivacy');
+        const passwordField = document.getElementById('passwordField');
+        const fileUpload = document.getElementById('fileUpload');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const fileList = document.getElementById('fileList');
+        const galleryForm = document.getElementById('galleryForm');
+        
+        // Lightbox elements
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const lightboxClose = document.querySelector('.lightbox-close');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        // Sample images for lightbox demo
+        const sampleImages = [
+            'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+            'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+            'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+            'https://images.unsplash.com/photo-1541178735493-479c1a27ed24?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80'
+        ];
+        let currentImageIndex = 0;
+        
+        // Event listeners for modals
+        loginBtn.addEventListener('click', () => {
+            loginModal.classList.remove('hidden');
+        });
+        
+        registerBtn.addEventListener('click', () => {
+            registerModal.classList.remove('hidden');
+        });
+        
+        heroRegisterBtn.addEventListener('click', () => {
+            registerModal.classList.remove('hidden');
+        });
+        
+        ctaRegisterBtn.addEventListener('click', () => {
+            registerModal.classList.remove('hidden');
+        });
+        
+        closeLoginModal.addEventListener('click', () => {
+            loginModal.classList.add('hidden');
+        });
+        
+        closeRegisterModal.addEventListener('click', () => {
+            registerModal.classList.add('hidden');
+        });
+        
+        switchToRegister.addEventListener('click', () => {
+            loginModal.classList.add('hidden');
+            registerModal.classList.remove('hidden');
+        });
+        
+        switchToLogin.addEventListener('click', () => {
+            registerModal.classList.add('hidden');
+            loginModal.classList.remove('hidden');
+        });
+        
+        
+        
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            dashboard.classList.add('hidden');
+            document.querySelector('body > div:not(#dashboard)').style.display = 'block';
+        });
+        
+        // Create gallery modal
+        createGalleryBtn.addEventListener('click', () => {
+            createGalleryModal.classList.remove('hidden');
+        });
+        
+        closeCreateGalleryModal.addEventListener('click', () => {
+            createGalleryModal.classList.add('hidden');
+        });
+        
+        cancelGalleryBtn.addEventListener('click', () => {
+            createGalleryModal.classList.add('hidden');
+        });
+        
+        // Gallery privacy toggle
+        galleryPrivacy.addEventListener('change', () => {
+            if (galleryPrivacy.value === 'private') {
+                passwordField.classList.remove('hidden');
+            } else {
+                passwordField.classList.add('hidden');
+            }
+        });
+        
+        // File upload handling
+        fileUpload.addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (files.length > 0) {
+                fileList.classList.remove('hidden');
+                const fileListUl = fileList.querySelector('ul');
+                fileListUl.innerHTML = '';
+                
+                for (let i = 0; i < files.length; i++) {
+                    const li = document.createElement('li');
+                    li.textContent = files[i].name;
+                    fileListUl.appendChild(li);
+                }
+                
+                // Simulate upload progress
+                uploadProgress.classList.remove('hidden');
+                const progressBar = uploadProgress.querySelector('.progress-bar');
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 5;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            uploadProgress.classList.add('hidden');
+                        }, 500);
+                    }
+                }, 100);
+            }
+        });
+        
+        // Gallery form submission
+        galleryForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Simulate gallery creation
+            setTimeout(() => {
+                createGalleryModal.classList.add('hidden');
+                // Here you would normally add the new gallery to the dashboard
+            }, 1000);
+        });
+        
+        // Lightbox functionality for sample gallery
+        document.querySelectorAll('.gallery-item img').forEach((img, index) => {
+            img.addEventListener('click', () => {
+                currentImageIndex = index;
+                lightboxImg.src = sampleImages[currentImageIndex];
+                lightbox.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+        
+        lightboxClose.addEventListener('click', () => {
+            lightbox.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        });
+        
+        prevBtn.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex - 1 + sampleImages.length) % sampleImages.length;
+            lightboxImg.src = sampleImages[currentImageIndex];
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex + 1) % sampleImages.length;
+            lightboxImg.src = sampleImages[currentImageIndex];
+        });
+        
+        // Close lightbox when clicking outside the image
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                lightbox.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Keyboard navigation for lightbox
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('hidden')) {
+                if (e.key === 'Escape') {
+                    lightbox.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                } else if (e.key === 'ArrowLeft') {
+                    prevBtn.click();
+                } else if (e.key === 'ArrowRight') {
+                    nextBtn.click();
+                }
+            }
+        });
+    </script>
+
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("loginEmail").value;
+    const senha = document.getElementById("loginPassword").value;
+
+    const resposta = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, senha })
+    });
+
+    const dados = await resposta.json();
+
+    if (dados.status === "ok") {
+        // Armazena nome e email no localStorage
+        localStorage.setItem("nomeUsuario", dados.usuario.nome);
+        localStorage.setItem("emailUsuario", dados.usuario.email);
+
+        // Redireciona para o painel do fotógrafo
+        window.location.href = "/entrar";
+    } else {
+        alert(dados.mensagem);
+    }
+});
+
+document.getElementById("registerForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const nome = document.getElementById("registerName").value;
+    const email = document.getElementById("registerEmail").value;
+    const senha = document.getElementById("registerPassword").value;
+    const confirmar = document.getElementById("registerConfirmPassword").value;
+
+    if (senha !== confirmar) {
+        alert("As senhas não coincidem!");
+        return;
+    }
+
+    const resposta = await fetch("http://localhost:5000/api/registro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome, email, senha }),
+    });
+    const dados = await resposta.json();
+    alert(dados.mensagem);
+});
+</script>
+
+<script>
+async function carregarGaleriasReais() {
+    const container = document.getElementById('galeriasReais');
+    container.innerHTML = '<p class="col-span-4 text-center text-gray-500">Carregando galerias...</p>';
+    try {
+        const res = await fetch('/api/galerias_publicas');
+        const galerias = await res.json();
+        if (galerias.length === 0) {
+            container.innerHTML = '<p class="col-span-4 text-center text-gray-500">Nenhuma galeria pública encontrada.</p>';
+            return;
+        }
+        container.innerHTML = '';
+        galerias.forEach(galeria => {
+            container.innerHTML += `
+            <div class="gallery-item bg-white rounded-lg overflow-hidden shadow-md cursor-pointer">
+                <img src="${galeria.capa || 'https://via.placeholder.com/400x250?text=Sem+Imagem'}" alt="${galeria.nome}" class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <h3 class="font-semibold text-lg mb-1">${galeria.nome}</h3>
+                    <p class="text-gray-600 text-sm">${galeria.descricao || ''}</p>
+                </div>
+            </div>
+            `;
+        });
+    } catch (e) {
+        container.innerHTML = '<p class="col-span-4 text-center text-red-500">Erro ao carregar galerias.</p>';
+    }
+}
+carregarGaleriasReais();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+PassengerEnabled On
+PassengerAppRoot /home/u276112142/domains/red-llama-690371.hostingersite.com/public_html
+PassengerAppType wsgi
+PassengerStartupFile passenger_wsgi.py
+PassengerPython /home/u276112142/domains/red-llama-690371.hostingersite.com/public_html/venv/bin/python
+
+# Não servir arquivos de upload via PHP
+<FilesMatch "\.(env|py|pyc)$">
+    Order deny,allow
+    Deny from all
+</FilesMatch>

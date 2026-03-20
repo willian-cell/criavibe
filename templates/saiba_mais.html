@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre o CriaVibe - Sistema de Galerias para Fotógrafos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.2);
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #4f46e5;
+            border: 3px solid #e0e7ff;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-camera-retro text-indigo-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-900">CriaVibe</span>
+                    </a>
+                </div>
+                <div class="hidden md:ml-6 md:flex md:items-center space-x-8">
+                    <a href="{{ url_for('index') }}" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Explorar</a>
+                    <a href="{{ url_for('precos') }}" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Preços</a>
+                    <a href="{{ url_for('saiba_mais') }}" class="text-indigo-600 px-3 py-2 text-sm font-medium">Sobre</a>
+                    <button id="loginBtn" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Entrar</button>
+                    <button id="registerBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">Cadastre-se</button>
+                </div>
+                
+                <div class="-mr-2 flex items-center md:hidden">
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menu</span>
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="bg-indigo-700 text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Sobre o CriaVibe</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">Conheça nossa história, missão e a equipe por trás da plataforma que está transformando a forma como fotógrafos compartilham seu trabalho.</p>
+        </div>
+    </div>
+
+    <!-- Nossa História -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Nossa História</h2>
+            <div class="w-20 h-1 bg-indigo-600 mx-auto"></div>
+        </div>
+        
+        <div class="relative pl-12">
+            <!-- Timeline -->
+            <div class="border-l-2 border-indigo-200 absolute left-8 top-0 bottom-0"></div>
+            
+            <div class="relative mb-12 timeline-item">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">2018 - A Ideia</h3>
+                    <p class="text-gray-600">Tudo começou quando nosso fundador, um fotógrafo profissional, percebeu a dificuldade que muitos colegas tinham em compartilhar seus trabalhos de forma profissional e organizada com clientes.</p>
+                </div>
+            </div>
+            
+            <div class="relative mb-12 timeline-item">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">2019 - Primeiro Protótipo</h3>
+                    <p class="text-gray-600">Desenvolvemos a primeira versão da plataforma, focada em resolver os principais problemas identificados na pesquisa com fotógrafos.</p>
+                </div>
+            </div>
+            
+            <div class="relative mb-12 timeline-item">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">2020 - Lançamento Oficial</h3>
+                    <p class="text-gray-600">Após um ano de testes com fotógrafos beta testers, lançamos oficialmente o CriaVibe para o público, com recursos aprimorados e feedback dos usuários.</p>
+                </div>
+            </div>
+            
+            <div class="relative timeline-item">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">2023 - Plataforma Consolidadada</h3>
+                    <p class="text-gray-600">Hoje, servimos mais de 10.000 fotógrafos em todo o país, com novas funcionalidades sendo adicionadas constantemente para melhor atender nossa comunidade.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nossa Missão -->
+    <div class="bg-gray-100 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Nossa Missão</h2>
+                <div class="w-20 h-1 bg-indigo-600 mx-auto"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Empoderar fotógrafos através da tecnologia</h3>
+                    <p class="text-gray-600 mb-6">Acreditamos que todo fotógrafo merece ferramentas profissionais para exibir e compartilhar seu trabalho, independente do seu nível de experiência ou tamanho do seu negócio.</p>
+                    <p class="text-gray-600">Nosso objetivo é simplificar o processo de entrega de fotos para clientes, permitindo que você se concentre no que realmente importa: capturar momentos incríveis.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Fotógrafo trabalhando" class="w-full rounded-md">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recursos Destaque -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Recursos em Destaque</h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Conheça algumas das funcionalidades que fazem do CriaVibe a escolha preferida dos fotógrafos</p>
+            <div class="w-20 h-1 bg-indigo-600 mx-auto mt-4"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                <div class="text-indigo-600 text-4xl mb-4">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Controle Total de Acesso</h3>
+                <p class="text-gray-600">Defina galerias públicas, privadas ou protegidas por senha. Controle exatamente quem pode ver cada conjunto de fotos.</p>
+            </div>
+            
+            <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                <div class="text-indigo-600 text-4xl mb-4">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Vendas Integradas</h3>
+                <p class="text-gray-600">Ofereça impressões e downloads digitais diretamente de suas galerias, com pagamentos seguros e relatórios detalhados.</p>
+            </div>
+            
+            <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                <div class="text-indigo-600 text-4xl mb-4">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Experiência Mobile</h3>
+                <p class="text-gray-600">Galerias otimizadas para qualquer dispositivo, garantindo que seus clientes tenham a melhor experiência em smartphones e tablets.</p>
+            </div>
+            
+            <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                <div class="text-indigo-600 text-4xl mb-4">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Análises Detalhadas</h3>
+                <p class="text-gray-600">Acompanhe visualizações, downloads e engajamento com relatórios que ajudam você a entender seu público.</p>
+            </div>
+            
+            <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                <div class="text-indigo-600 text-4xl mb-4">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Personalização</h3>
+                <p class="text-gray-600">Adapte o visual das suas galerias para combinar com sua marca, com opções de cores, logos e layouts exclusivos.</p>
+            </div>
+            
+            <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                <div class="text-indigo-600 text-4xl mb-4">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Upload em Massa</h3>
+                <p class="text-gray-600">Envie centenas de fotos de uma só vez, com processamento em segundo plano e suporte a arquivos RAW.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Equipe -->
+    <div class="bg-gray-100 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Conheça Nossa Equipe</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Profissionais apaixonados por fotografia e tecnologia</p>
+                <div class="w-20 h-1 bg-indigo-600 mx-auto mt-4"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="bg-white rounded-lg overflow-hidden shadow-md text-center p-6">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Fundador" class="w-32 h-32 rounded-full mx-auto mb-4">
+                    <h3 class="font-bold text-xl mb-1">Carlos Mendes</h3>
+                    <p class="text-indigo-600 mb-3">Fundador & CEO</p>
+                    <p class="text-gray-600 text-sm">Fotógrafo profissional há 12 anos, criou o CriaVibe para resolver problemas que enfrentava no dia a dia.</p>
+                </div>
+                
+                <div class="bg-white rounded-lg overflow-hidden shadow-md text-center p-6">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="CTO" class="w-32 h-32 rounded-full mx-auto mb-4">
+                    <h3 class="font-bold text-xl mb-1">Ana Souza</h3>
+                    <p class="text-indigo-600 mb-3">CTO</p>
+                    <p class="text-gray-600 text-sm">Especialista em desenvolvimento web com mais de 15 anos de experiência em plataformas de mídia.</p>
+                </div>
+                
+                <div class="bg-white rounded-lg overflow-hidden shadow-md text-center p-6">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Designer" class="w-32 h-32 rounded-full mx-auto mb-4">
+                    <h3 class="font-bold text-xl mb-1">Juliana Lima</h3>
+                    <p class="text-indigo-600 mb-3">Designer Chefe</p>
+                    <p class="text-gray-600 text-sm">Responsável pela experiência do usuário, garantindo que cada interação seja intuitiva e agradável.</p>
+                </div>
+                
+                <div class="bg-white rounded-lg overflow-hidden shadow-md text-center p-6">
+                    <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Suporte" class="w-32 h-32 rounded-full mx-auto mb-4">
+                    <h3 class="font-bold text-xl mb-1">Ricardo Alves</h3>
+                    <p class="text-indigo-600 mb-3">Gerente de Suporte</p>
+                    <p class="text-gray-600 text-sm">Líder da equipe que garante que todas as suas dúvidas sejam respondidas rapidamente.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Valores -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Nossos Valores</h2>
+            <div class="w-20 h-1 bg-indigo-600 mx-auto"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <div class="text-indigo-600 text-4xl mb-4">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Paixão pela Fotografia</h3>
+                <p class="text-gray-600">Acreditamos no poder das imagens para contar histórias e preservar memórias. Nossa plataforma é feita por quem ama fotografia.</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <div class="text-indigo-600 text-4xl mb-4">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Inovação Constante</h3>
+                <p class="text-gray-600">Estamos sempre buscando novas formas de melhorar nossa plataforma e surpreender nossos usuários.</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <div class="text-indigo-600 text-4xl mb-4">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-2">Suporte Excepcional</h3>
+                <p class="text-gray-600">Nosso time está sempre pronto para ajudar, com respostas rápidas e soluções personalizadas para suas necessidades.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="bg-indigo-700 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Pronto para transformar sua forma de compartilhar fotos?</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">Junte-se a milhares de fotógrafos profissionais que já usam o CriaVibe.</p>
+            <button id="ctaRegisterBtn" class="bg-white text-indigo-700 px-8 py-3 rounded-md text-lg font-medium hover:bg-gray-100">Experimente grátis</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">CriaVibe</h3>
+                    <p class="text-gray-400">A plataforma perfeita para fotógrafos compartilharem seu trabalho com o mundo.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Recursos</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Galerias</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacidade</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Vendas</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Clientes</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Empresa</h3>
+                    <ul class="space-y-2">
+                        <li><a href="saiba_mais.html" class="text-gray-400 hover:text-white">Sobre</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Carreiras</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contato</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Redes Sociais</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white text-xl"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white text-xl"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white text-xl"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white text-xl"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 CriaVibe. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mesmo script do modal de login/registro do index.html pode ser adicionado aqui
+        document.getElementById("ctaRegisterBtn").addEventListener("click", function() {
+            window.location.href = "index.html#register";
+        });
+    </script>
+</body>
+</html>

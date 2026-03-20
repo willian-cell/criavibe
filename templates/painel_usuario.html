@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Usuário - CriaVibe</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f6fa; }
+        .container { max-width: 700px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px; }
+        h1 { color: #3b2dd6; }
+        .user-info { margin-bottom: 24px; }
+        .galerias-list { list-style: none; padding: 0; }
+        .galerias-list li { background: #f0f0ff; margin-bottom: 10px; padding: 12px 16px; border-radius: 5px; }
+        .logout { display: inline-block; margin-top: 24px; color: #fff; background: #3b2dd6; padding: 8px 18px; border-radius: 4px; text-decoration: none; }
+        .logout:hover { background: #2a1fa0; }
+        .alert-success { background: #d1fae5; color: #065f46; padding:10px; margin-bottom:10px; border-radius:4px; }
+        .alert-error { background: #fee2e2; color: #991b1b; padding:10px; margin-bottom:10px; border-radius:4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div>
+              {% for category, message in messages %}
+                <div class="alert-{{ category }}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        <!-- Menu dinâmico -->
+        <nav style="margin-bottom: 24px;">
+            <ul style="display: flex; gap: 18px; list-style: none; padding: 0;">
+                <li><a href="/painel_usuario">Dashboard</a></li>
+                <li><a href="/galerias">Galerias</a></li>
+                {% if usuario.tipo in ['fotografo', 'admin'] %}
+                    <li><a href="/nova_galeria">Nova Galeria</a></li>
+                    <li><a href="/configuracoes">Configurações</a></li>
+                {% endif %}
+                {% if usuario.tipo == 'admin' %}
+                    <li><a href="/admin/usuarios">Gerenciar Usuários</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        <h1>Bem-vindo, {{ usuario.nome }}!</h1>
+        <div class="user-info">
+            <p><strong>Email:</strong> {{ usuario.email }}</p>
+            <p><strong>Tipo de usuário:</strong> {{ usuario.tipo|capitalize }}</p>
+        </div>
+        <hr>
+        <h2>Minhas Galerias</h2>
+        {% if galerias and galerias|length > 0 %}
+            <ul class="galerias-list">
+                {% for galeria in galerias %}
+                    <li>
+                        <strong>{{ galeria.nome }}</strong><br>
+                        <small>{{ galeria.descricao or 'Sem descrição' }}</small><br>
+                        <small>Privacidade: {{ galeria.privacidade|capitalize }}</small><br>
+                        <small>Criada em: {{ galeria.data_criacao.strftime('%d/%m/%Y') if galeria.data_criacao else 'N/A' }}</small><br>
+                        <small>Fotos: {{ galeria.imagens|length if galeria.imagens else 0 }}</small>
+                        <div style="display: flex; gap: 8px; margin: 8px 0;">
+                            {% for img in galeria.imagens[:3] %}
+                                <img src="{{ img.caminho_arquivo }}" alt="{{ img.titulo }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                            {% endfor %}
+                        </div>
+                        {% if usuario.tipo in ['fotografo', 'admin'] %}
+                            <a href="/galeria/{{ galeria.id }}/editar">Editar</a> |
+                            <a href="/galeria/{{ galeria.id }}/adicionar_imagem">Adicionar Imagem</a> |
+                            <a href="/galeria/{{ galeria.id }}/excluir" onclick="return confirm('Tem certeza?')">Excluir</a>
+                        {% endif %}
+                        {% if usuario.tipo == 'comum' %}
+                            <a href="/galeria/{{ galeria.id }}">Ver Galeria</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Você ainda não possui galerias.</p>
+        {% endif %}
+        <a class="logout" href="{{ url_for('logout') }}">Sair</a>
+    </div>
+</body>
+</html>

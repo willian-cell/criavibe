@@ -1,0 +1,12 @@
+# Configurações do Banco de Dados
+DB_USER=root
+DB_PASSWORD=98050771
+DB_HOST=localhost
+DB_NAME=criavibe
+
+# Configurações de Segurança
+SECRET_KEY=sua_chave_secreta_muito_forte_aqui
+
+# Configurações do Flask
+FLASK_ENV=development
+FLASK_DEBUG=True 
