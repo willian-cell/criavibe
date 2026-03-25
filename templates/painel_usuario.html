@@ -1,85 +1,189 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Painel do Usuário - CriaVibe</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <style>
-        body { font-family: Arial, sans-serif; background: #f5f6fa; }
-        .container { max-width: 700px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px; }
-        h1 { color: #3b2dd6; }
-        .user-info { margin-bottom: 24px; }
-        .galerias-list { list-style: none; padding: 0; }
-        .galerias-list li { background: #f0f0ff; margin-bottom: 10px; padding: 12px 16px; border-radius: 5px; }
-        .logout { display: inline-block; margin-top: 24px; color: #fff; background: #3b2dd6; padding: 8px 18px; border-radius: 4px; text-decoration: none; }
-        .logout:hover { background: #2a1fa0; }
-        .alert-success { background: #d1fae5; color: #065f46; padding:10px; margin-bottom:10px; border-radius:4px; }
-        .alert-error { background: #fee2e2; color: #991b1b; padding:10px; margin-bottom:10px; border-radius:4px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Minhas Galerias — CriaVibe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/dashboard.css">
 </head>
 <body>
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div>
-              {% for category, message in messages %}
-                <div class="alert-{{ category }}">
-                  {{ message }}
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-        <!-- Menu dinâmico -->
-        <nav style="margin-bottom: 24px;">
-            <ul style="display: flex; gap: 18px; list-style: none; padding: 0;">
-                <li><a href="/painel_usuario">Dashboard</a></li>
-                <li><a href="/galerias">Galerias</a></li>
-                {% if usuario.tipo in ['fotografo', 'admin'] %}
-                    <li><a href="/nova_galeria">Nova Galeria</a></li>
-                    <li><a href="/configuracoes">Configurações</a></li>
-                {% endif %}
-                {% if usuario.tipo == 'admin' %}
-                    <li><a href="/admin/usuarios">Gerenciar Usuários</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-        <h1>Bem-vindo, {{ usuario.nome }}!</h1>
-        <div class="user-info">
-            <p><strong>Email:</strong> {{ usuario.email }}</p>
-            <p><strong>Tipo de usuário:</strong> {{ usuario.tipo|capitalize }}</p>
-        </div>
-        <hr>
-        <h2>Minhas Galerias</h2>
-        {% if galerias and galerias|length > 0 %}
-            <ul class="galerias-list">
-                {% for galeria in galerias %}
-                    <li>
-                        <strong>{{ galeria.nome }}</strong><br>
-                        <small>{{ galeria.descricao or 'Sem descrição' }}</small><br>
-                        <small>Privacidade: {{ galeria.privacidade|capitalize }}</small><br>
-                        <small>Criada em: {{ galeria.data_criacao.strftime('%d/%m/%Y') if galeria.data_criacao else 'N/A' }}</small><br>
-                        <small>Fotos: {{ galeria.imagens|length if galeria.imagens else 0 }}</small>
-                        <div style="display: flex; gap: 8px; margin: 8px 0;">
-                            {% for img in galeria.imagens[:3] %}
-                                <img src="{{ img.caminho_arquivo }}" alt="{{ img.titulo }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
-                            {% endfor %}
-                        </div>
-                        {% if usuario.tipo in ['fotografo', 'admin'] %}
-                            <a href="/galeria/{{ galeria.id }}/editar">Editar</a> |
-                            <a href="/galeria/{{ galeria.id }}/adicionar_imagem">Adicionar Imagem</a> |
-                            <a href="/galeria/{{ galeria.id }}/excluir" onclick="return confirm('Tem certeza?')">Excluir</a>
-                        {% endif %}
-                        {% if usuario.tipo == 'comum' %}
-                            <a href="/galeria/{{ galeria.id }}">Ver Galeria</a>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Você ainda não possui galerias.</p>
-        {% endif %}
-        <a class="logout" href="{{ url_for('logout') }}">Sair</a>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a class="topnav-logo" href="/">✦ CriaVibe</a>
+  <div class="topnav-spacer"></div>
+  <div class="topnav-user">
+    Olá, <strong>{{ usuario.nome }}</strong>
+    <span class="topnav-logout" onclick="logout()">Sair</span>
+  </div>
+</nav>
+
+<!-- FLASH -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for cat, msg in messages %}
+      <div class="flash flash-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<!-- LAYOUT -->
+<div class="painel-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="painel-sidebar">
+    <h3>Menu</h3>
+    <a class="painel-sidebar-link active" href="{{ url_for('painel_usuario') }}">
+      🖼️ Minhas Galerias
+    </a>
+    {% if usuario.tipo in ['fotografo', 'admin'] %}
+    <a class="painel-sidebar-link" href="{{ url_for('nova_galeria') }}">
+      ➕ Nova Galeria
+    </a>
+    {% endif %}
+    <a class="painel-sidebar-link" href="{{ url_for('configuracoes') }}">
+      ⚙️ Configurações
+    </a>
+    {% if usuario.tipo == 'admin' %}
+    <a class="painel-sidebar-link" href="{{ url_for('admin_usuarios') }}">
+      👥 Usuários
+    </a>
+    {% endif %}
+  </aside>
+
+  <!-- MAIN -->
+  <main class="painel-main">
+
+    <!-- HEADER -->
+    <div class="painel-header">
+      <h2 style="font-size:1.3rem;font-weight:700;">Minhas Galerias</h2>
+      {% if usuario.tipo in ['fotografo', 'admin'] %}
+      <a class="btn-primary" href="{{ url_for('nova_galeria') }}">
+        ＋ Criar Nova Galeria
+      </a>
+      {% endif %}
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Procurar galeria...">
+      </div>
     </div>
+
+    <!-- TABELA DE GALERIAS -->
+    {% if galerias %}
+    <div class="galleries-table">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:70px;">Capa</th>
+            <th>Galeria</th>
+            <th>Nº de fotos</th>
+            <th>Entrega em Alta</th>
+            <th>Seleção de Fotos</th>
+            <th style="width:60px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="galeriasTable">
+          {% for g in galerias %}
+          <tr class="galeria-row" data-nome="{{ g.nome | lower }}">
+            <td>
+              {% if g.thumb %}
+                <img class="gallery-thumb" src="{{ g.thumb }}" alt="{{ g.nome }}">
+              {% else %}
+                <div class="gallery-thumb-empty">📷</div>
+              {% endif %}
+            </td>
+            <td>
+              <a class="gallery-name" href="{{ url_for('gerenciar_galeria', galeria_id=g.id) }}">
+                {{ g.nome }}
+              </a>
+              <div class="gallery-count">{{ g.descricao or 'Sem descrição' }}</div>
+            </td>
+            <td>
+              <span style="font-weight:600;">{{ g.total_fotos or 0 }}</span>
+              <span style="color:var(--text-muted);font-size:.8rem;"> fotos</span>
+            </td>
+            <td>
+              {% if g.entrega_em_alta %}
+                <span class="badge badge-ativo">● Ativo</span>
+              {% else %}
+                <span class="badge badge-inativo">Inativo</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if g.selecao_fotos %}
+                <span class="badge badge-ativo">● Ativo</span>
+              {% else %}
+                <span class="badge badge-inativo">Inativo</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="actions-menu">
+                <button class="actions-btn" onclick="toggleMenu(this)">⋮</button>
+                <div class="actions-dropdown">
+                  <a href="{{ url_for('gerenciar_galeria', galeria_id=g.id) }}">📁 Gerenciar</a>
+                  <a href="{{ url_for('editar_galeria', galeria_id=g.id) }}">✏️ Editar</a>
+                  {% if usuario.tipo in ['fotografo', 'admin'] %}
+                  <form method="POST" action="{{ url_for('excluir_galeria', galeria_id=g.id) }}"
+                        onsubmit="return confirm('Excluir galeria e todas as fotos?')">
+                    <button type="submit" class="danger">🗑️ Excluir</button>
+                  </form>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% else %}
+    <div class="empty-state" style="background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:80px 20px;">
+      <div class="icon">🖼️</div>
+      <h3>Nenhuma galeria ainda</h3>
+      <p>Crie sua primeira galeria de fotos e compartilhe com seus clientes.</p>
+      {% if usuario.tipo in ['fotografo', 'admin'] %}
+      <a class="btn-primary" href="{{ url_for('nova_galeria') }}" style="margin-top:8px;">
+        ＋ Criar Primeira Galeria
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </main>
+</div>
+
+<script>
+  // Fechar menus ao clicar fora
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.actions-menu')) {
+      document.querySelectorAll('.actions-dropdown.open').forEach(d => d.classList.remove('open'));
+    }
+  });
+
+  function toggleMenu(btn) {
+    const dd = btn.nextElementSibling;
+    const wasOpen = dd.classList.contains('open');
+    document.querySelectorAll('.actions-dropdown.open').forEach(d => d.classList.remove('open'));
+    if (!wasOpen) dd.classList.add('open');
+  }
+
+  // Busca em tempo real
+  document.getElementById('searchInput').addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    document.querySelectorAll('.galeria-row').forEach(row => {
+      const nome = row.dataset.nome || '';
+      row.style.display = nome.includes(q) ? '' : 'none';
+    });
+  });
+
+  // Logout
+  function logout() {
+    fetch('/api/logout').then(() => window.location.href = '/');
+  }
+</script>
+
 </body>
 </html>

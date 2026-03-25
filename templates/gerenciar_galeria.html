@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ galeria.nome }} — CriaVibe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a class="topnav-logo" href="/">✦ CriaVibe</a>
+  <span style="color:var(--text-muted);font-size:.8rem;margin-left:8px;">Gallery PRO</span>
+  <div class="topnav-spacer"></div>
+  <div class="topnav-user">
+    <span style="font-size:.8rem;color:var(--text-muted);">{{ usuario.nome }}</span>
+    <span class="topnav-logout" onclick="logout()">Sair</span>
+  </div>
+</nav>
+
+<!-- FLASH -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for cat, msg in messages %}
+      <div class="flash flash-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<!-- LAYOUT MANAGER -->
+<div class="manager-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="manager-sidebar">
+    <!-- CAPA -->
+    {% if galeria.capa_url %}
+    <div class="manager-cover" onclick="document.getElementById('capaModal').classList.add('open')">
+      <img src="{{ galeria.capa_url }}" alt="Capa">
+      <div class="manager-cover-label">Alterar Foto de Capa</div>
+    </div>
+    {% else %}
+    <div class="manager-cover-empty" onclick="document.getElementById('capaModal').classList.add('open')">
+      <span style="font-size:2rem;">📷</span>
+      <span>Alterar Foto de Capa</span>
+    </div>
+    {% endif %}
+
+    <!-- NAVEGAÇÃO -->
+    <nav class="manager-nav">
+      <a class="manager-nav-item {% if secao=='fotos' %}active{% endif %}"
+         href="{{ url_for('gerenciar_galeria', galeria_id=galeria.id) }}">
+        🖼️ Fotos
+        <span class="nav-badge off" style="background:none;color:var(--text-muted);">{{ galeria.total_fotos or 0 }}</span>
+      </a>
+      <a class="manager-nav-item {% if secao=='entrega' %}active{% endif %}"
+         href="{{ url_for('galeria_entrega', galeria_id=galeria.id) }}">
+        ⬇️ Entrega em Alta
+        <span class="nav-badge {% if galeria.entrega_em_alta %}on{% else %}off{% endif %}">
+          {% if galeria.entrega_em_alta %}ON{% else %}OFF{% endif %}
+        </span>
+      </a>
+      <a class="manager-nav-item {% if secao=='selecao' %}active{% endif %}"
+         href="{{ url_for('galeria_selecao_config', galeria_id=galeria.id) }}">
+        ★ Seleção de Fotos
+        <span class="nav-badge {% if galeria.selecao_fotos %}on{% else %}off{% endif %}">
+          {% if galeria.selecao_fotos %}ON{% else %}OFF{% endif %}
+        </span>
+      </a>
+      <a class="manager-nav-item {% if secao=='config' %}active{% endif %}"
+         href="{{ url_for('galeria_configuracoes', galeria_id=galeria.id) }}">
+        ⚙️ Configurações
+      </a>
+    </nav>
+
+    <!-- BREADCRUMB SIDEBAR -->
+    <div style="padding:12px 16px;border-top:1px solid var(--border);">
+      <a href="{{ url_for('painel_usuario') }}" style="font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
+        ← Minhas Galerias
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <div class="manager-content">
+
+    <!-- ═══════════════ SEÇÃO: FOTOS ═══════════════ -->
+    {% if secao == 'fotos' %}
+
+    <!-- TOPBAR -->
+    <div class="manager-topbar">
+      <span class="manager-tab active">{{ galeria.nome }}</span>
+      <div style="color:var(--text-muted);font-size:.8rem;padding:0 10px;">/ Fotos</div>
+      <div class="manager-spacer"></div>
+    </div>
+
+    <div class="manager-body">
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="{{ url_for('painel_usuario') }}">Minhas Galerias</a>
+        <span>/</span>
+        <span>{{ galeria.nome }}</span>
+        <span>/</span>
+        <span>Fotos</span>
+      </div>
+
+      <!-- UPLOAD INPUT OCULTO -->
+      <input type="file" id="uploadInput" name="imagens" multiple
+             accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+             style="display:none" onchange="iniciarUpload()">
+
+      <!-- BARRA DE PROGRESSO -->
+      <div class="upload-progress" id="uploadProgress">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <span id="uploadProgressTitle" style="font-size:.875rem;font-weight:600;">Subindo fotos…</span>
+          <span id="uploadPerc" style="font-size:.8rem;color:var(--text-muted);">0%</span>
+        </div>
+        <div class="upload-progress-bar-bg">
+          <div class="upload-progress-bar-fill" id="uploadBar"></div>
+        </div>
+        <div class="upload-progress-info">
+          <span id="uploadCount">0/0</span>
+          <span id="uploadSize">0 MB / 0 MB</span>
+        </div>
+      </div>
+
+      <!-- TOOLBAR DE FOTOS -->
+      <div class="photos-toolbar">
+        <button class="btn-primary" onclick="document.getElementById('uploadInput').click()">
+          ⬆️ Subir Fotos
+        </button>
+        <button class="btn-secondary" onclick="document.getElementById('ordenacaoModal').classList.add('open')">
+          ⇅ Ordenação
+        </button>
+        <button class="btn-secondary" onclick="selecionarTodas()">
+          ☑ Selecionar Todas
+        </button>
+        {% if galeria.total_fotos and galeria.total_fotos > 0 %}
+        <span style="margin-left:auto;font-size:.8rem;color:var(--text-muted);">
+          Total de <strong>{{ galeria.total_fotos }}</strong> foto(s)
+        </span>
+        {% endif %}
+      </div>
+
+      <!-- GRID DE FOTOS -->
+      {% if imagens %}
+      <div class="photos-grid" id="photosGrid">
+        {% for img in imagens %}
+        <div class="photo-card {% if img.selecionada %}selecionada{% endif %}" data-id="{{ img.id }}">
+          <input type="checkbox" class="photo-card-check" style="position:absolute;top:8px;left:8px;width:16px;height:16px;accent-color:var(--primary);z-index:2;">
+          <img src="{{ img.caminho_arquivo }}" alt="{{ img.nome_arquivo }}"
+               loading="lazy" onclick="abrirImagem('{{ img.caminho_arquivo }}')">
+          <div class="photo-card-actions">
+            <button class="photo-action-btn" title="Definir como capa"
+                    onclick="definirCapa('{{ img.caminho_arquivo }}')">🖼</button>
+            <form method="POST" action="{{ url_for('excluir_imagem', imagem_id=img.id) }}"
+                  style="display:inline" onsubmit="return confirm('Excluir esta foto?')">
+              <button type="submit" class="photo-action-btn danger" title="Excluir">🗑</button>
+            </form>
+          </div>
+          <div class="photo-card-label">{{ img.nome_arquivo }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div class="icon">📷</div>
+        <h3>Sem fotos ainda</h3>
+        <p>Clique em "Subir Fotos" para adicionar imagens a esta galeria.</p>
+        <button class="btn-primary" onclick="document.getElementById('uploadInput').click()" style="margin-top:8px;">
+          ⬆️ Subir Fotos
+        </button>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ═══════════════ SEÇÃO: ENTREGA EM ALTA ═══════════════ -->
+    {% elif secao == 'entrega' %}
+    <div class="manager-topbar">
+      <span class="manager-tab active">{{ galeria.nome }}</span>
+      <div style="color:var(--text-muted);font-size:.8rem;padding:0 10px;">/ Entrega em Alta</div>
+    </div>
+    <div class="manager-body">
+      <div class="breadcrumb">
+        <a href="{{ url_for('painel_usuario') }}">Minhas Galerias</a>
+        <span>/</span><span>{{ galeria.nome }}</span><span>/</span>
+        <span>Entrega em Alta</span>
+      </div>
+      <div class="info-box">
+        <span style="font-size:1.2rem;">ℹ️</span>
+        <span>Para download serão disponibilizadas as fotos originais enviadas por você, sem nenhuma redução de tamanho, marca d'água ou carimbo de cópia não autorizada.</span>
+      </div>
+      <div class="config-card">
+        <h3>Configurações de Download</h3>
+        <p>Controle o que seus clientes podem baixar desta galeria.</p>
+        <div class="config-row">
+          <div>
+            <div class="config-row-label">Ativar Entrega em Alta</div>
+            <div class="config-row-desc">Habilita o módulo de download para esta galeria</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-entrega"
+                   {% if galeria.entrega_em_alta %}checked{% endif %}
+                   onchange="toggleField('entrega_em_alta', this)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="config-row">
+          <div>
+            <div class="config-row-label">Permitir download de fotos individuais</div>
+            <div class="config-row-desc">O seu cliente poderá fazer o download das fotos individualmente.</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-individual"
+                   {% if galeria.download_individual %}checked{% endif %}
+                   onchange="toggleField('download_individual', this)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="config-row">
+          <div>
+            <div class="config-row-label">Permitir download de todas as fotos</div>
+            <div class="config-row-desc">O sistema irá gerar automaticamente um arquivo ZIP com todas as fotos e disponibilizar para o seu cliente fazer o download.</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-all"
+                   {% if galeria.download_all %}checked{% endif %}
+                   onchange="toggleField('download_all', this)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ SEÇÃO: SELEÇÃO ═══════════════ -->
+    {% elif secao == 'selecao' %}
+    <div class="manager-topbar">
+      <span class="manager-tab active">{{ galeria.nome }}</span>
+      <div style="color:var(--text-muted);font-size:.8rem;padding:0 10px;">/ Seleção de Fotos</div>
+    </div>
+    <div class="manager-body">
+      <div class="breadcrumb">
+        <a href="{{ url_for('painel_usuario') }}">Minhas Galerias</a>
+        <span>/</span><span>{{ galeria.nome }}</span><span>/</span>
+        <span>Seleção de Fotos</span>
+      </div>
+      <div class="config-card">
+        <h3>Seleção de Fotos pelo Cliente</h3>
+        <p>Permita que seus clientes marquem as fotos favoritas diretamente na galeria.</p>
+        <div class="config-row">
+          <div>
+            <div class="config-row-label">Ativar Seleção de Fotos</div>
+            <div class="config-row-desc">O cliente poderá marcar as fotos preferidas com ★</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-selecao"
+                   {% if galeria.selecao_fotos %}checked{% endif %}
+                   onchange="toggleField('selecao_fotos', this)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ SEÇÃO: CONFIGURAÇÕES ═══════════════ -->
+    {% elif secao == 'config' %}
+    <div class="manager-topbar">
+      <span class="manager-tab active">{{ galeria.nome }}</span>
+      <div style="color:var(--text-muted);font-size:.8rem;padding:0 10px;">/ Configurações</div>
+    </div>
+    <div class="manager-body">
+      <div class="breadcrumb">
+        <a href="{{ url_for('painel_usuario') }}">Minhas Galerias</a>
+        <span>/</span><span>{{ galeria.nome }}</span><span>/</span>
+        <span>Configurações</span>
+      </div>
+      <div class="config-card">
+        <h3>Editar Galeria</h3>
+        <p>Atualize as informações e privacidade da galeria.</p>
+        <a class="btn-primary" href="{{ url_for('editar_galeria', galeria_id=galeria.id) }}">
+          ✏️ Editar Informações
+        </a>
+      </div>
+      <div class="config-card" style="margin-top:0">
+        <h3 style="color:var(--primary);">Zona de Perigo</h3>
+        <p>Excluir a galeria remove permanentemente todas as fotos.</p>
+        <form method="POST" action="{{ url_for('excluir_galeria', galeria_id=galeria.id) }}"
+              onsubmit="return confirm('ATENÇÃO: Excluir a galeria e TODAS as fotos permanentemente?')">
+          <button type="submit" class="btn-primary" style="background:#dc2626;">
+            🗑️ Excluir Galeria
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+
+  </div><!-- /manager-content -->
+</div><!-- /manager-layout -->
+
+<!-- ═══ MODAL DE CAPA ═══ -->
+<div class="modal-backdrop" id="capaModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Foto de Capa</h3>
+      <button class="modal-close" onclick="document.getElementById('capaModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.875rem;color:var(--text-muted);margin-bottom:16px;">
+        Clique em qualquer foto na galeria e use o ícone 🖼 para defini-la como capa.
+      </p>
+      <button class="btn-secondary" onclick="document.getElementById('capaModal').classList.remove('open')" style="width:100%;">
+        Fechar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL DE ORDENAÇÃO ═══ -->
+<div class="modal-backdrop" id="ordenacaoModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Ordenar por</h3>
+      <button class="modal-close" onclick="document.getElementById('ordenacaoModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      {% set ordem_opts = [
+        ('ordem',      'Numeração da foto [0-9]'),
+        ('ordem_desc', 'Numeração da foto [9-0]'),
+        ('data_asc',   'Data do upload [A-Z]'),
+        ('data_desc',  'Data do upload [Z-A]'),
+        ('nome_asc',   'Nome do arquivo [A-Z]'),
+        ('nome_desc',  'Nome do arquivo [Z-A]'),
+      ] %}
+      {% for val, label in ordem_opts %}
+      <label class="modal-option {% if ordem_atual == val %}selected{% endif %}"
+             onclick="aplicarOrdem('{{ val }}')">
+        <input type="radio" name="ordem" value="{{ val }}" {% if ordem_atual == val %}checked{% endif %}>
+        {{ label }}
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LIGHTBOX SIMPLES ═══ -->
+<div id="lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:999;align-items:center;justify-content:center;cursor:zoom-out;"
+     onclick="document.getElementById('lightbox').style.display='none'">
+  <img id="lightboxImg" src="" style="max-width:90vw;max-height:90vh;border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,.6);">
+</div>
+
+<script>
+const GALERIA_ID = {{ galeria.id }};
+
+// ── Upload assíncrono ──────────────────────────────
+function iniciarUpload() {
+  const input = document.getElementById('uploadInput');
+  const files = Array.from(input.files);
+  if (!files.length) return;
+
+  const prog = document.getElementById('uploadProgress');
+  const bar  = document.getElementById('uploadBar');
+  const perc = document.getElementById('uploadPerc');
+  const cnt  = document.getElementById('uploadCount');
+  const sz   = document.getElementById('uploadSize');
+
+  prog.classList.add('visible');
+  let done = 0, errors = 0;
+  const total = files.length;
+  const totalBytes = files.reduce((s, f) => s + f.size, 0);
+  let doneBytes = 0;
+
+  async function uploadNext(idx) {
+    if (idx >= total) {
+      setTimeout(() => {
+        prog.classList.remove('visible');
+        window.location.reload();
+      }, 800);
+      return;
+    }
+    const file = files[idx];
+    const fd = new FormData();
+    fd.append('imagem', file);
+    try {
+      const resp = await fetch(`/api/galeria/${GALERIA_ID}/upload_async`, {method:'POST', body: fd});
+      const json = await resp.json();
+      if (json.status !== 'ok') errors++;
+    } catch {
+      errors++;
+    }
+    done++;
+    doneBytes += file.size;
+    const pct = Math.round((done / total) * 100);
+    bar.style.width = pct + '%';
+    perc.textContent = pct + '%';
+    cnt.textContent = `${done}/${total}`;
+    sz.textContent = `${(doneBytes/1048576).toFixed(1)} MB / ${(totalBytes/1048576).toFixed(1)} MB`;
+    uploadNext(idx + 1);
+  }
+
+  uploadNext(0);
+  input.value = '';
+}
+
+// ── Ordenação ──────────────────────────────────────
+function aplicarOrdem(val) {
+  document.getElementById('ordenacaoModal').classList.remove('open');
+  window.location.href = `?ordem=${val}`;
+}
+
+// ── Selecionar todas ───────────────────────────────
+function selecionarTodas() {
+  document.querySelectorAll('.photo-card-check').forEach(cb => cb.checked = true);
+}
+
+// ── Definir capa ───────────────────────────────────
+function definirCapa(url) {
+  fetch(`/api/galeria/${GALERIA_ID}/capa`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({url: url})
+  }).then(r => r.json()).then(d => {
+    if (d.status === 'ok') {
+      alert('Foto de capa definida!');
+      window.location.reload();
+    }
+  });
+}
+
+// ── Toggle ON/OFF ──────────────────────────────────
+function toggleField(campo, el) {
+  fetch(`/api/galeria/${GALERIA_ID}/toggle`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({campo: campo})
+  }).then(r => r.json()).then(d => {
+    if (!d.status) {
+      el.checked = !el.checked; // reverter se erro
+      alert('Erro ao atualizar. Tente novamente.');
+    }
+  });
+}
+
+// ── Lightbox ───────────────────────────────────────
+function abrirImagem(url) {
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lightboxImg').src = url;
+  lb.style.display = 'flex';
+}
+
+// ── Logout ─────────────────────────────────────────
+function logout() {
+  fetch('/api/logout').then(() => window.location.href = '/');
+}
+</script>
+
+</body>
+</html>

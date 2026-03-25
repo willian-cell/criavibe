@@ -1,81 +1,179 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ galeria.nome }} - Galeria | CriaVibe</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/style.css">
-    <style>
-        body { font-family: Arial, sans-serif; background: #f5f6fa; }
-        .container { max-width: 900px; margin: 24px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 24px; }
-        .galeria-header { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
-        .imagens-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
-        .img-thumb { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; box-shadow: 0 1px 4px #0002; }
-        .img-actions { margin-top: 6px; }
-        @media (max-width: 600px) {
-            .container { padding: 8px; }
-            .imagens-grid { grid-template-columns: 1fr 1fr; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>{{ galeria.nome }} — Galeria | CriaVibe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/dashboard.css">
+  <style>
+    /* Proteção extra para usuário comum */
     {% if usuario.tipo == 'comum' %}
-    <style>
-        body { -webkit-user-select: none; user-select: none; }
-        img { pointer-events: none; }
-    </style>
-    <script>
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', e => {
-            if (e.key === 'PrintScreen') {
-                e.preventDefault();
-                alert('PrintScreen desabilitado!');
-            }
-        });
-    </script>
+    body { -webkit-user-select: none; user-select: none; }
+    img  { pointer-events: none; -webkit-user-drag: none; }
     {% endif %}
+  </style>
+  {% if usuario.tipo == 'comum' %}
+  <script>
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (e.key === 'PrintScreen') { e.preventDefault(); }
+      if (e.ctrlKey && ['s','p','u'].includes(e.key)) e.preventDefault();
+    });
+  </script>
+  {% endif %}
 </head>
 <body>
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div>
-              {% for category, message in messages %}
-                <div class="alert-{{ category }}">
-                  {{ message }}
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-        <a href="/painel_usuario">&larr; Voltar</a>
-        <div class="galeria-header">
-            <h1>{{ galeria.nome }}</h1>
-            <p>{{ galeria.descricao or 'Sem descrição' }}</p>
-            <small>Privacidade: {{ galeria.privacidade|capitalize }}</small>
-            <small>Criada em: {{ galeria.data_criacao.strftime('%d/%m/%Y') if galeria.data_criacao else 'N/A' }}</small>
-            <small>Total de fotos: {{ imagens|length }}</small>
-            {% if usuario.tipo in ['fotografo', 'admin'] %}
-                <div>
-                    <a href="/galeria/{{ galeria.id }}/editar">Editar Galeria</a> |
-                    <a href="/galeria/{{ galeria.id }}/adicionar_imagem">Adicionar Imagem</a> |
-                    <a href="/galeria/{{ galeria.id }}/excluir" onclick="return confirm('Tem certeza?')">Excluir Galeria</a>
-                </div>
-            {% endif %}
-        </div>
-        <div class="imagens-grid">
-            {% for img in imagens %}
-                <div>
-                    <img class="img-thumb" src="{{ img.caminho_arquivo }}" alt="{{ img.titulo }}">
-                    <div><strong>{{ img.titulo }}</strong></div>
-                    <div>{{ img.descricao }}</div>
-                    {% if usuario.tipo in ['fotografo', 'admin'] %}
-                        <div class="img-actions">
-                            <a href="{{ img.caminho_arquivo }}" download>Baixar</a> |
-                            <a href="/imagem/{{ img.id }}/excluir" onclick="return confirm('Excluir imagem?')">Excluir</a>
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        </div>
+
+<!-- HEADER CLIENTE -->
+<div class="client-gallery">
+  <div class="client-header">
+    <div>
+      <h1>{{ galeria.nome }}</h1>
+      <p>
+        {{ galeria.descricao or '' }}
+        &nbsp;·&nbsp; {{ imagens|length }} foto(s)
+      </p>
     </div>
+    <div class="client-header-actions">
+      {% if galeria.download_all and galeria.entrega_em_alta %}
+      <a class="btn-primary" href="{{ url_for('api_download_zip', galeria_id=galeria.id) }}">
+        ⬇️ Baixar Todas (ZIP)
+      </a>
+      {% endif %}
+      {% if galeria.selecao_fotos %}
+      <button class="btn-secondary" style="color:#fff;border-color:rgba(255,255,255,.3);"
+              onclick="verSelecionadas()">
+        ★ Ver Selecionadas (<span id="totalSelecionadas">{{ imagens | selectattr('selecionada') | list | length }}</span>)
+      </button>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- FLASH -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div style="padding:12px 32px;">
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- GRID DE FOTOS -->
+  {% if imagens %}
+  <div class="client-photos" id="clientPhotosGrid">
+    {% for img in imagens %}
+    <div class="client-photo-wrap {% if img.selecionada %}selecionada{% endif %}"
+         id="wrap-{{ img.id }}" data-id="{{ img.id }}">
+      <img src="{{ img.caminho_arquivo }}" alt="{{ img.titulo or img.nome_arquivo }}" loading="lazy">
+      <div class="client-photo-overlay">
+        {% if galeria.selecao_fotos %}
+        <button class="client-photo-action {% if img.selecionada %}selected{% endif %}"
+                title="Selecionar" id="btn-sel-{{ img.id }}"
+                onclick="toggleSelecionada({{ img.id }})">★</button>
+        {% endif %}
+        {% if galeria.entrega_em_alta and galeria.download_individual %}
+        <a class="client-photo-action" href="{{ img.caminho_arquivo }}" download title="Baixar">
+          ⬇
+        </a>
+        {% endif %}
+        <button class="client-photo-action" title="Ver em tela cheia"
+                onclick="abrirLightbox('{{ img.caminho_arquivo }}')">⤢</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state" style="color:rgba(255,255,255,.5);">
+    <div class="icon">📷</div>
+    <h3 style="color:#fff;">Galeria vazia</h3>
+    <p>O fotógrafo ainda não adicionou fotos nesta galeria.</p>
+  </div>
+  {% endif %}
+
+</div><!-- /client-gallery -->
+
+<!-- LIGHTBOX -->
+<div id="lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);
+     z-index:999;align-items:center;justify-content:center;cursor:zoom-out;"
+     onclick="closeLightbox(event)">
+  <button onclick="navLightbox(-1)" style="position:absolute;left:20px;top:50%;transform:translateY(-50%);
+          background:rgba(255,255,255,.15);border:none;color:#fff;font-size:2rem;cursor:pointer;
+          padding:8px 16px;border-radius:4px;">‹</button>
+  <img id="lightboxImg" src="" style="max-width:92vw;max-height:92vh;object-fit:contain;
+       border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,.6);">
+  <button onclick="navLightbox(1)" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);
+          background:rgba(255,255,255,.15);border:none;color:#fff;font-size:2rem;cursor:pointer;
+          padding:8px 16px;border-radius:4px;">›</button>
+  <button onclick="closeLightbox()" style="position:absolute;top:16px;right:20px;
+          background:rgba(255,255,255,.15);border:none;color:#fff;font-size:1.5rem;cursor:pointer;
+          padding:4px 12px;border-radius:4px;">✕</button>
+</div>
+
+<script>
+// ── Lightbox ───────────
+const imgs = [{% for img in imagens %}'{{ img.caminho_arquivo }}',{% endfor %}];
+let lbIdx = 0;
+
+function abrirLightbox(url) {
+  lbIdx = imgs.indexOf(url);
+  document.getElementById('lightboxImg').src = url;
+  document.getElementById('lightbox').style.display = 'flex';
+}
+function closeLightbox(e) {
+  if (!e || e.target === document.getElementById('lightbox') || e.target.tagName === 'BUTTON')
+    document.getElementById('lightbox').style.display = 'none';
+}
+function navLightbox(dir) {
+  lbIdx = (lbIdx + dir + imgs.length) % imgs.length;
+  document.getElementById('lightboxImg').src = imgs[lbIdx];
+  event.stopPropagation();
+}
+document.addEventListener('keydown', e => {
+  const lb = document.getElementById('lightbox');
+  if (lb.style.display === 'flex') {
+    if (e.key === 'ArrowRight') navLightbox(1);
+    if (e.key === 'ArrowLeft')  navLightbox(-1);
+    if (e.key === 'Escape')     lb.style.display = 'none';
+  }
+});
+
+// ── Seleção de fotos ───
+let totalSel = parseInt(document.getElementById('totalSelecionadas')?.textContent || '0');
+
+function toggleSelecionada(id) {
+  fetch(`/api/imagem/${id}/selecionar`, {method:'POST'})
+    .then(r => r.json()).then(d => {
+      const wrap = document.getElementById(`wrap-${id}`);
+      const btn  = document.getElementById(`btn-sel-${id}`);
+      if (d.selecionada) {
+        wrap.classList.add('selecionada');
+        btn?.classList.add('selected');
+        totalSel++;
+      } else {
+        wrap.classList.remove('selecionada');
+        btn?.classList.remove('selected');
+        totalSel--;
+      }
+      const el = document.getElementById('totalSelecionadas');
+      if (el) el.textContent = totalSel;
+    });
+}
+
+function verSelecionadas() {
+  const grid = document.getElementById('clientPhotosGrid');
+  const wraps = grid.querySelectorAll('.client-photo-wrap');
+  const mostrandoSem = grid.dataset.filtrado === '1';
+  if (!mostrandoSem) {
+    wraps.forEach(w => { if (!w.classList.contains('selecionada')) w.style.display = 'none'; });
+    grid.dataset.filtrado = '1';
+  } else {
+    wraps.forEach(w => w.style.display = '');
+    delete grid.dataset.filtrado;
+  }
+}
+</script>
+
 </body>
-</html> 
+</html>

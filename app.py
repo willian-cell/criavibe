@@ -1,46 +1,110 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, get_flashed_messages
+from flask import (Flask, render_template, request, jsonify, session,
+                   redirect, url_for, flash, send_file)
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-import webbrowser
-import threading
-import os
-import logging
+import webbrowser, threading, os, logging, io, zipfile
 from werkzeug.utils import secure_filename
-from typing import Optional, Dict, Any, List, cast
+from typing import Optional, Dict, Any
 from dotenv import load_dotenv
-
-# Carregar variáveis de ambiente do .env
-load_dotenv()
-
-# Configurações do projeto
-from config import UPLOAD_FOLDER, ALLOWED_EXTENSIONS
-from db import conectar, inserir_usuario, buscar_usuario_por_email, criar_galeria, salvar_imagem
-from r2_storage import upload_para_r2, deletar_do_r2, r2_configurado
 from functools import wraps
 
-# Configuração de logging
+load_dotenv()
+
+from config import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, MAX_CONTENT_LENGTH
+from db import (
+    conectar, inserir_usuario, buscar_usuario_por_email,
+    criar_galeria, buscar_galerias_usuario, buscar_galeria_por_id,
+    atualizar_galeria, toggle_galeria, set_capa_galeria,
+    excluir_galeria_db, salvar_imagem, buscar_imagens_galeria,
+    salvar_ordem_imagens, toggle_selecao_imagem, excluir_imagem_db,
+    buscar_galerias_publicas
+)
+from r2_storage import upload_para_r2, deletar_do_r2, r2_configurado
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Inicialização do app
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'algum_segredo_muito_forte')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# CORS
+app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 CORS(app)
+
+# ─────────────────────────────────────────────────────────
+# DECORADORES
+# ─────────────────────────────────────────────────────────
+
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'usuario' not in session:
+            return redirect(url_for('entrar'))
+        return f(*args, **kwargs)
+    return decorated
+
+def fotografo_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'usuario' not in session or session['usuario'].get('tipo') not in ['fotografo', 'admin']:
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'usuario' not in session or session['usuario'].get('tipo') != 'admin':
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated
+
+def galeria_owner_required(f):
+    """Garante que o usuário é dono da galeria OU admin."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'usuario' not in session:
+            return redirect(url_for('entrar'))
+        galeria_id = kwargs.get('galeria_id')
+        galeria = buscar_galeria_por_id(galeria_id)
+        if not galeria:
+            return render_template('404.html'), 404
+        usuario = session['usuario']
+        if galeria['usuario_email'] != usuario['email'] and usuario.get('tipo') != 'admin':
+            flash('Acesso não autorizado a esta galeria.', 'error')
+            return redirect(url_for('painel_usuario'))
+        return f(*args, galeria=galeria, **kwargs)
+    return decorated
+
+# ─────────────────────────────────────────────────────────
+# HELPERS
+# ─────────────────────────────────────────────────────────
+
+def allowed_file(filename: Optional[str]) -> bool:
+    if not filename:
+        return False
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def validar_dados_registro(data: Dict[str, Any]) -> tuple:
+    if not data.get('nome') or len(data['nome'].strip()) < 2:
+        return False, "Nome deve ter pelo menos 2 caracteres"
+    if not data.get('email') or '@' not in data['email']:
+        return False, "E-mail inválido"
+    if not data.get('senha') or len(data['senha']) < 6:
+        return False, "Senha deve ter pelo menos 6 caracteres"
+    if data.get('tipo') and data['tipo'] not in ['admin', 'fotografo', 'comum']:
+        return False, "Tipo de usuário inválido"
+    return True, ""
+
+def abrir_navegador():
+    webbrowser.open_new('http://127.0.0.1:5000/')
+
+# ─────────────────────────────────────────────────────────
+# PÁGINAS PÚBLICAS
+# ─────────────────────────────────────────────────────────
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'usuario' not in session:
-            return redirect(url_for('entrar'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 @app.route('/entrar')
 def entrar():
@@ -54,65 +118,9 @@ def precos():
 def saiba_mais():
     return render_template('saiba_mais.html')
 
-@app.route('/painel_usuario')
-@login_required
-def painel_usuario():
-    usuario = session['usuario']
-    conn = conectar()
-    galerias = []
-    if conn:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM galerias WHERE usuario_email = %s", (usuario['email'],))
-        galerias_db = cursor.fetchall()
-        galerias = []
-        for g in galerias_db:
-            galeria = None
-            if isinstance(g, dict) and 'id' in g:
-                galeria = g
-            elif hasattr(cursor, 'description') and cursor.description and hasattr(g, '__iter__'):
-                colnames = [desc[0] for desc in cursor.description]
-                galeria = {col: val for col, val in zip(colnames, g)}
-                if 'id' not in galeria:
-                    continue
-            if not galeria or 'id' not in galeria:
-                continue
-            cursor.execute("SELECT * FROM imagens WHERE galeria_id = %s", (str(galeria['id']),))
-            galeria['imagens_lista'] = cursor.fetchall()
-            galerias.append(galeria)
-        conn.close()
-    return render_template('painel_usuario.html', usuario=usuario, galerias=galerias)
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'usuario' not in session or session['usuario'].get('tipo') != 'admin':
-            return redirect(url_for('index'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def fotografo_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'usuario' not in session or session['usuario'].get('tipo') not in ['fotografo', 'admin']:
-            return redirect(url_for('index'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def validar_dados_registro(data: Dict[str, Any]) -> tuple[bool, str]:
-    """Valida os dados de registro do usuário"""
-    if not data.get('nome') or len(data['nome'].strip()) < 2:
-        return False, "Nome deve ter pelo menos 2 caracteres"
-    
-    if not data.get('email') or '@' not in data['email']:
-        return False, "E-mail inválido"
-    
-    if not data.get('senha') or len(data['senha']) < 6:
-        return False, "Senha deve ter pelo menos 6 caracteres"
-    
-    if data.get('tipo') and data['tipo'] not in ['admin', 'fotografo', 'comum']:
-        return False, "Tipo de usuário inválido"
-    
-    return True, ""
+# ─────────────────────────────────────────────────────────
+# AUTENTICAÇÃO
+# ─────────────────────────────────────────────────────────
 
 @app.route('/api/registro', methods=['POST'])
 def registro():
@@ -120,23 +128,21 @@ def registro():
         data = request.get_json()
         if not data:
             return jsonify({'status': 'erro', 'mensagem': 'Dados inválidos'}), 400
-        
-        # Validação dos dados
         valido, mensagem = validar_dados_registro(data)
         if not valido:
             return jsonify({'status': 'erro', 'mensagem': mensagem}), 400
-        
         nome = data['nome'].strip()
         email = data['email'].strip().lower()
         senha = generate_password_hash(data['senha'])
         tipo = data.get('tipo', 'comum')
-
-        inserir_usuario(nome, email, senha, tipo)
-        logger.info(f"Usuário registrado com sucesso: {email} ({tipo})")
+        sucesso = inserir_usuario(nome, email, senha, tipo)
+        if not sucesso:
+            return jsonify({'status': 'erro', 'mensagem': 'E-mail já cadastrado ou BD indisponível.'}), 400
+        logger.info(f"Usuário registrado: {email} ({tipo})")
         return jsonify({'status': 'ok', 'mensagem': 'Usuário registrado com sucesso!'})
     except Exception as e:
-        logger.error(f"Erro no registro: {str(e)}")
-        return jsonify({'status': 'erro', 'mensagem': 'E-mail já cadastrado!'}), 400
+        logger.error(f"Erro no registro: {e}")
+        return jsonify({'status': 'erro', 'mensagem': 'Erro interno ao registrar.'}), 500
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -144,35 +150,38 @@ def login():
         data = request.get_json()
         if not data:
             return jsonify({'status': 'erro', 'mensagem': 'Dados inválidos'}), 400
-        
         email = data.get('email', '').strip().lower()
         senha = data.get('senha', '')
-        
         if not email or not senha:
             return jsonify({'status': 'erro', 'mensagem': 'E-mail e senha são obrigatórios'}), 400
-        
         usuario = buscar_usuario_por_email(email)
-        
-        if usuario and isinstance(usuario, dict) and check_password_hash(str(usuario.get('senha', '')), senha):
+        if usuario is None:
+            conn_teste = conectar()
+            if not conn_teste:
+                return jsonify({'status': 'erro', 'mensagem': 'Serviço temporariamente indisponível.'}), 503
+            conn_teste.close()
+            return jsonify({'status': 'erro', 'mensagem': 'E-mail ou senha incorretos!'}), 401
+        if isinstance(usuario, dict) and check_password_hash(str(usuario.get('senha', '')), senha):
             session['usuario'] = {
-                'nome': str(usuario.get('nome', '')), 
+                'nome': str(usuario.get('nome', '')),
                 'email': str(usuario.get('email', '')),
                 'tipo': str(usuario.get('tipo', 'comum'))
             }
-            logger.info(f"Login realizado com sucesso: {email} ({session['usuario']['tipo']})")
-            # Redirecionar para painel_usuario
-            return jsonify({
-                'status': 'ok', 
-                'mensagem': 'Login realizado com sucesso!', 
-                'usuario': session['usuario'],
-                'redirect': url_for('painel_usuario')
-            })
-        
-        logger.warning(f"Tentativa de login falhou para: {email}")
+            logger.info(f"Login: {email}")
+            return jsonify({'status': 'ok', 'mensagem': 'Login realizado!',
+                            'usuario': session['usuario'],
+                            'redirect': url_for('painel_usuario')})
         return jsonify({'status': 'erro', 'mensagem': 'E-mail ou senha incorretos!'}), 401
     except Exception as e:
-        logger.error(f"Erro no login: {str(e)}")
+        logger.error(f"Erro no login: {e}")
         return jsonify({'status': 'erro', 'mensagem': 'Erro interno do servidor'}), 500
+
+@app.route('/api/logout')
+def logout():
+    if 'usuario' in session:
+        logger.info(f"Logout: {session['usuario'].get('email')}")
+    session.pop('usuario', None)
+    return jsonify({'mensagem': 'Logout realizado'})
 
 @app.route('/api/usuario_logado')
 def usuario_logado():
@@ -180,269 +189,388 @@ def usuario_logado():
         return jsonify(session['usuario'])
     return jsonify({'erro': 'não autenticado'}), 401
 
-@app.route('/api/logout')
-def logout():
-    if 'usuario' in session:
-        logger.info(f"Logout realizado: {session['usuario'].get('email', 'desconhecido')}")
-    session.pop('usuario', None)
-    return jsonify({'mensagem': 'Logout realizado'})
+# ─────────────────────────────────────────────────────────
+# PAINEL DO USUÁRIO
+# ─────────────────────────────────────────────────────────
 
-def abrir_navegador():
-    webbrowser.open_new('http://127.0.0.1:5000/')
-
-@app.route('/api/galerias_usuario')
-def galerias_usuario():
-    try:
-        email = request.args.get('email')
-        if not email:
-            return jsonify({'erro': 'E-mail é obrigatório'}), 400
-        
-        conn = conectar()
-        if not conn:
-            return jsonify({'erro': 'Erro de conexão com banco de dados'}), 500
-        
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM galerias WHERE usuario_email = %s", (email,))
-        galerias = cursor.fetchall()
-        conn.close()
-        
-        return jsonify(galerias)
-    except Exception as e:
-        logger.error(f"Erro ao buscar galerias: {str(e)}")
-        return jsonify({'erro': 'Erro interno do servidor'}), 500
-
-@app.route('/api/imagens_por_galeria')
-def imagens_por_galeria():
-    try:
-        galeria_id = request.args.get('galeria_id')
-        if not galeria_id:
-            return jsonify({'erro': 'ID da galeria é obrigatório'}), 400
-        
-        conn = conectar()
-        if not conn:
-            return jsonify({'erro': 'Erro de conexão com banco de dados'}), 500
-        
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM imagens WHERE galeria_id = %s", (galeria_id,))
-        imagens = cursor.fetchall()
-        conn.close()
-        
-        return jsonify(imagens)
-    except Exception as e:
-        logger.error(f"Erro ao buscar imagens: {str(e)}")
-        return jsonify({'erro': 'Erro interno do servidor'}), 500
-
-def allowed_file(filename: Optional[str]) -> bool:
-    """Verifica se a extensão do arquivo é permitida"""
-    if not filename:
-        return False
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-@app.route('/api/upload_imagem', methods=['POST'])
-def upload_imagem():
-    if 'usuario' not in session or session['usuario']['tipo'] == 'comum':
-        return jsonify({'status': 'erro', 'mensagem': 'Usuário comum não tem permissão.'}), 403
-    try:
-        galeria_id = request.form.get('galeria_id')
-        titulo = request.form.get('titulo', '').strip()
-        descricao = request.form.get('descricao', '').strip()
-
-        if not galeria_id:
-            return jsonify({'status': 'erro', 'mensagem': 'ID da galeria é obrigatório'}), 400
-
-        if 'imagem' not in request.files:
-            return jsonify({'status': 'erro', 'mensagem': 'Nenhum arquivo enviado'}), 400
-
-        imagem = request.files['imagem']
-        if not imagem or imagem.filename == '':
-            return jsonify({'status': 'erro', 'mensagem': 'Nome de arquivo inválido'}), 400
-
-        if not allowed_file(imagem.filename):
-            return jsonify({'status': 'erro', 'mensagem': 'Formato de imagem inválido'}), 400
-
-        filename = secure_filename(imagem.filename or '')
-        if not filename:
-            return jsonify({'status': 'erro', 'mensagem': 'Nome de arquivo inválido'}), 400
-
-        if r2_configurado():
-            # Upload para Cloudflare R2
-            resultado = upload_para_r2(imagem, int(galeria_id))
-            caminho_url = resultado['url']
-            r2_key = resultado['key']
-            salvar_imagem(galeria_id, filename, titulo, descricao, caminho_url, r2_key=r2_key)
-            logger.info(f"Imagem enviada para R2: {r2_key}")
-        else:
-            # Fallback: salvar localmente
-            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-            caminho = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            imagem.save(caminho)
-            salvar_imagem(galeria_id, filename, titulo, descricao, f"/static/uploads/{filename}")
-            logger.info(f"Imagem salva localmente: {filename}")
-
-        flash('Imagem enviada com sucesso!', 'success')
-        return redirect(url_for('ver_galeria', galeria_id=galeria_id))
-    except Exception as e:
-        logger.error(f"Erro no upload de imagem: {str(e)}")
-        return jsonify({'status': 'erro', 'mensagem': f'Erro ao fazer upload: {str(e)}'}), 500
-
-@app.route('/api/galerias_publicas')
-def galerias_publicas():
-    conn = conectar()
-    if not conn:
-        return jsonify([])
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT g.*, (SELECT caminho_arquivo FROM imagens WHERE galeria_id = g.id LIMIT 1) as capa FROM galerias g WHERE privacidade = 'publica' ORDER BY id DESC LIMIT 8")
-    galerias = cursor.fetchall()
-    conn.close()
-    return jsonify(galerias)
-
-@app.route('/galeria/<int:galeria_id>')
-def ver_galeria(galeria_id):
-    if 'usuario' not in session:
-        return redirect(url_for('entrar'))
+@app.route('/painel_usuario')
+@login_required
+def painel_usuario():
     usuario = session['usuario']
-    conn = conectar()
-    galeria = None
-    imagens = []
-    if conn:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM galerias WHERE id = %s", (galeria_id,))
-        galeria = cursor.fetchone()
-        if galeria:
-            cursor.execute("SELECT * FROM imagens WHERE galeria_id = %s", (galeria_id,))
-            imagens = cursor.fetchall()
-        conn.close()
-    if not galeria:
-        return render_template('404.html'), 404
-    return render_template('galeria.html', usuario=usuario, galeria=galeria, imagens=imagens)
+    galerias = buscar_galerias_usuario(usuario['email'])
+    return render_template('painel_usuario.html', usuario=usuario, galerias=galerias)
 
-@app.route('/galeria/<int:galeria_id>/upload', methods=['GET', 'POST'])
+@app.route('/galerias')
+@login_required
+def galerias():
+    return redirect(url_for('painel_usuario'))
+
+@app.route('/configuracoes')
+@login_required
+def configuracoes():
+    return render_template('configuracoes.html', usuario=session['usuario'])
+
+@app.route('/admin/usuarios')
+@admin_required
+def admin_usuarios():
+    conn = conectar()
+    usuarios = []
+    if conn:
+        try:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT id, nome, email, tipo FROM usuarios ORDER BY id DESC")
+            usuarios = cursor.fetchall()
+        finally:
+            conn.close()
+    return render_template('admin_usuarios.html', usuarios=usuarios)
+
+# ─────────────────────────────────────────────────────────
+# CRIAR GALERIA
+# ─────────────────────────────────────────────────────────
+
+@app.route('/nova_galeria', methods=['GET', 'POST'])
 @fotografo_required
-def upload_multiplas_imagens(galeria_id):
+def nova_galeria():
     if request.method == 'POST':
-        if 'imagens' not in request.files:
-            return jsonify({'status': 'erro', 'mensagem': 'Nenhuma imagem enviada'}), 400
-        imagens = request.files.getlist('imagens')
-        titulos = request.form.getlist('titulos')
-        descricoes = request.form.getlist('descricoes')
-        erros = []
-        for idx, imagem in enumerate(imagens):
-            if imagem and allowed_file(imagem.filename):
-                filename = secure_filename(imagem.filename)
-                titulo = titulos[idx] if idx < len(titulos) else ''
-                descricao = descricoes[idx] if idx < len(descricoes) else ''
-                try:
-                    if r2_configurado():
-                        resultado = upload_para_r2(imagem, galeria_id)
-                        salvar_imagem(galeria_id, filename, titulo, descricao,
-                                      resultado['url'], r2_key=resultado['key'])
-                        logger.info(f"Upload R2: {resultado['key']}")
-                    else:
-                        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-                        caminho = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                        imagem.save(caminho)
-                        salvar_imagem(galeria_id, filename, titulo, descricao,
-                                      f'/static/uploads/{filename}')
-                except Exception as e:
-                    logger.error(f"Erro no upload de {filename}: {e}")
-                    erros.append(filename)
-        if erros:
-            flash(f'Erro ao enviar: {', '.join(erros)}', 'error')
-        else:
-            flash('Fotos enviadas com sucesso!', 'success')
-        return redirect(url_for('ver_galeria', galeria_id=galeria_id))
-    # GET: renderiza o formulário
-    return render_template('upload_multiplas.html', galeria_id=galeria_id)
+        nome = request.form.get('nome', '').strip()
+        descricao = request.form.get('descricao', '').strip()
+        privacidade = request.form.get('privacidade', 'privada')
+        senha = request.form.get('senha') or None
+        senha_hash = generate_password_hash(senha) if senha else None
+        email = session['usuario']['email']
+        if not nome:
+            flash('O nome da galeria é obrigatório.', 'error')
+            return render_template('nova_galeria.html')
+        sucesso = criar_galeria(email, nome, descricao, privacidade, senha_hash)
+        if sucesso:
+            flash('Galeria criada com sucesso!', 'success')
+            return redirect(url_for('painel_usuario'))
+        flash('Erro ao criar galeria. Tente novamente.', 'error')
+    return render_template('nova_galeria.html')
+
+# ─────────────────────────────────────────────────────────
+# GERENCIAR GALERIA (FOTÓGRAFO)
+# ─────────────────────────────────────────────────────────
+
+@app.route('/galeria/<int:galeria_id>/fotos')
+@fotografo_required
+@galeria_owner_required
+def gerenciar_galeria(galeria_id, galeria):
+    ordem = request.args.get('ordem', 'ordem')
+    imagens = buscar_imagens_galeria(galeria_id, ordem)
+    return render_template('gerenciar_galeria.html',
+                           usuario=session['usuario'],
+                           galeria=galeria,
+                           imagens=imagens,
+                           ordem_atual=ordem,
+                           secao='fotos')
+
+@app.route('/galeria/<int:galeria_id>/entrega')
+@fotografo_required
+@galeria_owner_required
+def galeria_entrega(galeria_id, galeria):
+    imagens = buscar_imagens_galeria(galeria_id)
+    return render_template('gerenciar_galeria.html',
+                           usuario=session['usuario'],
+                           galeria=galeria,
+                           imagens=imagens,
+                           ordem_atual='ordem',
+                           secao='entrega')
+
+@app.route('/galeria/<int:galeria_id>/selecao_config')
+@fotografo_required
+@galeria_owner_required
+def galeria_selecao_config(galeria_id, galeria):
+    imagens = buscar_imagens_galeria(galeria_id)
+    return render_template('gerenciar_galeria.html',
+                           usuario=session['usuario'],
+                           galeria=galeria,
+                           imagens=imagens,
+                           ordem_atual='ordem',
+                           secao='selecao')
+
+@app.route('/galeria/<int:galeria_id>/configuracoes_galeria')
+@fotografo_required
+@galeria_owner_required
+def galeria_configuracoes(galeria_id, galeria):
+    return render_template('gerenciar_galeria.html',
+                           usuario=session['usuario'],
+                           galeria=galeria,
+                           imagens=[],
+                           ordem_atual='ordem',
+                           secao='config')
 
 @app.route('/galeria/<int:galeria_id>/editar', methods=['GET', 'POST'])
 @fotografo_required
-def editar_galeria(galeria_id):
-    conn = conectar()
-    galeria = None
-    if conn:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM galerias WHERE id = %s", (galeria_id,))
-        galeria = cursor.fetchone()
-        if request.method == 'POST':
-            nome = request.form.get('nome', '').strip()
-            descricao = request.form.get('descricao', '').strip()
-            privacidade = request.form.get('privacidade', 'publica')
-            senha = request.form.get('senha', None)
-            cursor.execute("UPDATE galerias SET nome=%s, descricao=%s, privacidade=%s, senha=%s WHERE id=%s",
-                           (nome, descricao, privacidade, senha, galeria_id))
-            conn.commit()
-            conn.close()
-            return redirect(url_for('ver_galeria', galeria_id=galeria_id))
-        conn.close()
-    if not galeria:
-        return render_template('404.html'), 404
+@galeria_owner_required
+def editar_galeria(galeria_id, galeria):
+    if request.method == 'POST':
+        nome = request.form.get('nome', '').strip()
+        descricao = request.form.get('descricao', '').strip()
+        privacidade = request.form.get('privacidade', 'publica')
+        senha_nova = request.form.get('senha') or None
+        senha_hash = generate_password_hash(senha_nova) if senha_nova else galeria.get('senha')
+        atualizar_galeria(galeria_id, nome, descricao, privacidade, senha_hash)
+        flash('Galeria atualizada!', 'success')
+        return redirect(url_for('gerenciar_galeria', galeria_id=galeria_id))
     return render_template('editar_galeria.html', galeria=galeria)
 
 @app.route('/galeria/<int:galeria_id>/excluir', methods=['POST'])
 @fotografo_required
-def excluir_galeria(galeria_id):
-    conn = conectar()
-    if conn:
-        cursor = conn.cursor()
-        # Excluir imagens físicas e registros
-        cursor.execute("SELECT caminho_arquivo FROM imagens WHERE galeria_id = %s", (galeria_id,))
-        imagens = cursor.fetchall()
-        for img in imagens:
-            caminho = None
-            if isinstance(img, dict):
-                caminho = img.get('caminho_arquivo')
-            elif isinstance(img, (list, tuple)) and len(img) > 0 and isinstance(img[0], str):
-                caminho = img[0]
-            if caminho and isinstance(caminho, str):
+@galeria_owner_required
+def excluir_galeria(galeria_id, galeria):
+    imagens = excluir_galeria_db(galeria_id)
+    for img in imagens:
+        if isinstance(img, dict):
+            r2_key = img.get('r2_key')
+            caminho = img.get('caminho_arquivo', '')
+            if r2_key:
+                deletar_do_r2(r2_key)
+            elif caminho and not caminho.startswith('http'):
                 try:
                     os.remove(os.path.join(os.getcwd(), caminho.lstrip('/')))
                 except Exception:
                     pass
-        cursor.execute("DELETE FROM imagens WHERE galeria_id = %s", (galeria_id,))
-        cursor.execute("DELETE FROM galerias WHERE id = %s", (galeria_id,))
-        conn.commit()
-        conn.close()
-        flash('Galeria excluída com sucesso!', 'success')
-    else:
-        flash('Erro ao excluir galeria.', 'error')
+    flash('Galeria excluída com sucesso!', 'success')
     return redirect(url_for('painel_usuario'))
+
+# ─────────────────────────────────────────────────────────
+# UPLOAD DE IMAGENS
+# ─────────────────────────────────────────────────────────
+
+@app.route('/galeria/<int:galeria_id>/upload', methods=['GET', 'POST'])
+@fotografo_required
+@galeria_owner_required
+def upload_multiplas_imagens(galeria_id, galeria):
+    """Upload em lote via form normal."""
+    if request.method == 'POST':
+        imagens_files = request.files.getlist('imagens')
+        erros = []
+        enviadas = 0
+        for imagem in imagens_files:
+            if not imagem or not allowed_file(imagem.filename):
+                continue
+            filename = secure_filename(imagem.filename or '')
+            if not filename:
+                continue
+            try:
+                tamanho = imagem.seek(0, 2); imagem.seek(0)
+                if r2_configurado():
+                    res = upload_para_r2(imagem, galeria_id)
+                    salvar_imagem(galeria_id, filename, '', '',
+                                  res['url'], r2_key=res['key'], tamanho_bytes=tamanho)
+                else:
+                    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                    caminho = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    imagem.save(caminho)
+                    salvar_imagem(galeria_id, filename, '', '',
+                                  f'/static/uploads/{filename}', tamanho_bytes=tamanho)
+                enviadas += 1
+            except Exception as e:
+                logger.error(f"Erro upload {filename}: {e}")
+                erros.append(filename)
+        if erros:
+            flash(f"Erro ao enviar: {', '.join(erros)}", 'error')
+        if enviadas:
+            flash(f'{enviadas} foto(s) enviada(s) com sucesso!', 'success')
+        return redirect(url_for('gerenciar_galeria', galeria_id=galeria_id))
+    return render_template('gerenciar_galeria.html',
+                           usuario=session['usuario'], galeria=galeria,
+                           imagens=buscar_imagens_galeria(galeria_id),
+                           ordem_atual='ordem', secao='fotos')
+
+@app.route('/api/galeria/<int:galeria_id>/upload_async', methods=['POST'])
+@fotografo_required
+def upload_async(galeria_id):
+    """Upload assíncrono: UMA foto por request. Usado pela barra de progresso JS."""
+    if 'usuario' not in session or session['usuario']['tipo'] not in ['fotografo', 'admin']:
+        return jsonify({'status': 'erro', 'mensagem': 'Sem permissão'}), 403
+    galeria = buscar_galeria_por_id(galeria_id)
+    if not galeria or galeria['usuario_email'] != session['usuario']['email']:
+        if session['usuario']['tipo'] != 'admin':
+            return jsonify({'status': 'erro', 'mensagem': 'Galeria não encontrada'}), 404
+    if 'imagem' not in request.files:
+        return jsonify({'status': 'erro', 'mensagem': 'Nenhum arquivo'}), 400
+    imagem = request.files['imagem']
+    if not imagem or not allowed_file(imagem.filename):
+        return jsonify({'status': 'erro', 'mensagem': 'Arquivo inválido'}), 400
+    filename = secure_filename(imagem.filename or '')
+    if not filename:
+        return jsonify({'status': 'erro', 'mensagem': 'Nome inválido'}), 400
+    try:
+        tamanho = imagem.seek(0, 2); imagem.seek(0)
+        if r2_configurado():
+            res = upload_para_r2(imagem, galeria_id)
+            salvar_imagem(galeria_id, filename, '', '',
+                          res['url'], r2_key=res['key'], tamanho_bytes=tamanho)
+            url = res['url']
+        else:
+            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+            caminho = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            imagem.save(caminho)
+            url = f'/static/uploads/{filename}'
+            salvar_imagem(galeria_id, filename, '', '', url, tamanho_bytes=tamanho)
+        return jsonify({'status': 'ok', 'url': url, 'filename': filename})
+    except Exception as e:
+        logger.error(f"Erro upload async: {e}")
+        return jsonify({'status': 'erro', 'mensagem': str(e)}), 500
+
+# ─────────────────────────────────────────────────────────
+# APIS DE GERENCIAMENTO
+# ─────────────────────────────────────────────────────────
+
+@app.route('/api/galeria/<int:galeria_id>/toggle', methods=['POST'])
+@login_required
+def api_toggle_galeria(galeria_id):
+    """Toggle de entrega_em_alta, selecao_fotos, download_individual, download_all."""
+    galeria = buscar_galeria_por_id(galeria_id)
+    if not galeria:
+        return jsonify({'erro': 'Galeria não encontrada'}), 404
+    if galeria['usuario_email'] != session['usuario']['email'] and session['usuario']['tipo'] != 'admin':
+        return jsonify({'erro': 'Sem permissão'}), 403
+    campo = request.json.get('campo') if request.json else None
+    novo_valor = toggle_galeria(galeria_id, campo)
+    if novo_valor is None:
+        return jsonify({'erro': 'Campo inválido ou erro no banco'}), 400
+    return jsonify({'status': 'ok', 'campo': campo, 'valor': novo_valor})
+
+@app.route('/api/galeria/<int:galeria_id>/capa', methods=['POST'])
+@fotografo_required
+def api_set_capa(galeria_id):
+    """Define foto de capa enviando URL (body JSON: {url: '...'})."""
+    galeria = buscar_galeria_por_id(galeria_id)
+    if not galeria or (galeria['usuario_email'] != session['usuario']['email']
+                       and session['usuario']['tipo'] != 'admin'):
+        return jsonify({'erro': 'Sem permissão'}), 403
+    data = request.json or {}
+    url = data.get('url', '').strip()
+    if not url:
+        return jsonify({'erro': 'URL obrigatória'}), 400
+    set_capa_galeria(galeria_id, url)
+    return jsonify({'status': 'ok', 'capa_url': url})
+
+@app.route('/api/galeria/<int:galeria_id>/ordem', methods=['POST'])
+@fotografo_required
+def api_salvar_ordem(galeria_id):
+    """Salva nova ordem: body JSON {ids: [1,3,2,...]}."""
+    galeria = buscar_galeria_por_id(galeria_id)
+    if not galeria or (galeria['usuario_email'] != session['usuario']['email']
+                       and session['usuario']['tipo'] != 'admin'):
+        return jsonify({'erro': 'Sem permissão'}), 403
+    data = request.json or {}
+    ids = data.get('ids', [])
+    if not ids or not isinstance(ids, list):
+        return jsonify({'erro': 'Lista de IDs obrigatória'}), 400
+    salvar_ordem_imagens(ids)
+    return jsonify({'status': 'ok'})
+
+@app.route('/api/imagem/<int:imagem_id>/selecionar', methods=['POST'])
+@login_required
+def api_selecionar_imagem(imagem_id):
+    """Cliente marca/desmarca imagem como favorita."""
+    novo = toggle_selecao_imagem(imagem_id)
+    if novo is None:
+        return jsonify({'erro': 'Imagem não encontrada'}), 404
+    return jsonify({'status': 'ok', 'selecionada': novo})
+
+@app.route('/api/galeria/<int:galeria_id>/zip')
+@login_required
+def api_download_zip(galeria_id):
+    """Gera ZIP com todas as imagens locais (apenas fallback local)."""
+    galeria = buscar_galeria_por_id(galeria_id)
+    if not galeria:
+        return jsonify({'erro': 'Galeria não encontrada'}), 404
+    eh_dono = galeria['usuario_email'] == session['usuario']['email']
+    eh_admin = session['usuario']['tipo'] == 'admin'
+    download_all = galeria.get('download_all', False)
+    if not (eh_dono or eh_admin or download_all):
+        return jsonify({'erro': 'Download não permitido'}), 403
+    imagens = buscar_imagens_galeria(galeria_id)
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for img in imagens:
+            caminho = img.get('caminho_arquivo', '')
+            if caminho and not caminho.startswith('http'):
+                full_path = os.path.join(os.getcwd(), caminho.lstrip('/'))
+                if os.path.exists(full_path):
+                    zf.write(full_path, img.get('nome_arquivo', os.path.basename(full_path)))
+    buf.seek(0)
+    nome_zip = f"galeria_{galeria_id}_{galeria.get('nome','fotos').replace(' ','_')}.zip"
+    return send_file(buf, as_attachment=True, download_name=nome_zip, mimetype='application/zip')
+
+# ─────────────────────────────────────────────────────────
+# VISTA DO CLIENTE (GALERIA PÚBLICA)
+# ─────────────────────────────────────────────────────────
+
+@app.route('/galeria/<int:galeria_id>')
+@login_required
+def ver_galeria(galeria_id):
+    usuario = session['usuario']
+    galeria = buscar_galeria_por_id(galeria_id)
+    if not galeria:
+        return render_template('404.html'), 404
+    eh_dono = galeria['usuario_email'] == usuario['email']
+    eh_admin = usuario['tipo'] == 'admin'
+    eh_publica = galeria['privacidade'] == 'publica'
+    if not (eh_dono or eh_admin or eh_publica):
+        flash('Você não tem acesso a esta galeria.', 'error')
+        return redirect(url_for('painel_usuario'))
+    if eh_dono or eh_admin:
+        return redirect(url_for('gerenciar_galeria', galeria_id=galeria_id))
+    imagens = buscar_imagens_galeria(galeria_id)
+    return render_template('galeria.html', usuario=usuario, galeria=galeria, imagens=imagens)
+
+# ─────────────────────────────────────────────────────────
+# EXCLUSÃO DE IMAGEM
+# ─────────────────────────────────────────────────────────
 
 @app.route('/imagem/<int:imagem_id>/excluir', methods=['POST'])
 @fotografo_required
 def excluir_imagem(imagem_id):
-    conn = conectar()
+    img = excluir_imagem_db(imagem_id)
     galeria_id = None
-    if conn:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT caminho_arquivo, galeria_id, r2_key FROM imagens WHERE id = %s", (imagem_id,))
-        img = cursor.fetchone()
-        if img:
-            galeria_id = img['galeria_id']
-            r2_key = img.get('r2_key')
-            caminho = img.get('caminho_arquivo')
-
-            if r2_key:
-                # Deletar do Cloudflare R2
-                deletar_do_r2(r2_key)
-            elif caminho and not caminho.startswith('http'):
-                # Deletar arquivo local (fallback)
-                try:
-                    os.remove(os.path.join(os.getcwd(), caminho.lstrip('/')))
-                except Exception:
-                    pass
-
-            cursor.execute("DELETE FROM imagens WHERE id = %s", (imagem_id,))
-            conn.commit()
-            flash('Imagem excluída com sucesso!', 'success')
-        else:
-            flash('Imagem não encontrada.', 'error')
-        conn.close()
+    if img:
+        galeria_id = img.get('galeria_id')
+        r2_key = img.get('r2_key')
+        caminho = img.get('caminho_arquivo', '')
+        if r2_key:
+            deletar_do_r2(r2_key)
+        elif caminho and not caminho.startswith('http'):
+            try:
+                os.remove(os.path.join(os.getcwd(), caminho.lstrip('/')))
+            except Exception:
+                pass
+        flash('Imagem excluída!', 'success')
     else:
-        flash('Erro ao excluir imagem.', 'error')
+        flash('Imagem não encontrada.', 'error')
     if galeria_id:
-        return redirect(url_for('ver_galeria', galeria_id=galeria_id))
+        return redirect(url_for('gerenciar_galeria', galeria_id=galeria_id))
     return redirect(url_for('painel_usuario'))
+
+# ─────────────────────────────────────────────────────────
+# APIS PÚBLICAS
+# ─────────────────────────────────────────────────────────
+
+@app.route('/api/galerias_publicas')
+def galerias_publicas():
+    return jsonify(buscar_galerias_publicas(8))
+
+@app.route('/api/galerias_usuario')
+@login_required
+def api_galerias_usuario():
+    email = request.args.get('email', session['usuario']['email'])
+    if email != session['usuario']['email'] and session['usuario']['tipo'] != 'admin':
+        return jsonify({'erro': 'Acesso não autorizado'}), 403
+    return jsonify(buscar_galerias_usuario(email))
+
+@app.route('/api/imagens_por_galeria')
+def imagens_por_galeria():
+    galeria_id = request.args.get('galeria_id')
+    if not galeria_id:
+        return jsonify({'erro': 'ID obrigatório'}), 400
+    return jsonify(buscar_imagens_galeria(int(galeria_id)))
 
 if __name__ == '__main__':
     threading.Timer(1, abrir_navegador).start()
-    app.run(debug=True)
+    debug_mode = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
+    app.run(debug=debug_mode)
