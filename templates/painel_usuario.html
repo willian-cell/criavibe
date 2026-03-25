@@ -1,189 +1,231 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Minhas Galerias — CriaVibe</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/static/dashboard.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 </head>
 <body>
 
-<!-- TOP NAV -->
+<!-- ── Top Nav ─────────────────────────────────────────── -->
 <nav class="topnav">
-  <a class="topnav-logo" href="/">✦ CriaVibe</a>
+  <div class="topnav-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+      <circle cx="8.5" cy="8.5" r="1.5"/>
+      <polyline points="21,15 16,10 5,21"/>
+    </svg>
+    CriaVibe
+  </div>
   <div class="topnav-spacer"></div>
   <div class="topnav-user">
-    Olá, <strong>{{ usuario.nome }}</strong>
-    <span class="topnav-logout" onclick="logout()">Sair</span>
+    <i class="fa-solid fa-user-circle" style="font-size:1.2rem;color:var(--primary)"></i>
+    <span>Olá, <strong>{{ usuario.nome }}</strong></span>
+    <button class="topnav-logout" onclick="logout()">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
+    </button>
   </div>
 </nav>
 
-<!-- FLASH -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-  <div class="flash-container">
-    {% for cat, msg in messages %}
-      <div class="flash flash-{{ cat }}">{{ msg }}</div>
-    {% endfor %}
+<!-- ── Sidebar ─────────────────────────────────────────── -->
+<div class="painel-layout">
+<aside class="painel-sidebar">
+  <h3>Menu</h3>
+  <a href="/painel_usuario" class="painel-sidebar-link active">
+    <i class="fa-solid fa-images"></i> Galerias
+  </a>
+  <a href="/clientes" class="painel-sidebar-link">
+    <i class="fa-solid fa-users"></i> Clientes
+  </a>
+  <h3 style="margin-top:20px;">Conta</h3>
+  <a href="/configuracoes" class="painel-sidebar-link">
+    <i class="fa-solid fa-gear"></i> Configurações
+  </a>
+  <a href="/precos" class="painel-sidebar-link">
+    <i class="fa-solid fa-tag"></i> Planos
+  </a>
+</aside>
+
+<!-- ── Main ───────────────────────────────────────────── -->
+<main class="painel-main">
+
+  {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+      <div class="flash-container" style="padding:0 0 12px">
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}"><i class="fa-solid fa-circle-info"></i> {{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="painel-header">
+    <h2><i class="fa-solid fa-images" style="color:var(--primary)"></i> Minhas Galerias</h2>
+    <div class="search-bar">
+      <i class="fa-solid fa-magnifying-glass" style="color:var(--text-light)"></i>
+      <input id="search-input" type="text" placeholder="Buscar galeria..." oninput="filtrar()"/>
+    </div>
+    <a href="/nova_galeria" class="btn btn-primary">
+      <i class="fa-solid fa-plus"></i> Nova Galeria
+    </a>
+  </div>
+
+  {% if galerias %}
+  <div class="galleries-table">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:60px">Capa</th>
+          <th>Galeria</th>
+          <th>Cliente</th>
+          <th>Fotos</th>
+          <th>Seleção</th>
+          <th>Entrega em Alta</th>
+          <th style="width:50px">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="gallery-tbody">
+      {% for g in galerias %}
+        <tr data-nome="{{ g.nome | lower }}">
+          <td>
+            {% if g.thumb %}
+              <img class="gallery-thumb" src="{{ g.thumb }}" alt="{{ g.nome }}"/>
+            {% else %}
+              <div class="gallery-thumb-empty"><i class="fa-solid fa-image"></i></div>
+            {% endif %}
+          </td>
+          <td>
+            <a href="/gerenciar/{{ g.id }}" class="gallery-name">{{ g.nome }}</a>
+            <span class="gallery-count">
+              <span class="badge badge-{{ 'ativo' if g.privacidade == 'publica' else 'inativo' }}">
+                {{ 'Pública' if g.privacidade == 'publica' else 'Privada' }}
+              </span>
+            </span>
+          </td>
+          <td>
+            {% if g.cliente_nome %}
+              <div style="display:flex;align-items:center;gap:6px">
+                <div class="client-avatar" style="width:28px;height:28px;font-size:.7rem">
+                  {{ g.cliente_nome[0] | upper }}
+                </div>
+                <span style="font-size:.82rem">{{ g.cliente_nome }}</span>
+              </div>
+            {% else %}
+              <span style="color:var(--text-light);font-size:.8rem">—</span>
+            {% endif %}
+          </td>
+          <td>
+            <strong>{{ g.total_fotos or 0 }}</strong>
+            <span style="color:var(--text-muted);font-size:.8rem"> fotos</span>
+          </td>
+          <td>
+            {% if g.selecao_fotos %}
+              {% if g.max_selecao %}
+                <span class="badge badge-ativo">{{ g.max_selecao }} escolhas</span>
+              {% else %}
+                <span class="badge badge-ativo">Ativa</span>
+              {% endif %}
+            {% else %}
+              <span class="badge badge-inativo">Inativo</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if g.entrega_em_alta %}
+              <span class="badge badge-ativo"><i class="fa-solid fa-circle-check"></i> Ativo</span>
+            {% else %}
+              <span class="badge badge-inativo">Inativo</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="actions-menu">
+              <button class="actions-btn" onclick="toggleMenu(this)">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+              </button>
+              <div class="actions-dropdown">
+                <a href="/gerenciar/{{ g.id }}">
+                  <i class="fa-solid fa-pen-to-square"></i> Gerenciar
+                </a>
+                <a href="/galeria/{{ g.id }}" target="_blank">
+                  <i class="fa-solid fa-eye"></i> Visualizar
+                </a>
+                {% if g.link_token %}
+                <button onclick="copiarLink('{{ g.link_token }}')">
+                  <i class="fa-solid fa-link"></i> Copiar Link
+                </button>
+                {% endif %}
+                <hr style="border:none;border-top:1px solid var(--border);margin:2px 0"/>
+                <form method="POST" action="/galeria/{{ g.id }}/excluir"
+                      onsubmit="return confirm('Excluir galeria \'{{ g.nome }}\'? Esta ação é irreversível.')">
+                  <button type="submit" class="danger">
+                    <i class="fa-solid fa-trash"></i> Excluir
+                  </button>
+                </form>
+              </div>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="icon"><i class="fa-solid fa-images"></i></div>
+    <h3>Nenhuma galeria criada</h3>
+    <p>Crie sua primeira galeria para começar a organizar e entregar seus trabalhos aos clientes.</p>
+    <a href="/nova_galeria" class="btn btn-primary" style="margin-top:20px">
+      <i class="fa-solid fa-plus"></i> Criar Primeira Galeria
+    </a>
   </div>
   {% endif %}
-{% endwith %}
 
-<!-- LAYOUT -->
-<div class="painel-layout">
-
-  <!-- SIDEBAR -->
-  <aside class="painel-sidebar">
-    <h3>Menu</h3>
-    <a class="painel-sidebar-link active" href="{{ url_for('painel_usuario') }}">
-      🖼️ Minhas Galerias
-    </a>
-    {% if usuario.tipo in ['fotografo', 'admin'] %}
-    <a class="painel-sidebar-link" href="{{ url_for('nova_galeria') }}">
-      ➕ Nova Galeria
-    </a>
-    {% endif %}
-    <a class="painel-sidebar-link" href="{{ url_for('configuracoes') }}">
-      ⚙️ Configurações
-    </a>
-    {% if usuario.tipo == 'admin' %}
-    <a class="painel-sidebar-link" href="{{ url_for('admin_usuarios') }}">
-      👥 Usuários
-    </a>
-    {% endif %}
-  </aside>
-
-  <!-- MAIN -->
-  <main class="painel-main">
-
-    <!-- HEADER -->
-    <div class="painel-header">
-      <h2 style="font-size:1.3rem;font-weight:700;">Minhas Galerias</h2>
-      {% if usuario.tipo in ['fotografo', 'admin'] %}
-      <a class="btn-primary" href="{{ url_for('nova_galeria') }}">
-        ＋ Criar Nova Galeria
-      </a>
-      {% endif %}
-      <div class="search-bar">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Procurar galeria...">
-      </div>
-    </div>
-
-    <!-- TABELA DE GALERIAS -->
-    {% if galerias %}
-    <div class="galleries-table">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:70px;">Capa</th>
-            <th>Galeria</th>
-            <th>Nº de fotos</th>
-            <th>Entrega em Alta</th>
-            <th>Seleção de Fotos</th>
-            <th style="width:60px;">Ações</th>
-          </tr>
-        </thead>
-        <tbody id="galeriasTable">
-          {% for g in galerias %}
-          <tr class="galeria-row" data-nome="{{ g.nome | lower }}">
-            <td>
-              {% if g.thumb %}
-                <img class="gallery-thumb" src="{{ g.thumb }}" alt="{{ g.nome }}">
-              {% else %}
-                <div class="gallery-thumb-empty">📷</div>
-              {% endif %}
-            </td>
-            <td>
-              <a class="gallery-name" href="{{ url_for('gerenciar_galeria', galeria_id=g.id) }}">
-                {{ g.nome }}
-              </a>
-              <div class="gallery-count">{{ g.descricao or 'Sem descrição' }}</div>
-            </td>
-            <td>
-              <span style="font-weight:600;">{{ g.total_fotos or 0 }}</span>
-              <span style="color:var(--text-muted);font-size:.8rem;"> fotos</span>
-            </td>
-            <td>
-              {% if g.entrega_em_alta %}
-                <span class="badge badge-ativo">● Ativo</span>
-              {% else %}
-                <span class="badge badge-inativo">Inativo</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if g.selecao_fotos %}
-                <span class="badge badge-ativo">● Ativo</span>
-              {% else %}
-                <span class="badge badge-inativo">Inativo</span>
-              {% endif %}
-            </td>
-            <td>
-              <div class="actions-menu">
-                <button class="actions-btn" onclick="toggleMenu(this)">⋮</button>
-                <div class="actions-dropdown">
-                  <a href="{{ url_for('gerenciar_galeria', galeria_id=g.id) }}">📁 Gerenciar</a>
-                  <a href="{{ url_for('editar_galeria', galeria_id=g.id) }}">✏️ Editar</a>
-                  {% if usuario.tipo in ['fotografo', 'admin'] %}
-                  <form method="POST" action="{{ url_for('excluir_galeria', galeria_id=g.id) }}"
-                        onsubmit="return confirm('Excluir galeria e todas as fotos?')">
-                    <button type="submit" class="danger">🗑️ Excluir</button>
-                  </form>
-                  {% endif %}
-                </div>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    {% else %}
-    <div class="empty-state" style="background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:80px 20px;">
-      <div class="icon">🖼️</div>
-      <h3>Nenhuma galeria ainda</h3>
-      <p>Crie sua primeira galeria de fotos e compartilhe com seus clientes.</p>
-      {% if usuario.tipo in ['fotografo', 'admin'] %}
-      <a class="btn-primary" href="{{ url_for('nova_galeria') }}" style="margin-top:8px;">
-        ＋ Criar Primeira Galeria
-      </a>
-      {% endif %}
-    </div>
-    {% endif %}
-
-  </main>
+</main>
 </div>
 
 <script>
-  // Fechar menus ao clicar fora
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.actions-menu')) {
-      document.querySelectorAll('.actions-dropdown.open').forEach(d => d.classList.remove('open'));
-    }
+function toggleMenu(btn) {
+  document.querySelectorAll('.actions-dropdown.open').forEach(d => {
+    if (d !== btn.nextElementSibling) d.classList.remove('open');
   });
-
-  function toggleMenu(btn) {
-    const dd = btn.nextElementSibling;
-    const wasOpen = dd.classList.contains('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.actions-menu')) {
     document.querySelectorAll('.actions-dropdown.open').forEach(d => d.classList.remove('open'));
-    if (!wasOpen) dd.classList.add('open');
   }
+});
 
-  // Busca em tempo real
-  document.getElementById('searchInput').addEventListener('input', function() {
-    const q = this.value.toLowerCase().trim();
-    document.querySelectorAll('.galeria-row').forEach(row => {
-      const nome = row.dataset.nome || '';
-      row.style.display = nome.includes(q) ? '' : 'none';
-    });
+function filtrar() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  document.querySelectorAll('#gallery-tbody tr').forEach(tr => {
+    tr.style.display = tr.dataset.nome.includes(q) ? '' : 'none';
   });
+}
 
-  // Logout
-  function logout() {
-    fetch('/api/logout').then(() => window.location.href = '/');
-  }
+function copiarLink(token) {
+  const url = `${window.location.origin}/acesso/${token}`;
+  navigator.clipboard.writeText(url).then(() => showToast('Link copiado!'));
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, {
+    position:'fixed',bottom:'24px',right:'24px',background:'#1e293b',color:'#fff',
+    padding:'10px 18px',borderRadius:'8px',fontSize:'.85rem',fontWeight:'600',
+    zIndex:9999,animation:'fadeIn .2s ease'
+  });
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+async function logout() {
+  await fetch('/api/logout');
+  window.location.href = '/';
+}
 </script>
-
 </body>
 </html>

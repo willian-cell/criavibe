@@ -17,7 +17,8 @@ from db import (
     atualizar_galeria, toggle_galeria, set_capa_galeria,
     excluir_galeria_db, salvar_imagem, buscar_imagens_galeria,
     salvar_ordem_imagens, toggle_selecao_imagem, excluir_imagem_db,
-    buscar_galerias_publicas
+    buscar_galerias_publicas,
+    salvar_musica, buscar_musicas_galeria, excluir_musica_db, salvar_ordem_musicas
 )
 from r2_storage import upload_para_r2, deletar_do_r2, r2_configurado
 
@@ -546,6 +547,109 @@ def excluir_imagem(imagem_id):
     if galeria_id:
         return redirect(url_for('gerenciar_galeria', galeria_id=galeria_id))
     return redirect(url_for('painel_usuario'))
+
+# ─────────────────────────────────────────────────────────
+# MÚSICAS
+# ─────────────────────────────────────────────────────────
+
+ALLOWED_MUSIC_EXTENSIONS = {'mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a', 'wma'}
+
+def allowed_music(filename):
+    return filename and '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_MUSIC_EXTENSIONS
+
+@app.route('/api/galeria/<int:galeria_id>/musicas')
+@fotografo_required
+def api_musicas_galeria(galeria_id):
+    galeria = buscar_galeria_por_id(galeria_id)
+    if not galeria or (galeria['usuario_email'] != session['usuario']['email']
+                       and session['usuario']['tipo'] != 'admin'):
+        return jsonify({'erro': 'Sem permissão'}), 403
+    return jsonify(buscar_musicas_galeria(galeria_id))
+
+@app.route('/api/galeria/<int:galeria_id>/musica/upload', methods=['POST'])
+@fotografo_required
+def api_upload_musica(galeria_id):
+    """Upload de arquivo de música (mp3, wav, ogg, aac, flac, m4a)."""
+    galeria = buscar_galeria_por_id(galeria_id)
+    if not galeria or (galeria['usuario_email'] != session['usuario']['email']
+                       and session['usuario']['tipo'] != 'admin'):
+        return jsonify({'erro': 'Sem permissão'}), 403
+    arquivo = request.files.get('musica')
+    if not arquivo or not allowed_music(arquivo.filename):
+        return jsonify({'erro': 'Arquivo inválido. Formatos: mp3, wav, ogg, aac, flac, m4a'}), 400
+    nome = secure_filename(arquivo.filename)
+    nome_exibicao = request.form.get('nome_exibicao', nome.rsplit('.', 1)[0])
+    caminho_url = None
+    r2_key = None
+    if r2_configurado():
+        import uuid
+        r2_key = f"musicas/{galeria_id}/{uuid.uuid4().hex}_{nome}"
+        caminho_url = upload_para_r2(arquivo, r2_key, arquivo.content_type or 'audio/mpeg')
+    else:
+        pasta = os.path.join(UPLOAD_FOLDER, 'musicas', str(galeria_id))
+        os.makedirs(pasta, exist_ok=True)
+        caminho_local = os.path.join(pasta, nome)
+        arquivo.save(caminho_local)
+        caminho_url = f"/static/uploads/musicas/{galeria_id}/{nome}"
+    if not caminho_url:
+        return jsonify({'erro': 'Falha ao salvar arquivo'}), 500
+    sucesso = salvar_musica(galeria_id, nome, nome_exibicao, caminho_arquivo=caminho_url, r2_key=r2_key)
+    if not sucesso:
+        return jsonify({'erro': 'Erro ao salvar no banco'}), 500
+    return jsonify({'status': 'ok', 'url': caminho_url, 'nome': nome_exibicao})
+
+@app.route('/api/galeria/<int:galeria_id>/musica/youtube', methods=['POST'])
+@fotografo_required
+def api_adicionar_youtube(galeria_id):
+    """Adiciona música via link do YouTube."""
+    galeria = buscar_galeria_por_id(galeria_id)
+    if not galeria or (galeria['usuario_email'] != session['usuario']['email']
+                       and session['usuario']['tipo'] != 'admin'):
+        return jsonify({'erro': 'Sem permissão'}), 403
+    data = request.get_json() or {}
+    youtube_url = (data.get('url') or '').strip()
+    nome_exibicao = (data.get('nome') or youtube_url).strip()
+    # Validação básica de URL do YouTube
+    if 'youtube.com' not in youtube_url and 'youtu.be' not in youtube_url:
+        return jsonify({'erro': 'URL deve ser do YouTube (youtube.com ou youtu.be)'}), 400
+    # Extrair ID do vídeo para embed
+    import re
+    yt_id = None
+    m = re.search(r'(?:v=|youtu\.be/)([\w-]{11})', youtube_url)
+    if m:
+        yt_id = m.group(1)
+    if not yt_id:
+        return jsonify({'erro': 'Não foi possível extrair o ID do vídeo'}), 400
+    sucesso = salvar_musica(galeria_id, yt_id, nome_exibicao, youtube_url=youtube_url)
+    if not sucesso:
+        return jsonify({'erro': 'Erro ao salvar no banco'}), 500
+    return jsonify({'status': 'ok', 'yt_id': yt_id, 'nome': nome_exibicao})
+
+@app.route('/api/musica/<int:musica_id>/excluir', methods=['POST'])
+@fotografo_required
+def api_excluir_musica(musica_id):
+    musica = excluir_musica_db(musica_id)
+    if musica:
+        r2_key = musica.get('r2_key')
+        caminho = musica.get('caminho_arquivo', '')
+        if r2_key:
+            deletar_do_r2(r2_key)
+        elif caminho and not caminho.startswith('http'):
+            try:
+                os.remove(os.path.join(os.getcwd(), caminho.lstrip('/')))
+            except Exception:
+                pass
+        return jsonify({'status': 'ok'})
+    return jsonify({'erro': 'Não encontrada'}), 404
+
+@app.route('/api/galeria/<int:galeria_id>/musica/ordem', methods=['POST'])
+@fotografo_required
+def api_ordem_musicas(galeria_id):
+    data = request.get_json() or {}
+    ids = data.get('ids', [])
+    salvar_ordem_musicas(ids)
+    return jsonify({'status': 'ok'})
 
 # ─────────────────────────────────────────────────────────
 # APIS PÚBLICAS

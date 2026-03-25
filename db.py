@@ -148,7 +148,12 @@ def atualizar_galeria(galeria_id: int, nome: str, descricao: str,
 
 def toggle_galeria(galeria_id: int, campo: str) -> Optional[bool]:
     """Alterna um campo booleano da galeria. Retorna o novo valor ou None em erro."""
-    campos_permitidos = {'entrega_em_alta', 'selecao_fotos', 'download_individual', 'download_all'}
+    campos_permitidos = {
+        'entrega_em_alta', 'selecao_fotos', 'selecao_ativa',
+        'download_individual', 'download_all',
+        'musicas_ativas', 'vender_fotos',
+        'selecao_sem_senha', 'selecao_publica'
+    }
     if campo not in campos_permitidos:
         return None
     conn = conectar()
@@ -312,6 +317,89 @@ def excluir_imagem_db(imagem_id: int) -> Optional[Dict]:
     except Error as e:
         logger.error(f"Erro ao excluir imagem: {e}")
         return None
+    finally:
+        conn.close()
+
+# ─────────────────────────────────────────────────────────
+# MÚSICAS
+# ─────────────────────────────────────────────────────────
+
+def salvar_musica(galeria_id: int, nome_arquivo: str, nome_exibicao: str,
+                  caminho_arquivo: Optional[str] = None,
+                  r2_key: Optional[str] = None,
+                  youtube_url: Optional[str] = None) -> bool:
+    """Salva uma música (upload de arquivo ou link YouTube)."""
+    conn = conectar()
+    if not conn:
+        return False
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COALESCE(MAX(ordem),0)+1 FROM musicas WHERE galeria_id=%s", (galeria_id,))
+        row = cursor.fetchone()
+        proxima_ordem = row[0] if row else 1
+        cursor.execute("""
+            INSERT INTO musicas (galeria_id, nome_arquivo, nome_exibicao,
+                                 caminho_arquivo, r2_key, youtube_url, ordem)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (galeria_id, nome_arquivo, nome_exibicao or nome_arquivo,
+              caminho_arquivo, r2_key, youtube_url, proxima_ordem))
+        conn.commit()
+        return True
+    except Error as e:
+        logger.error(f"Erro ao salvar música: {e}")
+        return False
+    finally:
+        conn.close()
+
+def buscar_musicas_galeria(galeria_id: int) -> List[Dict]:
+    conn = conectar()
+    if not conn:
+        return []
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT * FROM musicas WHERE galeria_id=%s ORDER BY ordem ASC, id ASC",
+            (galeria_id,)
+        )
+        return cursor.fetchall() or []
+    except Error as e:
+        logger.error(f"Erro ao buscar músicas: {e}")
+        return []
+    finally:
+        conn.close()
+
+def excluir_musica_db(musica_id: int) -> Optional[Dict]:
+    """Exclui música e retorna seus dados (para limpar storage externo)."""
+    conn = conectar()
+    if not conn:
+        return None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM musicas WHERE id=%s", (musica_id,))
+        musica = cursor.fetchone()
+        if musica:
+            cursor.execute("DELETE FROM musicas WHERE id=%s", (musica_id,))
+            conn.commit()
+        return musica
+    except Error as e:
+        logger.error(f"Erro ao excluir música: {e}")
+        return None
+    finally:
+        conn.close()
+
+def salvar_ordem_musicas(ordem_ids: List[int]) -> bool:
+    conn = conectar()
+    if not conn:
+        return False
+    try:
+        cursor = conn.cursor()
+        for idx, mid in enumerate(ordem_ids):
+            cursor.execute("UPDATE musicas SET ordem=%s WHERE id=%s", (idx, mid))
+        conn.commit()
+        return True
+    except Error as e:
+        logger.error(f"Erro ao salvar ordem de músicas: {e}")
+        return False
     finally:
         conn.close()
 

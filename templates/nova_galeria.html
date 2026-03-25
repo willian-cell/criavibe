@@ -1,55 +1,107 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Nova Galeria - CriaVibe</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/style.css">
-    <style>
-        body { font-family: Arial, sans-serif; background: #f5f6fa; }
-        .container { max-width: 500px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px; }
-        label { display: block; margin-top: 12px; font-weight: bold; }
-        input, textarea, select { width: 100%; padding: 8px; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
-        button { margin-top: 18px; background: #3b2dd6; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 1em; }
-        button:hover { background: #2a1fa0; }
-        .alert-success { background: #d1fae5; color: #065f46; padding:10px; margin-bottom:10px; border-radius:4px; }
-        .alert-error { background: #fee2e2; color: #991b1b; padding:10px; margin-bottom:10px; border-radius:4px; }
-        h2 { color: #3b2dd6; }
-        @media (max-width: 600px) { .container { padding: 8px; } }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nova Galeria — CriaVibe</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 </head>
 <body>
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div>
-              {% for category, message in messages %}
-                <div class="alert-{{ category }}">{{ message }}</div>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
 
-        <h2>Nova Galeria</h2>
-        <form method="POST" action="{{ url_for('nova_galeria') }}">
-            <label for="nome">Nome da Galeria *</label>
-            <input type="text" id="nome" name="nome" required placeholder="Ex: Casamento Silva">
+<nav class="topnav">
+  <div class="topnav-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <circle cx="8.5" cy="8.5" r="1.5"/>
+      <polyline points="21,15 16,10 5,21"/>
+    </svg>
+    CriaVibe
+  </div>
+  <div class="topnav-spacer"></div>
+  <a href="/painel_usuario" class="btn btn-secondary btn-sm">
+    <i class="fa-solid fa-chevron-left"></i> Voltar
+  </a>
+</nav>
 
-            <label for="descricao">Descrição</label>
-            <textarea id="descricao" name="descricao" rows="3" placeholder="Breve descrição da galeria"></textarea>
+<div style="min-height:calc(100vh - 56px);margin-top:56px;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;background:var(--bg)">
+  <div style="width:100%;max-width:560px">
 
-            <label for="privacidade">Privacidade</label>
-            <select id="privacidade" name="privacidade">
-                <option value="publica">Pública</option>
-                <option value="privada">Privada</option>
-            </select>
-
-            <label for="senha">Senha (se privada)</label>
-            <input type="password" id="senha" name="senha" placeholder="Deixe em branco se pública">
-
-            <button type="submit">Criar Galeria</button>
-        </form>
-        <p style="margin-top:16px;"><a href="{{ url_for('painel_usuario') }}">← Voltar ao painel</a></p>
+    <div style="margin-bottom:28px">
+      <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:6px">
+        <i class="fa-solid fa-plus-circle" style="color:var(--primary)"></i> Nova Galeria
+      </h2>
+      <p style="color:var(--text-muted);font-size:.875rem">Crie uma galeria para organizar e entregar fotos ao seu cliente.</p>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}" style="margin-bottom:16px">
+            <i class="fa-solid fa-circle-info"></i> {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/nova_galeria" id="galeria-form">
+      <div style="background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;margin-bottom:16px">
+        <h3 style="font-size:.9rem;font-weight:700;margin-bottom:16px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">
+          Informações Básicas
+        </h3>
+        <div class="form-group">
+          <label>Nome da Galeria <span style="color:var(--danger)">*</span></label>
+          <input type="text" name="nome" class="form-control" required placeholder="Ex: Casamento Beatriz & André"/>
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea name="descricao" class="form-control" placeholder="Uma breve descrição para o cliente..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Privacidade</label>
+          <select name="privacidade" class="form-control" onchange="toggleSenha(this)">
+            <option value="privada">Privada</option>
+            <option value="publica">Pública</option>
+          </select>
+          <div class="form-hint">Galerias privadas só são acessíveis via link ou senha.</div>
+        </div>
+        <div class="form-group" id="senha-group" style="display:none">
+          <label>Senha de Acesso</label>
+          <input type="text" name="senha" class="form-control" placeholder="Senha para o cliente acessar"/>
+        </div>
+      </div>
+
+      <div style="background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;margin-bottom:16px">
+        <h3 style="font-size:.9rem;font-weight:700;margin-bottom:16px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">
+          Cliente
+        </h3>
+        <div class="form-group">
+          <label>Nome do Cliente</label>
+          <input type="text" name="cliente_nome" class="form-control" placeholder="Nome completo do cliente"/>
+        </div>
+        <div class="form-group">
+          <label>E-mail do Cliente</label>
+          <input type="email" name="cliente_email" class="form-control" placeholder="email@cliente.com"/>
+          <div class="form-hint">Usado para enviar o link de acesso por e-mail.</div>
+        </div>
+        <div class="form-group">
+          <label>Quantidade máxima de fotos para selecionar</label>
+          <input type="number" name="max_selecao" class="form-control" placeholder="Sem limite" min="1"/>
+          <div class="form-hint">Deixe em branco para ilimitado.</div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" style="padding:14px">
+        <i class="fa-solid fa-check"></i> Criar Galeria
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+function toggleSenha(sel) {
+  document.getElementById('senha-group').style.display = sel.value === 'privada' ? 'none' : '';
+}
+</script>
 </body>
 </html>
