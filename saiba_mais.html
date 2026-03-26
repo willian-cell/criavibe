@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,21 +25,25 @@
     :root {
       --primary: #6366f1;
       --primary-dk: #4f46e5;
-      --bg-dark: #070711;
-      --text: #f8fafc;
-      --muted: rgba(255, 255, 255, .6);
-      --light: rgba(255, 255, 255, .35);
-
-      /* Glassmorphism Variables */
-      --glass-bg: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.1);
       
-      /* Neumorphism Variables for Dark Mode */
-      --neu-bg: #0a0a16;
-      --neu-shadow-dark: -6px -6px 12px rgba(255, 255, 255, 0.02),
-                          6px 6px 12px rgba(0, 0, 0, 0.7);
-      --neu-shadow-inset: inset -4px -4px 8px rgba(255, 255, 255, 0.02),
-                          inset 4px 4px 8px rgba(0, 0, 0, 0.7);
+      /* Tema Claro (Light Mode) */
+      --bg-dark: #ffffff;      
+      --bg-light: #f8fafc;     
+      --text: #0f172a;         
+      --text-muted: #475569;   
+      --muted: #64748b;        
+      --light: #94a3b8;        
+
+      /* Glassmorphism Variables - Light Mode */
+      --glass-bg: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.9);
+      
+      /* Neumorphism Variables - Light Mode */
+      --neu-bg: #f8fafc;
+      --neu-shadow-dark: -6px -6px 12px rgba(255, 255, 255, 1),
+                          6px 6px 12px rgba(0, 0, 0, 0.05);
+      --neu-shadow-inset: inset -4px -4px 8px rgba(255, 255, 255, 1),
+                          inset 4px 4px 8px rgba(0, 0, 0, 0.05);
     }
 
     html {
@@ -72,15 +75,15 @@
       align-items: center;
       padding: 0 5vw;
       gap: 16px;
-      background: rgba(7, 7, 17, .8);
+      background: rgba(255, 255, 255, 0.9); 
       backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       transition: all .3s;
     }
     .nav-logo {
       font-size: 1.25rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #fff, var(--primary));
+      background: linear-gradient(135deg, #0f172a, var(--primary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       letter-spacing: -.5px;
@@ -90,14 +93,14 @@
     .nav-link {
       padding: 8px 16px;
       font-size: .875rem;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--muted);
       border-radius: 8px;
       transition: .2s;
     }
     .nav-link:hover, .nav-link.active {
-      color: #fff;
-      background: rgba(255, 255, 255, .06);
+      color: var(--text);
+      background: rgba(0, 0, 0, .05);
     }
     .nav-cta {
       padding: 9px 20px;
@@ -125,7 +128,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      perspective: 1px; /* Para Fallback ou JS Parallax */
+      perspective: 1px; 
     }
 
     .parallax-bg {
@@ -133,13 +136,13 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 120%; /* Extra height for scrolling effect */
-      background: linear-gradient(to bottom, rgba(7,7,17,0.3) 0%, rgba(7,7,17,1) 100%),
+      height: 120%; 
+      background: linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,1) 100%),
                   url('https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=2070&auto=format&fit=crop');
       background-size: cover;
       background-position: center;
       z-index: 1;
-      transform: translateZ(0); /* Will be manipulated by JS for smoother Parallax */
+      transform: translateZ(0); 
       will-change: transform;
     }
 
@@ -148,15 +151,13 @@
       z-index: 2;
       background: var(--glass-bg);
       backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--glass-border);
       padding: 3rem;
       border-radius: 24px;
       text-align: center;
       max-width: 800px;
       width: 90%;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      /* Scroll Trigger Animation default state */
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
       opacity: 0;
       transform: translateY(40px);
       transition: opacity 1s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
@@ -172,16 +173,16 @@
       font-weight: 900;
       line-height: 1.1;
       margin-bottom: 20px;
-      background: linear-gradient(135deg, #fff, #a78bfa, #ec4899);
+      background: linear-gradient(135deg, #0f172a, #6366f1, #a78bfa);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     .hero-text {
       font-size: clamp(1rem, 2vw, 1.25rem);
-      color: var(--text);
+      color: var(--text-muted);
       opacity: 0.9;
-      font-weight: 300;
+      font-weight: 400;
       line-height: 1.7;
     }
 
@@ -225,7 +226,7 @@
       font-size: 2.5rem;
       font-weight: 800;
       margin-bottom: 24px;
-      color: #fff;
+      color: var(--text);
     }
 
     .about-content h2 span {
@@ -236,7 +237,7 @@
 
     .about-content p {
       font-size: 1.1rem;
-      color: var(--muted);
+      color: var(--text-muted);
       margin-bottom: 20px;
     }
 
@@ -244,21 +245,132 @@
       width: 100%;
       max-width: 500px;
       margin: 0 auto;
-      filter: drop-shadow(0 0 30px rgba(99, 102, 241, 0.2));
+      filter: drop-shadow(0 0 30px rgba(99, 102, 241, 0.15));
     }
 
-    /* ── REDES SOCIAIS & NEUMORPHISM ── */
+    /* ── INSTAGRAM CAROUSEL ── */
+    .ig-carousel-section {
+      padding: 100px 5vw;
+      text-align: center;
+      background: var(--bg-light); /* Cinza clarinho */
+      overflow: hidden;
+    }
+
+    .ig-carousel-section h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    
+    .ig-carousel-section p.sub {
+      color: var(--muted);
+      margin-bottom: 50px;
+      font-size: 1.1rem;
+    }
+
+    .carousel-container {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding: 0 5vw;
+      padding-bottom: 40px;
+      -ms-overflow-style: none;  
+      scrollbar-width: none;  
+    }
+    .carousel-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carousel-item {
+      flex: 0 0 300px;
+      height: 400px;
+      scroll-snap-align: center;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.05);
+      transition: transform 0.4s;
+      cursor: pointer;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+    }
+    
+    .carousel-item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
+    }
+
+    .carousel-item img, .carousel-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s;
+    }
+    
+    .carousel-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .ig-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+      gap: 20px;
+      color: #0f172a;
+      font-size: 1.5rem;
+      font-weight: bold;
+      backdrop-filter: blur(4px);
+    }
+
+    .carousel-item:hover .ig-overlay {
+      opacity: 1;
+    }
+
+    .ig-overlay span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .carousel-btn {
+      display: inline-block;
+      margin-top: 40px;
+      padding: 14px 32px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-weight: 600;
+      transition: 0.3s;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .carousel-btn:hover {
+      background: var(--primary-dk);
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+
+    /* ── REDES SOCIAIS (NEUMORPHISM LIGHT) ── */
     .social-section {
       background: var(--neu-bg);
       text-align: center;
       padding-top: 80px;
-      padding-bottom: 80px;
+      padding-bottom: 120px;
     }
 
     .social-section h2 {
       font-size: 2.5rem;
       font-weight: 800;
       margin-bottom: 50px;
+      color: var(--text);
     }
 
     .social-cards {
@@ -281,13 +393,14 @@
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       position: relative;
       overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.4);
     }
 
     .social-card::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent);
+      background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent);
       opacity: 0;
       transition: opacity 0.3s;
       z-index: 1;
@@ -317,6 +430,7 @@
       transition: all 0.3s;
       position: relative;
       z-index: 2;
+      color: var(--text);
     }
 
     .social-card:hover .icon-wrapper {
@@ -335,132 +449,24 @@
       font-weight: 700;
       position: relative;
       z-index: 2;
+      color: var(--text);
     }
 
     .social-card p {
-      font-size: 0.9rem;
-      color: var(--muted);
+      font-size: 0.95rem;
+      color: var(--text-muted);
       position: relative;
       z-index: 2;
     }
 
-    /* ── INSTAGRAM CAROUSEL ── */
-    .ig-carousel-section {
-      padding: 100px 5vw;
-      text-align: center;
-      background: #070711;
-      overflow: hidden;
-    }
-
-    .ig-carousel-section h2 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 16px;
-    }
-    
-    .ig-carousel-section p.sub {
-      color: var(--muted);
-      margin-bottom: 50px;
-      font-size: 1.1rem;
-    }
-
-    .carousel-container {
-      display: flex;
-      gap: 20px;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scroll-padding: 0 5vw;
-      padding-bottom: 40px;
-      /* Ocultar barra de rolagem */
-      -ms-overflow-style: none;  
-      scrollbar-width: none;  
-    }
-    .carousel-container::-webkit-scrollbar {
-      display: none;
-    }
-
-    .carousel-item {
-      flex: 0 0 300px;
-      height: 400px;
-      scroll-snap-align: center;
-      border-radius: 16px;
-      position: relative;
-      overflow: hidden;
-      background: var(--bg-card);
-      border: 1px solid var(--border-glass);
-      transition: transform 0.4s;
-      cursor: pointer;
-    }
-    
-    .carousel-item:hover {
-      transform: translateY(-8px);
-    }
-
-    .carousel-item img, .carousel-item video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.6s;
-    }
-    
-    .carousel-item:hover img {
-      transform: scale(1.05);
-    }
-
-    .ig-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.3s;
-      gap: 20px;
-      color: #fff;
-      font-size: 1.5rem;
-      font-weight: bold;
-      backdrop-filter: blur(2px);
-    }
-
-    .carousel-item:hover .ig-overlay {
-      opacity: 1;
-    }
-
-    .ig-overlay span {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .carousel-btn {
-      display: inline-block;
-      margin-top: 40px;
-      padding: 14px 32px;
-      background: transparent;
-      color: #fff;
-      border: 1px solid var(--border-glass);
-      border-radius: 30px;
-      font-weight: 600;
-      transition: 0.3s;
-      backdrop-filter: blur(10px);
-    }
-
-    .carousel-btn:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.3);
-      transform: scale(1.05);
-    }
-
-
     /* ── FOOTER ── */
     footer {
-      border-top: 1px solid rgba(255, 255, 255, .08);
+      border-top: 1px solid rgba(0, 0, 0, .05);
       padding: 32px 5vw;
       display: flex;
       align-items: center;
       gap: 16px;
-      color: var(--light);
+      color: var(--muted);
       font-size: .8rem;
       background: var(--bg-dark);
     }
@@ -511,7 +517,7 @@
         </p>
       </div>
       <div class="lottie-container">
-        <!-- Lottie Animation usando URL publica de fotografia/camera -->
+        <!-- Lottie Animation -->
         <lottie-player 
           src="https://lottie.host/8cd7b2c5-7aeb-4c7b-9f44-8cbdaeb20970/QvR5wA10D4.json" 
           background="transparent" 
@@ -530,42 +536,41 @@
     <p class="sub">@criavibe_ • Últimos Trabalhos e Ensaios</p>
     
     <div class="carousel-container" id="ig-carousel">
-      <!-- Item 1: Vestido Vermelho / Sparkles -->
-      <a href="https://www.instagram.com/criavibe_/" target="_blank" class="carousel-item">
-        <img src="https://images.unsplash.com/photo-1510520434124-5bc7e642b61d?w=600&h=800&fit=crop&q=80" alt="Ensaio Vestido Vermelho">
+      <!-- Item 1: Foto real do IG / Pessoas / Wedding -->
+      <a href="https://www.instagram.com/p/DLAsuZmxllJ/" target="_blank" class="carousel-item">
+        <img src="https://images.unsplash.com/photo-1543881673-c6c753b8fc23?w=600&h=800&fit=crop&q=80" alt="CriaVibe Portfólio - Sparklers">
         <div class="ig-overlay">
           <span><i class="fa-solid fa-heart"></i> 1K</span>
           <span><i class="fa-solid fa-comment"></i> 42</span>
         </div>
       </a>
-      <!-- Item 2: Casamento com Sparkles -->
-      <a href="https://www.instagram.com/criavibe_/" target="_blank" class="carousel-item">
-        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=800&fit=crop&q=80" alt="Casamento CriaVibe">
+      <!-- Item 2: Foto Real / Casamento -->
+      <a href="https://www.instagram.com/criavibe_/p/DEDIV-QROCn/" target="_blank" class="carousel-item">
+        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=800&fit=crop&q=80" alt="CriaVibe Portfólio - Casamento">
         <div class="ig-overlay">
           <span><i class="fa-solid fa-heart"></i> 2.3K</span>
           <span><i class="fa-solid fa-comment"></i> 85</span>
         </div>
       </a>
-      <!-- Item 3: Casal e Cavalos -->
-      <a href="https://www.instagram.com/criavibe_/" target="_blank" class="carousel-item">
-        <img src="https://images.unsplash.com/photo-1554160408-ae5cde185aab?w=600&h=800&fit=crop&q=80" alt="Ensaio com Cavalos">
+      <!-- Item 3: Casal / Estilo Rústico rural -->
+      <a href="https://www.instagram.com/criavibe_/p/C9NNTvEONU_/" target="_blank" class="carousel-item">
+        <img src="https://images.unsplash.com/photo-1554160408-ae5cde185aab?w=600&h=800&fit=crop&q=80" alt="CriaVibe Portfólio - Campo">
         <div class="ig-overlay">
           <span><i class="fa-solid fa-heart"></i> 856</span>
           <span><i class="fa-solid fa-comment"></i> 15</span>
         </div>
       </a>
-      <!-- Item 4: Casal / Retrato -->
-      <a href="https://www.instagram.com/criavibe_/" target="_blank" class="carousel-item">
-        <video autoplay muted loop playsinline>
-          <source src="https://cdn.pixabay.com/video/2019/11/18/29281-374712398_tiny.mp4" type="video/mp4">
-        </video>
+      <!-- Item 4 -->
+      <a href="https://www.instagram.com/criavibe_/p/DV6oGqFkUoe/" target="_blank" class="carousel-item">
+        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&h=800&fit=crop&q=80" alt="CriaVibe Portfólio - Casual">
         <div class="ig-overlay">
-           <span><i class="fa-solid fa-play"></i> 4.5K</span>
+          <span><i class="fa-solid fa-heart"></i> 3.1K</span>
+          <span><i class="fa-solid fa-comment"></i> 124</span>
         </div>
       </a>
-      <!-- Item 5: Formatura / Ensaio -->
-      <a href="https://www.instagram.com/criavibe_/" target="_blank" class="carousel-item">
-        <img src="https://images.unsplash.com/photo-1521102910793-2c1dd7cba1a1?w=600&h=800&fit=crop&q=80" alt="Formatura CriaVibe">
+      <!-- Item 5 -->
+      <a href="https://www.instagram.com/criavibe_/p/DVWyuOPER3a/" target="_blank" class="carousel-item">
+        <img src="https://images.unsplash.com/photo-1521102910793-2c1dd7cba1a1?w=600&h=800&fit=crop&q=80" alt="CriaVibe Portfólio - Formatura">
         <div class="ig-overlay">
           <span><i class="fa-solid fa-heart"></i> 530</span>
           <span><i class="fa-solid fa-comment"></i> 8</span>
@@ -578,7 +583,7 @@
     </a>
   </section>
 
-  <!-- REDES SOCIAIS (NEUMORPHISM) -->
+  <!-- REDES SOCIAIS (NEUMORPHISM LIGHT) -->
   <section class="social-section fade-in-section scroll-trigger">
     <h2>Conecte-se Conosco</h2>
     
@@ -615,8 +620,8 @@
   <!-- FOOTER -->
   <footer>
     <div class="nav-logo">✦ CriaVibe</div>
-    <a href="/saiba_mais.html" style="color:var(--light);font-size:.8rem">Sobre</a>
-    <a href="/entrar.html" style="color:var(--light);font-size:.8rem">Entrar</a>
+    <a href="/saiba_mais.html" style="color:var(--muted);font-size:.8rem">Sobre</a>
+    <a href="/entrar.html" style="color:var(--muted);font-size:.8rem">Entrar</a>
     <span>© 2025 CriaVibe · Todos os direitos reservados</span>
   </footer>
 
@@ -625,11 +630,17 @@
     const parallaxBg = document.getElementById('parallax-bg');
     window.addEventListener('scroll', () => {
       let scrollPos = window.scrollY;
-      // move the background slightly slower than the user scrolls
       parallaxBg.style.transform = `translateY(${scrollPos * 0.4}px)`;
       
-      // Nav scroll effect
-      document.getElementById('topnav').style.background = scrollPos > 60 ? 'rgba(7,7,17,.95)' : 'rgba(7,7,17,.8)';
+      // Nav scroll effect adapted for light mode
+      const nav = document.getElementById('topnav');
+      if (scrollPos > 60) {
+        nav.style.background = 'rgba(255,255,255,0.95)';
+        nav.style.boxShadow = '0 4px 20px rgba(0,0,0,0.05)';
+      } else {
+        nav.style.background = 'rgba(255,255,255,0.9)';
+        nav.style.boxShadow = 'none';
+      }
     });
 
     // Scroll Triggered Animations with IntersectionObserver
@@ -639,12 +650,12 @@
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
-          obs.unobserve(entry.target); // Animates only once
+          obs.unobserve(entry.target); 
         }
       });
     }, {
-      threshold: 0.1, // Trigger when 10% visible
-      rootMargin: "0px 0px -50px 0px" // Trigger slightly before it comes fully into view
+      threshold: 0.1, 
+      rootMargin: "0px 0px -50px 0px"
     });
 
     triggerElements.forEach(el => observer.observe(el));
@@ -676,10 +687,9 @@
       if (!isDown) return;
       e.preventDefault();
       const x = e.pageX - carouselContainer.offsetLeft;
-      const walk = (x - startX) * 2; // Scroll-fast
+      const walk = (x - startX) * 2;
       carouselContainer.scrollLeft = scrollLeft - walk;
     });
   </script>
 </body>
-
 </html>
