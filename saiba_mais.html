@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CriaVibe — Sobre Nós</title>
+  <meta name="description"
+    content="Conheça a CriaVibe e o trabalho de nossos fotógrafos profissionais. Entregando obras com elegância e qualidade premium.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #6366f1;
+      --primary-dk: #4f46e5;
+      --bg-dark: #070711;
+      --text: #f8fafc;
+      --muted: rgba(255, 255, 255, .6);
+      --light: rgba(255, 255, 255, .35);
+
+      /* Glassmorphism Variables */
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      
+      /* Neumorphism Variables for Dark Mode */
+      --neu-bg: #0a0a16;
+      --neu-shadow-dark: -6px -6px 12px rgba(255, 255, 255, 0.02),
+                          6px 6px 12px rgba(0, 0, 0, 0.7);
+      --neu-shadow-inset: inset -4px -4px 8px rgba(255, 255, 255, 0.02),
+                          inset 4px 4px 8px rgba(0, 0, 0, 0.7);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding: 0 5vw;
+      gap: 16px;
+      background: rgba(7, 7, 17, .8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      transition: all .3s;
+    }
+    .nav-logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -.5px;
+    }
+    .nav-spacer { flex: 1; }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-link {
+      padding: 8px 16px;
+      font-size: .875rem;
+      font-weight: 500;
+      color: var(--muted);
+      border-radius: 8px;
+      transition: .2s;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: #fff;
+      background: rgba(255, 255, 255, .06);
+    }
+    .nav-cta {
+      padding: 9px 20px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 8px;
+      font-size: .875rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: .2s;
+      font-family: inherit;
+    }
+    .nav-cta:hover {
+      background: var(--primary-dk);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, .4);
+    }
+
+    /* ── PARALLAX HERO ── */
+    .parallax-hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      perspective: 1px; /* Para Fallback ou JS Parallax */
+    }
+
+    .parallax-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 120%; /* Extra height for scrolling effect */
+      background: linear-gradient(to bottom, rgba(7,7,17,0.3) 0%, rgba(7,7,17,1) 100%),
+                  url('https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=2070&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      z-index: 1;
+      transform: translateZ(0); /* Will be manipulated by JS for smoother Parallax */
+      will-change: transform;
+    }
+
+    .hero-glass-card {
+      position: relative;
+      z-index: 2;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      padding: 3rem;
+      border-radius: 24px;
+      text-align: center;
+      max-width: 800px;
+      width: 90%;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      /* Scroll Trigger Animation default state */
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 1s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .hero-glass-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff, #a78bfa, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-text {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text);
+      opacity: 0.9;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ── SCROLL TRIGGERED SECTIONS ── */
+    .section {
+      padding: 100px 5vw;
+      position: relative;
+      z-index: 5;
+      background: var(--bg-dark);
+    }
+    
+    .fade-in-section {
+      opacity: 0;
+      transform: translateY(50px) scale(0.95);
+      transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, visibility;
+    }
+    
+    .fade-in-section.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* ── SOBRE A CRIAVIBE & LOTTIE ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .about-content h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 24px;
+      color: #fff;
+    }
+
+    .about-content h2 span {
+      background: linear-gradient(135deg, var(--primary), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .about-content p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .lottie-container {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      filter: drop-shadow(0 0 30px rgba(99, 102, 241, 0.2));
+    }
+
+    /* ── REDES SOCIAIS & NEUMORPHISM ── */
+    .social-section {
+      background: var(--neu-bg);
+      text-align: center;
+      padding-top: 80px;
+      padding-bottom: 80px;
+    }
+
+    .social-section h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 50px;
+    }
+
+    .social-cards {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .social-card {
+      width: 280px;
+      padding: 40px 20px;
+      border-radius: 20px;
+      background: var(--neu-bg);
+      box-shadow: var(--neu-shadow-dark);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .social-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 1;
+      border-radius: 20px;
+    }
+
+    .social-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--neu-shadow-inset);
+    }
+    
+    .social-card:hover::before {
+      opacity: 1;
+    }
+
+    .icon-wrapper {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--neu-bg);
+      box-shadow: var(--neu-shadow-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 2rem;
+      transition: all 0.3s;
+      position: relative;
+      z-index: 2;
+    }
+
+    .social-card:hover .icon-wrapper {
+      box-shadow: var(--neu-shadow-inset);
+      transform: scale(0.9);
+      color: var(--primary);
+    }
+    
+    .social-card.instagram:hover .icon-wrapper { color: #E1306C; }
+    .social-card.facebook:hover .icon-wrapper { color: #1877F2; }
+    .social-card.whatsapp:hover .icon-wrapper { color: #25D366; }
+
+    .social-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+      position: relative;
+      z-index: 2;
+    }
+
+    .social-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── INSTAGRAM CAROUSEL ── */
+    .ig-carousel-section {
+      padding: 100px 5vw;
+      text-align: center;
+      background: #070711;
+      overflow: hidden;
+    }
+
+    .ig-carousel-section h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    
+    .ig-carousel-section p.sub {
+      color: var(--muted);
+      margin-bottom: 50px;
+      font-size: 1.1rem;
+    }
+
+    .carousel-container {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding: 0 5vw;
+      padding-bottom: 40px;
+      /* Ocultar barra de rolagem */
+      -ms-overflow-style: none;  
+      scrollbar-width: none;  
+    }
+    .carousel-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carousel-item {
+      flex: 0 0 300px;
+      height: 400px;
+      scroll-snap-align: center;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      transition: transform 0.4s;
+      cursor: pointer;
+    }
+    
+    .carousel-item:hover {
+      transform: translateY(-8px);
+    }
+
+    .carousel-item img, .carousel-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s;
+    }
+    
+    .carousel-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .ig-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+      gap: 20px;
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: bold;
+      backdrop-filter: blur(2px);
+    }
+
+    .carousel-item:hover .ig-overlay {
+      opacity: 1;
+    }
+
+    .ig-overlay span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .carousel-btn {
+      display: inline-block;
+      margin-top: 40px;
+      padding: 14px 32px;
+      background: transparent;
+      color: #fff;
+      border: 1px solid var(--border-glass);
+      border-radius: 30px;
+      font-weight: 600;
+      transition: 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .carousel-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, .08);
+      padding: 32px 5vw;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: var(--light);
+      font-size: .8rem;
+      background: var(--bg-dark);
+    }
+
+    footer span {
+      flex: 1;
+      text-align: right;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav id="topnav">
+    <div class="nav-logo">✦ CriaVibe</div>
+    <div class="nav-spacer"></div>
+    <div class="nav-links">
+      <a href="/saiba_mais.html" class="nav-link active">Sobre</a>
+      <a href="/entrar.html" class="nav-link">Entrar</a>
+    </div>
+    <button class="nav-cta" onclick="location.href='/entrar.html#cadastro'">
+      Começar Grátis <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </nav>
+
+  <!-- PARALLAX HERO -->
+  <header class="parallax-hero">
+    <div class="parallax-bg" id="parallax-bg"></div>
+    <div class="hero-glass-card scroll-trigger">
+      <h1 class="hero-title">A Arte da CriaVibe</h1>
+      <p class="hero-text">
+        Capturamos a essência, eternizamos o momento. Na CriaVibe, nossa missão é transformar instantâneos em memórias artísticas que atravessam gerações.
+      </p>
+    </div>
+  </header>
+
+  <!-- SOBRE NOS SECTION -->
+  <section class="section fade-in-section scroll-trigger">
+    <div class="about-grid">
+      <div class="about-content">
+        <h2>Fotografia <span>Profissional</span> em Cada Detalhe</h2>
+        <p>
+          Com equipamentos de ponta, olhar sensível e cuidado na edição de cada fotografia, nossos profissionais garantem que você receba um trabalho que transborda sentimento. 
+        </p>
+        <p>
+          Cada ensaio, cada evento e cada ensaio de estúdio é tratado de forma única. Não apenas entregamos fotos, mas curamos uma experiência premium por meio da nossa plataforma de galerias exclusiva.
+        </p>
+      </div>
+      <div class="lottie-container">
+        <!-- Lottie Animation usando URL publica de fotografia/camera -->
+        <lottie-player 
+          src="https://lottie.host/8cd7b2c5-7aeb-4c7b-9f44-8cbdaeb20970/QvR5wA10D4.json" 
+          background="transparent" 
+          speed="1" 
+          style="width: 100%; height: 100%;" 
+          loop 
+          autoplay>
+        </lottie-player>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSTAGRAM CAROUSEL -->
+  <section class="ig-carousel-section fade-in-section scroll-trigger">
+    <h2>Nossa Vibe no Instagram</h2>
+    <p class="sub">@criavibe_ • Últimos Trabalhos</p>
+    
+    <div class="carousel-container" id="ig-carousel">
+      <!-- Item 1 -->
+      <a href="https://www.instagram.com/criavibe_/" target="_blank" class="carousel-item">
+        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&h=800&fit=crop" alt="CriaVibe Portfólio">
+        <div class="ig-overlay">
+          <span><i class="fa-solid fa-heart"></i> 1K</span>
+          <span><i class="fa-solid fa-comment"></i> 42</span>
+        </div>
+      </a>
+      <!-- Item 2 -->
+      <a href="https://www.instagram.com/criavibe_/" target="_blank" class="carousel-item">
+        <video autoplay muted loop playsinline>
+          <source src="https://cdn.pixabay.com/video/2016/08/22/4747-183786483_tiny.mp4" type="video/mp4">
+        </video>
+        <div class="ig-overlay">
+          <span><i class="fa-solid fa-play"></i> 5K</span>
+        </div>
+      </a>
+      <!-- Item 3 -->
+      <a href="https://www.instagram.com/criavibe_/" target="_blank" class="carousel-item">
+        <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=800&fit=crop" alt="CriaVibe Portfólio">
+        <div class="ig-overlay">
+          <span><i class="fa-solid fa-heart"></i> 856</span>
+          <span><i class="fa-solid fa-comment"></i> 15</span>
+        </div>
+      </a>
+      <!-- Item 4 -->
+      <a href="https://www.instagram.com/criavibe_/" target="_blank" class="carousel-item">
+        <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&h=800&fit=crop" alt="CriaVibe Portfólio">
+        <div class="ig-overlay">
+          <span><i class="fa-solid fa-heart"></i> 2.1K</span>
+          <span><i class="fa-solid fa-comment"></i> 124</span>
+        </div>
+      </a>
+      <!-- Item 5 -->
+      <a href="https://www.instagram.com/criavibe_/" target="_blank" class="carousel-item">
+        <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=600&h=800&fit=crop" alt="CriaVibe Portfólio">
+        <div class="ig-overlay">
+          <span><i class="fa-solid fa-heart"></i> 530</span>
+          <span><i class="fa-solid fa-comment"></i> 8</span>
+        </div>
+      </a>
+    </div>
+
+    <a href="https://www.instagram.com/criavibe_/" target="_blank" class="carousel-btn">
+      <i class="fa-brands fa-instagram"></i> Ver Perfil Completo
+    </a>
+  </section>
+
+  <!-- REDES SOCIAIS (NEUMORPHISM) -->
+  <section class="social-section fade-in-section scroll-trigger">
+    <h2>Conecte-se Conosco</h2>
+    
+    <div class="social-cards">
+      <!-- Instagram -->
+      <a href="https://www.instagram.com/criavibe_/" target="_blank" class="social-card instagram">
+        <div class="icon-wrapper">
+          <i class="fa-brands fa-instagram"></i>
+        </div>
+        <h3>Instagram</h3>
+        <p>Acompanhe nossos bastidores e os últimos ensaios no feed.</p>
+      </a>
+
+      <!-- Facebook -->
+      <a href="https://facebook.com/criavibe" target="_blank" class="social-card facebook">
+        <div class="icon-wrapper">
+          <i class="fa-brands fa-facebook-f"></i>
+        </div>
+        <h3>Facebook</h3>
+        <p>Junte-se a nossa comunidade e veja promoções exclusivas.</p>
+      </a>
+
+      <!-- WhatsApp -->
+      <a href="https://wa.me/5511000000000" target="_blank" class="social-card whatsapp">
+        <div class="icon-wrapper">
+          <i class="fa-brands fa-whatsapp"></i>
+        </div>
+        <h3>WhatsApp</h3>
+        <p>Agende seu ensaio ou tire dúvidas diretamente com nossa equipe.</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="nav-logo">✦ CriaVibe</div>
+    <a href="/saiba_mais.html" style="color:var(--light);font-size:.8rem">Sobre</a>
+    <a href="/entrar.html" style="color:var(--light);font-size:.8rem">Entrar</a>
+    <span>© 2025 CriaVibe · Todos os direitos reservados</span>
+  </footer>
+
+  <script>
+    // Parallax Effect
+    const parallaxBg = document.getElementById('parallax-bg');
+    window.addEventListener('scroll', () => {
+      let scrollPos = window.scrollY;
+      // move the background slightly slower than the user scrolls
+      parallaxBg.style.transform = `translateY(${scrollPos * 0.4}px)`;
+      
+      // Nav scroll effect
+      document.getElementById('topnav').style.background = scrollPos > 60 ? 'rgba(7,7,17,.95)' : 'rgba(7,7,17,.8)';
+    });
+
+    // Scroll Triggered Animations with IntersectionObserver
+    const triggerElements = document.querySelectorAll('.scroll-trigger');
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          obs.unobserve(entry.target); // Animates only once
+        }
+      });
+    }, {
+      threshold: 0.1, // Trigger when 10% visible
+      rootMargin: "0px 0px -50px 0px" // Trigger slightly before it comes fully into view
+    });
+
+    triggerElements.forEach(el => observer.observe(el));
+    
+    // Auto-scroll microinteraction for carousel on hover to hint scrubability
+    const carouselContainer = document.getElementById('ig-carousel');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    carouselContainer.addEventListener('mousedown', (e) => {
+      isDown = true;
+      carouselContainer.style.cursor = 'grabbing';
+      startX = e.pageX - carouselContainer.offsetLeft;
+      scrollLeft = carouselContainer.scrollLeft;
+    });
+    
+    carouselContainer.addEventListener('mouseleave', () => {
+      isDown = false;
+      carouselContainer.style.cursor = 'pointer';
+    });
+    
+    carouselContainer.addEventListener('mouseup', () => {
+      isDown = false;
+      carouselContainer.style.cursor = 'pointer';
+    });
+    
+    carouselContainer.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - carouselContainer.offsetLeft;
+      const walk = (x - startX) * 2; // Scroll-fast
+      carouselContainer.scrollLeft = scrollLeft - walk;
+    });
+  </script>
+</body>
+
+</html>
