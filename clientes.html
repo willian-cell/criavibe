@@ -83,32 +83,90 @@
   await carregarClientes();
 })();
 
+let listaClientes = [];
+
 async function carregarClientes() {
   const d = await API.get('/clientes/list.php');
   const tbody = document.getElementById('clientes-tbody');
-  const lista = d.clientes || [];
-  if (!lista.length) {
+  listaClientes = d.clientes || [];
+  if (!listaClientes.length) {
     tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="icon"><i class="fa-solid fa-users"></i></div><p>Nenhum cliente cadastrado.</p></div></td></tr>';
     return;
   }
-  tbody.innerHTML = lista.map(c => `
-    <tr>
-      <td><strong>${c.nome}</strong></td>
-      <td style="color:var(--muted)">${c.email||'—'}</td>
-      <td style="color:var(--muted)">${c.telefone||'—'}</td>
-      <td>
-        <code style="background:var(--bg);padding:3px 8px;border-radius:4px;font-size:.85rem">${c.senha_acesso}</code>
-        <button class="copy-btn" onclick="navigator.clipboard.writeText('${c.senha_acesso}').then(()=>showToast('Senha copiada!'))">
-          <i class="fa-solid fa-copy"></i>
-        </button>
-      </td>
-      <td>
-        <button class="btn btn-danger btn-sm" onclick="excluirCliente(${c.id},'${c.nome.replace(/'/g,"\\'")}')">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </td>
-    </tr>
-  `).join('');
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('clientes-tbody');
+  tbody.innerHTML = listaClientes.map(c => {
+    if (c.editando) {
+      return `
+        <tr>
+          <td><input type="text" id="edit-n-${c.id}" class="form-control" value="${c.nome}" style="padding:4px 8px; width:100%"></td>
+          <td><input type="email" id="edit-e-${c.id}" class="form-control" value="${c.email||''}" style="padding:4px 8px; width:100%"></td>
+          <td><input type="tel" id="edit-t-${c.id}" class="form-control" value="${c.telefone||''}" style="padding:4px 8px; width:100%"></td>
+          <td>
+            <input type="text" id="edit-s-${c.id}" class="form-control" value="${c.senha_acesso}" style="padding:4px 8px; width:100px; display:inline-block">
+          </td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-primary btn-sm" onclick="salvarEdicao(${c.id})" title="Salvar"><i class="fa-solid fa-check"></i></button>
+            <button class="btn btn-secondary btn-sm" onclick="cancelarEdicao(${c.id})" title="Cancelar"><i class="fa-solid fa-xmark"></i></button>
+          </td>
+        </tr>
+      `;
+    }
+    return `
+      <tr>
+        <td><strong>${c.nome}</strong></td>
+        <td style="color:var(--muted)">${c.email||'—'}</td>
+        <td style="color:var(--muted)">${c.telefone||'—'}</td>
+        <td>
+          <code style="background:var(--bg);padding:3px 8px;border-radius:4px;font-size:.85rem">${c.senha_acesso}</code>
+          <button class="copy-btn" onclick="navigator.clipboard.writeText('${c.senha_acesso}').then(()=>showToast('Senha copiada!'))">
+             <i class="fa-solid fa-copy"></i>
+          </button>
+        </td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-secondary btn-sm" onclick="iniciarEdicao(${c.id})" title="Editar inline">
+            <i class="fa-solid fa-pen"></i>
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="excluirCliente(${c.id},'${c.nome.replace(/'/g,"\\'")}')" title="Excluir">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function iniciarEdicao(id) {
+  const c = listaClientes.find(x => x.id == id);
+  if(c) { c.editando = true; renderTable(); }
+}
+
+function cancelarEdicao(id) {
+  const c = listaClientes.find(x => x.id == id);
+  if(c) { c.editando = false; renderTable(); }
+}
+
+async function salvarEdicao(id) {
+  const nome = document.getElementById('edit-n-'+id).value.trim();
+  const email = document.getElementById('edit-e-'+id).value.trim();
+  const tel = document.getElementById('edit-t-'+id).value.trim();
+  const senha = document.getElementById('edit-s-'+id).value.trim();
+  if(!nome || !senha) return showToast('Nome e senha são obrigatórios!');
+  
+  try {
+    const d = await API.post('/clientes/update.php', {id, nome, email, telefone: tel, senha_acesso: senha});
+    if(d.status === 'ok') {
+      showToast('Cliente atualizado com sucesso!');
+      await carregarClientes();
+    } else {
+      showToast(d.mensagem);
+    }
+  } catch(e) {
+    showToast(e.message);
+  }
 }
 
 async function criarCliente() {
