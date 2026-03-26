@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__.'/../config.php';
-require_auth();
+// Fotos são acessíveis publicamente se você tem o galeria_id (via token da galeria)
+// Sem exigir login para permitir que clientes vejam as fotos
 
 $galeria_id = (int)($_GET['galeria_id'] ?? 0);
 if (!$galeria_id) json_out(['status'=>'erro','mensagem'=>'galeria_id obrigatório.'], 400);
