@@ -146,6 +146,21 @@
         <label>Nova Senha <small style="color:var(--muted)">(vazio = manter atual)</small></label>
         <input id="e-senha" class="form-control" type="password" placeholder="Nova senha">
       </div>
+      <div class="form-group">
+        <label>Limite de Downloads <small style="color:var(--muted)">(0 = ilimitado)</small></label>
+        <input id="e-max-dl" class="form-control" type="number" min="0" placeholder="Ex: 50">
+      </div>
+      <div class="form-group" style="display:flex;gap:16px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem">
+          <input type="checkbox" id="e-download-individual"> Permitir download individual
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem">
+          <input type="checkbox" id="e-download-all"> Baixar todas em ZIP
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem">
+          <input type="checkbox" id="e-selecao-ativa"> Seleção de fotos
+        </label>
+      </div>
       <div id="e-err" class="form-error"></div>
       <div style="display:flex;gap:10px;margin-top:8px">
         <button class="btn btn-primary" style="flex:1" onclick="salvarEdicao()">
@@ -272,6 +287,10 @@ async function abrirEdicao(id) {
   document.getElementById('e-descricao').value     = g.descricao || '';
   document.getElementById('e-privacidade').value   = g.privacidade;
   document.getElementById('e-senha').value         = '';
+  document.getElementById('e-max-dl').value        = g.max_selecao || 0;
+  document.getElementById('e-download-individual').checked = !!g.download_individual;
+  document.getElementById('e-download-all').checked        = !!g.download_all;
+  document.getElementById('e-selecao-ativa').checked       = !!g.selecao_ativa;
   document.getElementById('e-err').classList.remove('show');
   toggleSenha('e-senha-g','e-privacidade');
   fecharModal('modal-nova');
@@ -292,6 +311,10 @@ async function salvarEdicao() {
       descricao: document.getElementById('e-descricao').value.trim(),
       privacidade: document.getElementById('e-privacidade').value,
       senha: document.getElementById('e-senha').value || null,
+      max_selecao: parseInt(document.getElementById('e-max-dl').value) || 0,
+      download_individual: document.getElementById('e-download-individual').checked ? 1 : 0,
+      download_all: document.getElementById('e-download-all').checked ? 1 : 0,
+      selecao_ativa: document.getElementById('e-selecao-ativa').checked ? 1 : 0,
     });
     if (d.status==='ok') { fecharModal('modal-editar'); showToast('Galeria atualizada!'); await carregarGalerias(); }
     else { err.textContent=d.mensagem; err.classList.add('show'); }
