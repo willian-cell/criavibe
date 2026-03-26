@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes — CriaVibe</title>
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-logo"><i class="fa-solid fa-images"></i> CriaVibe</div>
+  <div class="topnav-spacer"></div>
+  <div class="topnav-user">
+    <i class="fa-solid fa-user-circle" style="font-size:1.2rem;color:var(--primary)"></i>
+    <span>Olá, <strong id="nav-nome">...</strong></span>
+    <button class="topnav-logout" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
+  </div>
+</nav>
+
+<div class="painel-layout">
+  <aside class="painel-sidebar">
+    <h3>Menu</h3>
+    <a href="/painel.html" class="sidebar-link"><i class="fa-solid fa-images"></i> Galerias</a>
+    <a href="/clientes.html" class="sidebar-link active"><i class="fa-solid fa-users"></i> Clientes</a>
+    <h3 style="margin-top:20px">Conta</h3>
+    <a href="/configuracoes.html" class="sidebar-link"><i class="fa-solid fa-gear"></i> Configurações</a>
+  </aside>
+
+  <main class="painel-main">
+    <div class="painel-header">
+      <h2><i class="fa-solid fa-users" style="color:var(--primary)"></i> Clientes</h2>
+      <button class="btn btn-primary" onclick="document.getElementById('modal-novo').classList.add('open')">
+        <i class="fa-solid fa-plus"></i> Novo Cliente
+      </button>
+    </div>
+
+    <div class="galleries-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th>Senha de Acesso</th>
+            <th style="width:50px">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="clientes-tbody">
+          <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted)"><i class="fa-solid fa-spinner fa-spin"></i></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL NOVO CLIENTE -->
+<div class="modal-backdrop" id="modal-novo" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fa-solid fa-user-plus" style="color:var(--primary)"></i> Novo Cliente</h3>
+      <button class="modal-close" onclick="document.getElementById('modal-novo').classList.remove('open')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Nome completo</label><input id="c-nome" class="form-control" type="text" placeholder="Nome do cliente"></div>
+      <div class="form-group"><label>E-mail</label><input id="c-email" class="form-control" type="email" placeholder="email@exemplo.com"></div>
+      <div class="form-group"><label>Telefone / WhatsApp</label><input id="c-tel" class="form-control" type="tel" placeholder="+55 (11) 99999-9999"></div>
+      <div id="c-err" class="form-error"></div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-primary" style="flex:1" onclick="criarCliente()"><i class="fa-solid fa-plus"></i> Criar</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('modal-novo').classList.remove('open')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/auth.js"></script>
+<script>
+(async () => {
+  const u = await requireAuth();
+  document.getElementById('nav-nome').textContent = u.nome;
+  await carregarClientes();
+})();
+
+async function carregarClientes() {
+  const d = await API.get('/clientes/list.php');
+  const tbody = document.getElementById('clientes-tbody');
+  const lista = d.clientes || [];
+  if (!lista.length) {
+    tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="icon"><i class="fa-solid fa-users"></i></div><p>Nenhum cliente cadastrado.</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = lista.map(c => `
+    <tr>
+      <td><strong>${c.nome}</strong></td>
+      <td style="color:var(--muted)">${c.email||'—'}</td>
+      <td style="color:var(--muted)">${c.telefone||'—'}</td>
+      <td>
+        <code style="background:var(--bg);padding:3px 8px;border-radius:4px;font-size:.85rem">${c.senha_acesso}</code>
+        <button class="copy-btn" onclick="navigator.clipboard.writeText('${c.senha_acesso}').then(()=>showToast('Senha copiada!'))">
+          <i class="fa-solid fa-copy"></i>
+        </button>
+      </td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="excluirCliente(${c.id},'${c.nome.replace(/'/g,"\\'")}')">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function criarCliente() {
+  const nome  = document.getElementById('c-nome').value.trim();
+  const email = document.getElementById('c-email').value.trim();
+  const tel   = document.getElementById('c-tel').value.trim();
+  const err   = document.getElementById('c-err');
+  err.classList.remove('show');
+  if (!nome) { err.textContent='Nome obrigatório.'; err.classList.add('show'); return; }
+  try {
+    const d = await API.post('/clientes/create.php', {nome,email,telefone:tel});
+    if (d.status==='ok') {
+      document.getElementById('modal-novo').classList.remove('open');
+      showToast(`Cliente criado! Senha: ${d.senha_acesso}`);
+      await carregarClientes();
+    } else { err.textContent=d.mensagem; err.classList.add('show'); }
+  } catch(e) { err.textContent=e.message; err.classList.add('show'); }
+}
+
+async function excluirCliente(id, nome) {
+  if (!confirm(`Excluir cliente "${nome}"?`)) return;
+  await API.post('/clientes/delete.php', {id});
+  showToast('Cliente excluído.'); await carregarClientes();
+}
+</script>
+</body>
+</html>

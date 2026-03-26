@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações — CriaVibe</title>
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-logo"><i class="fa-solid fa-images"></i> CriaVibe</div>
+  <div class="topnav-spacer"></div>
+  <div class="topnav-user">
+    <span>Olá, <strong id="nav-nome">...</strong></span>
+    <button class="topnav-logout" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
+  </div>
+</nav>
+
+<div class="painel-layout">
+  <aside class="painel-sidebar">
+    <h3>Menu</h3>
+    <a href="/painel.html" class="sidebar-link"><i class="fa-solid fa-images"></i> Galerias</a>
+    <a href="/clientes.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Clientes</a>
+    <h3 style="margin-top:20px">Conta</h3>
+    <a href="/configuracoes.html" class="sidebar-link active"><i class="fa-solid fa-gear"></i> Configurações</a>
+  </aside>
+
+  <main class="painel-main">
+    <div class="painel-header"><h2><i class="fa-solid fa-gear" style="color:var(--primary)"></i> Configurações da Conta</h2></div>
+
+    <div style="background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;max-width:520px">
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:20px">Dados Pessoais</h3>
+      <div class="form-group"><label>Nome</label><input id="cfg-nome" class="form-control" type="text"></div>
+      <div class="form-group"><label>E-mail</label><input id="cfg-email" class="form-control" type="email" disabled style="opacity:.6;cursor:not-allowed"></div>
+      <div id="cfg-msg" class="form-error"></div>
+      <button class="btn btn-primary" onclick="salvarNome()"><i class="fa-solid fa-floppy-disk"></i> Salvar Nome</button>
+
+      <hr style="margin:28px 0;border-color:var(--border)">
+
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:20px">Alterar Senha</h3>
+      <div class="form-group"><label>Nova Senha</label><input id="nova-senha" class="form-control" type="password" placeholder="Mínimo 6 caracteres"></div>
+      <div class="form-group"><label>Confirmar Senha</label><input id="confirma-senha" class="form-control" type="password" placeholder="Repita a nova senha"></div>
+      <div id="pwd-msg" class="form-error"></div>
+      <button class="btn btn-secondary" onclick="alterarSenha()"><i class="fa-solid fa-key"></i> Alterar Senha</button>
+    </div>
+  </main>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/auth.js"></script>
+<script>
+(async () => {
+  const u = await requireAuth();
+  document.getElementById('nav-nome').textContent  = u.nome;
+  document.getElementById('cfg-nome').value  = u.nome;
+  document.getElementById('cfg-email').value = u.email;
+})();
+
+async function salvarNome() {
+  const nome = document.getElementById('cfg-nome').value.trim();
+  const err  = document.getElementById('cfg-msg');
+  err.classList.remove('show');
+  if (!nome) { err.textContent='Nome obrigatório.'; err.classList.add('show'); return; }
+  showToast('Nome atualizado! (integração em breve)');
+}
+
+async function alterarSenha() {
+  const senha  = document.getElementById('nova-senha').value;
+  const conf   = document.getElementById('confirma-senha').value;
+  const err    = document.getElementById('pwd-msg');
+  err.classList.remove('show');
+  if (senha.length < 6) { err.textContent='Mínimo 6 caracteres.'; err.classList.add('show'); return; }
+  if (senha !== conf)   { err.textContent='As senhas não coincidem.'; err.classList.add('show'); return; }
+  showToast('Senha alterada! (integração em breve)');
+}
+</script>
+</body>
+</html>

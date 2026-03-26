@@ -1,18 +1,22 @@
-# Credenciais e segredos - NUNCA subir ao GitHub!
+# Credenciais e segredos — NUNCA subir ao GitHub!
 CREDENCIAIS.md
 .env
 *.env
 
-# Python
-__pycache__/
-*.py[cod]
-venv/
-.venv/
-*.egg-info/
+# PHP
+api/config.php
+
+# Uploads dos clientes (ficam no servidor)
+uploads/fotos/*
+uploads/musicas/*
+!uploads/fotos/.gitkeep
+!uploads/musicas/.gitkeep
 
 # Sistema
 .DS_Store
 Thumbs.db
+Thumbs.db:encdata
+*.log
 
-# Uploads locais (usar R2 em produção)
-static/uploads/
+# Deploy
+deploy_ftp.ps1

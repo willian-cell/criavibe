@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar — CriaVibe</title>
+  <meta name="description" content="Acesse sua conta CriaVibe ou crie uma nova conta de fotógrafo.">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .auth-card { background: #fff; border-radius: 20px; padding: 40px; width: 100%; max-width: 420px; box-shadow: 0 24px 60px rgba(0,0,0,.25); }
+    .auth-logo { text-align: center; font-size: 1.6rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+    .auth-sub { text-align: center; color: var(--muted); font-size: .875rem; margin-bottom: 28px; }
+    .auth-tabs { display: flex; gap: 4px; background: var(--bg); border-radius: 8px; padding: 4px; margin-bottom: 28px; }
+    .auth-tab { flex: 1; text-align: center; padding: 8px; border-radius: 6px; font-size: .85rem; font-weight: 600; cursor: pointer; border: none; background: none; color: var(--muted); transition: var(--tr); font-family: inherit; }
+    .auth-tab.active { background: #fff; color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; }
+    #msg { margin-top: 12px; }
+  </style>
+</head>
+<body>
+<div class="auth-card">
+  <div class="auth-logo">✦ CriaVibe</div>
+  <p class="auth-sub">Plataforma de galerias para fotógrafos</p>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" onclick="switchTab('login')">Entrar</button>
+    <button class="auth-tab" onclick="switchTab('register')">Criar Conta</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="panel-login" class="auth-panel active">
+    <div class="form-group">
+      <label for="l-email">E-mail</label>
+      <input id="l-email" class="form-control" type="email" placeholder="seu@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label for="l-senha">Senha</label>
+      <input id="l-senha" class="form-control" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div id="msg-login" class="form-error"></div>
+    <button class="btn btn-primary btn-block" style="margin-top:8px" onclick="fazerLogin()">
+      <i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar
+    </button>
+    <p style="text-align:center;font-size:.8rem;color:var(--muted);margin-top:16px">
+      <a href="/" style="color:var(--primary)">← Voltar para o site</a>
+    </p>
+  </div>
+
+  <!-- CADASTRO -->
+  <div id="panel-register" class="auth-panel">
+    <div class="form-group">
+      <label for="r-nome">Seu Nome</label>
+      <input id="r-nome" class="form-control" type="text" placeholder="Nome completo">
+    </div>
+    <div class="form-group">
+      <label for="r-email">E-mail</label>
+      <input id="r-email" class="form-control" type="email" placeholder="seu@email.com">
+    </div>
+    <div class="form-group">
+      <label for="r-senha">Senha</label>
+      <input id="r-senha" class="form-control" type="password" placeholder="Mínimo 6 caracteres">
+    </div>
+    <div id="msg-register" class="form-error"></div>
+    <button class="btn btn-primary btn-block" style="margin-top:8px" onclick="fazerCadastro()">
+      <i class="fa-solid fa-user-plus"></i> Criar Conta Grátis
+    </button>
+  </div>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('panel-login').classList.toggle('active', tab==='login');
+  document.getElementById('panel-register').classList.toggle('active', tab==='register');
+}
+
+async function fazerLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const senha = document.getElementById('l-senha').value;
+  const err   = document.getElementById('msg-login');
+  err.classList.remove('show');
+  if (!email || !senha) { err.textContent='Preencha todos os campos.'; err.classList.add('show'); return; }
+  try {
+    const d = await API.post('/auth/login.php', { email, senha });
+    if (d.status === 'ok') window.location.href = '/painel.html';
+    else { err.textContent = d.mensagem; err.classList.add('show'); }
+  } catch(e) { err.textContent = e.message; err.classList.add('show'); }
+}
+
+async function fazerCadastro() {
+  const nome  = document.getElementById('r-nome').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const senha = document.getElementById('r-senha').value;
+  const err   = document.getElementById('msg-register');
+  err.classList.remove('show');
+  if (!nome || !email || !senha) { err.textContent='Preencha todos os campos.'; err.classList.add('show'); return; }
+  try {
+    const d = await API.post('/auth/register.php', { nome, email, senha });
+    if (d.status === 'ok') { showToast('Conta criada! Faça login.'); switchTab('login'); }
+    else { err.textContent = d.mensagem; err.classList.add('show'); }
+  } catch(e) { err.textContent = e.message; err.classList.add('show'); }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') fazerLogin(); });
+
+// Se já logado, redireciona
+(async () => {
+  try {
+    const d = await API.get('/auth/me.php');
+    if (d.status === 'ok') window.location.href = '/painel.html';
+  } catch {}
+})();
+</script>
+</body>
+</html>

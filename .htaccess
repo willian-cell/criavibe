@@ -1,11 +1,41 @@
-PassengerEnabled On
-PassengerAppRoot /home/u276112142/domains/red-llama-690371.hostingersite.com/public_html
-PassengerAppType wsgi
-PassengerStartupFile passenger_wsgi.py
-PassengerPython /home/u276112142/domains/red-llama-690371.hostingersite.com/public_html/venv/bin/python
+# .htaccess — CriaVibe PHP Edition
 
-# Não servir arquivos de upload via PHP
-<FilesMatch "\.(env|py|pyc)$">
-    Order deny,allow
-    Deny from all
-</FilesMatch>
+Options -Indexes
+
+# ── PHP Settings ──────────────────────────────────────────────
+php_value upload_max_filesize 50M
+php_value post_max_size 52M
+php_value memory_limit 128M
+php_value max_execution_time 120
+
+# ── Protect sensitive files ────────────────────────────────────
+<Files ".env">
+  Order allow,deny
+  Deny from all
+</Files>
+<Files "*.sql">
+  Order allow,deny
+  Deny from all
+</Files>
+<Files "*.md">
+  Order allow,deny
+  Deny from all
+</Files>
+
+# ── Protect uploads dir from PHP execution ─────────────────────
+<Directory "uploads">
+  php_flag engine off
+  Options -ExecCGI
+  AddType text/plain .php .php3 .phtml
+</Directory>
+
+# ── Routing (SPA-like) ─────────────────────────────────────────
+RewriteEngine On
+
+# Allow direct access to real files/directories
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Serve index.html for anything else at root
+# (API routes handled directly by PHP files)
