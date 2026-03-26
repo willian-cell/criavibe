@@ -111,7 +111,7 @@
     #lb-next{right:16px}
     #lb-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);
       border:none;color:#fff;font-size:1.3rem;padding:8px 12px;cursor:pointer;border-radius:8px}
-    #lb-dl{position:absolute;bottom:20px;right:20px}
+    #lb-dl{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:30px;box-shadow:0 8px 30px rgba(0,0,0,0.5);font-size:1rem;z-index:310}
     .loading{text-align:center;padding:80px;color:var(--muted)}
     .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
       background:#1e1e3a;border:1px solid var(--primary);border-radius:10px;
@@ -150,7 +150,11 @@
 
 <!-- TOOLBAR -->
 <div id="toolbar" style="display:none">
-  <div class="toolbar-info" id="toolbar-info">Clique nas fotos para selecionar</div>
+  <div class="toolbar-info" id="toolbar-info" style="font-size:0.75rem; line-height:1.4;">
+    * 1 Clique na foto para selecionar<br>
+    * 2 Cliques para ampliar a foto na tela<br>
+    * 3 Cliques para selecionar todas possíveis
+  </div>
   <button class="tbtn tbtn-outline" id="btn-select-all" onclick="selecionarTodas()" style="display:none">
     <i class="fa-solid fa-check-double"></i> Todas
   </button>
@@ -324,12 +328,38 @@ async function carregarMusica() {
 }
 
 // ── SELECTION ─────────────────────────────────────────────────
+let clickTimer = null;
+let clickCount = 0;
+
 function clicarFoto(e, idx) {
   if (e.target.classList.contains('dl-btn') || e.target.closest('.dl-btn')) return;
-  if (GALERIA.selecao_ativa) {
-    toggleSelecao(idx);
-  } else {
-    abrirLightbox(idx);
+  
+  clickCount++;
+  
+  if (clickCount === 1) {
+    clickTimer = setTimeout(() => {
+      // 1 Clique: Seleciona
+      if (GALERIA.selecao_ativa) {
+        toggleSelecao(idx);
+      } else {
+        abrirLightbox(idx);
+      }
+      clickCount = 0;
+    }, 280);
+  } else if (clickCount === 2) {
+    clearTimeout(clickTimer);
+    clickTimer = setTimeout(() => {
+      // 2 Cliques: Amplia
+      abrirLightbox(idx);
+      clickCount = 0;
+    }, 280);
+  } else if (clickCount === 3) {
+    clearTimeout(clickTimer);
+    // 3 Cliques: Seleciona Todas
+    if (GALERIA.selecao_ativa) {
+      selecionarTodas();
+    }
+    clickCount = 0;
   }
 }
 
@@ -360,9 +390,9 @@ function atualizarToolbar() {
   document.getElementById('sel-count').textContent = n;
   const btnZipSel = document.getElementById('btn-zip-sel');
   if (btnZipSel) btnZipSel.style.display = n > 0 ? '' : 'none';
-  document.getElementById('toolbar-info').textContent =
-    n > 0 ? `${n} foto${n>1?'s':''} selecionada${n>1?'s':''}` :
-    (GALERIA.selecao_ativa ? 'Clique nas fotos para selecionar' : `${FOTOS.length} fotos`);
+  document.getElementById('toolbar-info').innerHTML =
+    n > 0 ? `<b>${n} foto${n>1?'s':''} selecionada${n>1?'s':''}</b><br><span style="font-size:0.7rem;opacity:0.8">* 1 Clique: Seleciona | 2 Cliques: Amplia | 3 Cliques: Seleciona Todas</span>` :
+    (GALERIA.selecao_ativa ? '* 1 Clique na foto para selecionar<br>* 2 Cliques para ampliar a foto na tela<br>* 3 Cliques para selecionar todas possíveis' : `${FOTOS.length} fotos`);
 }
 
 // ── DOWNLOADS ─────────────────────────────────────────────────
