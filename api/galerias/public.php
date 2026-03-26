@@ -2,14 +2,22 @@
 require_once __DIR__.'/../config.php';
 
 $sql = "
-    SELECT g.id, g.nome, g.descricao, g.usuario_email,
-           GROUP_CONCAT(i.caminho_arquivo ORDER BY i.eh_publica DESC, i.ordem LIMIT 3 SEPARATOR '|') as fotos_destaque
+    SELECT g.id, g.nome, g.descricao, g.usuario_email
     FROM galerias g
-    LEFT JOIN imagens i ON i.galeria_id = g.id AND i.eh_publica = 1
     WHERE g.privacidade = 'publica'
-    GROUP BY g.id
     ORDER BY g.criado_em DESC
     LIMIT 20
 ";
 $stmt = db()->query($sql);
-json_out(['status'=>'ok','galerias'=>$stmt->fetchAll()]);
+$gals = $stmt->fetchAll();
+
+// Para cada galeria, pega as primeiras fotos públicas se houver
+foreach ($gals as &$g) {
+    $f = db()->prepare("SELECT caminho_arquivo FROM imagens WHERE galeria_id=? AND eh_publica=1 ORDER BY ordem ASC LIMIT 3");
+    $f->execute([$g['id']]);
+    $fotos = $f->fetchAll();
+    $g['fotos_destaque'] = implode('|', array_column($fotos, 'caminho_arquivo'));
+}
+
+json_out(['status'=>'ok','galerias'=>$gals]);
+
