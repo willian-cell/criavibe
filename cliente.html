@@ -368,8 +368,9 @@ async function carregarFotos(isFromCover = false) {
     grid.innerHTML = FOTOS.map((f,i) => {
       const src = '/' + f.caminho_arquivo;
       const nome = f.nome_arquivo || 'foto_' + f.id;
+      if (f.selecionada) selecionadas.add(f.id);
       return `
-        <div class="foto-item" data-id="${f.id}" data-idx="${i}" onclick="clicarFoto(event,${i})">
+        <div class="foto-item ${f.selecionada ? 'selected' : ''}" data-id="${f.id}" data-idx="${i}" onclick="clicarFoto(event,${i})">
           <img src="${src}" alt="${nome}" loading="lazy">
           <div class="sel-check"><i class="fa-solid fa-check"></i></div>
           ${(GALERIA.download_individual || GALERIA.entrega_em_alta) ? `
@@ -378,6 +379,7 @@ async function carregarFotos(isFromCover = false) {
           </button>` : ''}
         </div>`;
     }).join('');
+    atualizarToolbar();
   } catch (e) {
     grid.innerHTML = '<div class="loading" style="color:#f87171"><i class="fa-solid fa-triangle-exclamation"></i><br>Erro ao carregar fotos.</div>';
   }
@@ -468,6 +470,11 @@ function toggleSelecao(idx) {
   if (selecionadas.has(id)) { selecionadas.delete(id); el?.classList.remove('selected'); }
   else { selecionadas.add(id); el?.classList.add('selected'); }
   atualizarToolbar();
+  
+  fetch('/api/fotos/client_selecao.php', {
+    method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({acao: 'toggle', id: id, galeria_id: GALERIA.id})
+  }).catch(()=>{});
 }
 
 function selecionarTodas() {
@@ -476,12 +483,22 @@ function selecionarTodas() {
     document.querySelector(`.foto-item[data-idx="${i}"]`)?.classList.add('selected');
   });
   atualizarToolbar();
+  
+  fetch('/api/fotos/client_selecao.php', {
+    method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({acao: 'all', galeria_id: GALERIA.id})
+  }).catch(()=>{});
 }
 
 function limparSelecao() {
   selecionadas.clear();
   document.querySelectorAll('.foto-item.selected').forEach(el => el.classList.remove('selected'));
   atualizarToolbar();
+  
+  fetch('/api/fotos/client_selecao.php', {
+    method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({acao: 'clear', galeria_id: GALERIA.id})
+  }).catch(()=>{});
 }
 
 function atualizarToolbar() {
