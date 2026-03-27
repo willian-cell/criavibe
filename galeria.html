@@ -321,8 +321,21 @@ async function salvarConfig() {
   else showToast(d.mensagem,'error');
 }
 async function salvarModulos() {
-  // Salva via update com campos extras — simplificado aqui
-  showToast('Módulos salvos! (integração em breve)');
+  const d = await API.post('/galerias/update_modulos.php', {
+    id: parseInt(galeriaId),
+    entrega_em_alta: document.getElementById('tog-alta').checked,
+    selecao_ativa:   document.getElementById('tog-sel').checked,
+    musicas_ativas:  document.getElementById('tog-mus').checked,
+  });
+  if (d.status === 'ok') {
+    showToast('Módulos salvos com sucesso!');
+    // Atualiza objeto local para refletir mudanças imediatamente
+    galeria.entrega_em_alta = document.getElementById('tog-alta').checked ? 1 : 0;
+    galeria.selecao_ativa   = document.getElementById('tog-sel').checked  ? 1 : 0;
+    galeria.musicas_ativas  = document.getElementById('tog-mus').checked  ? 1 : 0;
+  } else {
+    showToast(d.mensagem || 'Erro ao salvar módulos.', 'error');
+  }
 }
 
 // ── Músicas ───────────────────────────────────────────────
