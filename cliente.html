@@ -340,12 +340,12 @@ function iniciarGaleriaNav() {
   atualizarContador();
 
   // Botões (baseado nos módulos da galeria)
-  if (GALERIA.selecao_ativa) {
-    // Mode is always active
+  // Coerce para boolean (MySQL retorna '0'/'1' como string)
+  if (GALERIA.selecao_ativa == 1) {
     isModoSelecao = true;
   }
   
-  if (GALERIA.download_all || GALERIA.entrega_em_alta) {
+  if (GALERIA.download_all == 1 || GALERIA.entrega_em_alta == 1) {
     document.getElementById('btn-zip-all').style.display = '';
   }
 
@@ -445,9 +445,12 @@ function clicarFoto(e, idx) {
   
   if (clickCount === 1) {
     clickTimer = setTimeout(() => {
-      // 1 Clique: Seleciona direto se GALERIA.selecao_ativa (o modo está sempre ativado no bg)
-      if (GALERIA.selecao_ativa) {
+      // 1 Clique: Seleciona direto se GALERIA.selecao_ativa
+      if (GALERIA.selecao_ativa == 1) {
         toggleSelecao(idx);
+      } else {
+        // Se seleção não habilitada, 1 clique amplia
+        abrirLightbox(idx);
       }
       clickCount = 0;
     }, 280);
@@ -477,7 +480,7 @@ function toggleSelecao(idx) {
   
   fetch('/api/fotos/client_selecao.php', {
     method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({acao: 'toggle', id: id, galeria_id: GALERIA.id})
+    body: JSON.stringify({acao: 'toggle', id: id, galeria_id: GALERIA.id, token: TOKEN})
   }).catch(()=>{});
 }
 
@@ -490,7 +493,7 @@ function selecionarTodas() {
   
   fetch('/api/fotos/client_selecao.php', {
     method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({acao: 'all', galeria_id: GALERIA.id})
+    body: JSON.stringify({acao: 'all', galeria_id: GALERIA.id, token: TOKEN})
   }).catch(()=>{});
 }
 
@@ -501,7 +504,7 @@ function limparSelecao() {
   
   fetch('/api/fotos/client_selecao.php', {
     method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({acao: 'clear', galeria_id: GALERIA.id})
+    body: JSON.stringify({acao: 'clear', galeria_id: GALERIA.id, token: TOKEN})
   }).catch(()=>{});
 }
 
