@@ -79,11 +79,12 @@
       overflow:hidden;cursor:pointer;border:2px solid transparent;transition:.2s}
     .foto-item img{width:100%;display:block;transition:transform .4s}
     .foto-item:hover img{transform:scale(1.04)}
-    .foto-item.selected{border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.3)}
+    .foto-item.selected{border-color:#39ff14;box-shadow:0 0 15px rgba(57,255,20,0.6)}
+    .foto-item.selected::after{content:'';position:absolute;inset:0;background:rgba(57,255,20,0.25);pointer-events:none}
     .foto-item .sel-check{position:absolute;top:8px;right:8px;width:26px;height:26px;
-      border-radius:50%;background:var(--primary);display:flex;align-items:center;
-      justify-content:center;font-size:.75rem;color:#fff;opacity:0;transition:.2s;
-      box-shadow:0 2px 8px rgba(0,0,0,.4);pointer-events:none}
+      border-radius:50%;background:#39ff14;display:flex;align-items:center;
+      justify-content:center;font-size:.75rem;color:#000;opacity:0;transition:.2s;
+      box-shadow:0 2px 8px rgba(0,0,0,.4);pointer-events:none;z-index:2}
     .foto-item.selected .sel-check{opacity:1}
     .foto-item .dl-btn{position:absolute;bottom:8px;right:8px;padding:5px 10px;
       background:rgba(0,0,0,.7);color:#fff;border:none;border-radius:6px;cursor:pointer;
@@ -111,7 +112,12 @@
     #lb-next{right:16px}
     #lb-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);
       border:none;color:#fff;font-size:1.3rem;padding:8px 12px;cursor:pointer;border-radius:8px}
-    #lb-dl{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:30px;box-shadow:0 8px 30px rgba(0,0,0,0.5);font-size:1rem;z-index:310}
+    #lb-dl{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+      background:rgba(34,197,94,0.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      border:1px solid rgba(34,197,94,0.3);color:#fff;padding:8px 20px;border-radius:30px;
+      font-size:0.85rem;font-weight:500;box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:310;
+      transition:all 0.3s;display:flex;align-items:center;gap:6px;cursor:pointer}
+    #lb-dl:hover{background:rgba(34,197,94,0.3);border-color:rgba(34,197,94,0.5);transform:translateX(-50%) translateY(-2px)}
     .loading{text-align:center;padding:80px;color:var(--muted)}
     .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
       background:#1e1e3a;border:1px solid var(--primary);border-radius:10px;
@@ -141,8 +147,28 @@
   </div>
 </div>
 
+<!-- COVER SCREEN (CAPA) -->
+<div id="cover-screen" style="display:none;position:fixed;inset:0;z-index:150;background:#000;display:none;flex-direction:column">
+  <div id="cover-bg" style="position:absolute;inset:0;background-size:cover;background-position:center;opacity:0.5;filter:blur(4px);"></div>
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;padding:20px;text-align:center">
+    <h1 id="cover-title" style="font-size:2.5rem;font-weight:800;margin-bottom:8px;text-shadow:0 4px 10px rgba(0,0,0,0.5)">Bem-vinda</h1>
+    <p id="cover-count" style="font-size:1rem;color:var(--muted);margin-bottom:40px;letter-spacing:1px;text-shadow:0 2px 5px rgba(0,0,0,0.5)">0 FOTOS</p>
+    <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px">
+      <button class="btn btn-primary" onclick="irParaGaleria()" style="background:#fff;color:#000;border-radius:30px">
+        <i class="fa-solid fa-images"></i> VER FOTOS
+      </button>
+      <button class="btn tbtn-outline" id="btn-cover-dl" onclick="baixarZipTodas()" style="border-color:rgba(255,255,255,0.4);color:#fff;border-radius:30px;display:none">
+        <i class="fa-solid fa-download"></i> DOWNLOAD
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- TOP NAV -->
 <nav id="topnav" style="display:none">
+  <button onclick="voltarParaCapa()" style="background:transparent;border:none;color:var(--text);font-size:1.2rem;cursor:pointer;margin-right:16px;transition:0.2s" title="Voltar" onmouseover="this.style.color='var(--primary)';this.style.transform='translateX(-3px)'" onmouseout="this.style.color='var(--text)';this.style.transform=''">
+    <i class="fa-solid fa-arrow-left"></i>
+  </button>
   <div class="logo">✦ CriaVibe</div>
   <div id="galeria-nome"></div>
   <div id="dl-counter" style="display:none"></div>
@@ -170,7 +196,7 @@
 </div>
 
 <!-- GALLERY -->
-<div id="gallery"><div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Carregando fotos...</div></div>
+<div id="gallery" style="display:none"><div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Carregando fotos...</div></div>
 
 <!-- LIGHTBOX -->
 <div id="lightbox">
@@ -178,7 +204,7 @@
   <button class="lb-btn" id="lb-prev" onclick="navLightbox(-1)">‹</button>
   <img id="lb-img" src="" alt="">
   <button class="lb-btn" id="lb-next" onclick="navLightbox(1)">›</button>
-  <button class="tbtn tbtn-primary lb-btn" id="lb-dl" onclick="baixarFotoAtual()">
+  <button id="lb-dl" onclick="baixarFotoAtual()">
     <i class="fa-solid fa-download"></i> Baixar
   </button>
 </div>
@@ -222,7 +248,7 @@ async function autenticar() {
       dlCount = d.dl_count || 0;
       dlMax   = GALERIA.max_selecao ? parseInt(GALERIA.max_selecao) : 0;
       document.getElementById('lock-screen').style.display = 'none';
-      iniciarGaleria();
+      prepararCapa();
     } else {
       erro.textContent = d.mensagem || 'Senha incorreta.';
       erro.style.display = 'block';
@@ -243,12 +269,37 @@ document.getElementById('senha-input').addEventListener('keydown', e => {
 });
 
 // ── INIT ──────────────────────────────────────────────────────
-async function iniciarGaleria() {
+async function prepararCapa() {
+  document.getElementById('cover-screen').style.display = 'flex';
+  document.getElementById('cover-title').textContent = 'Bem-vindo(a) ' + GALERIA.nome;
+  document.title = GALERIA.nome + ' — CriaVibe';
+  
+  if (GALERIA.download_all || GALERIA.entrega_em_alta) {
+    document.getElementById('btn-cover-dl').style.display = 'flex';
+  }
+  
+  // Carrega fotos silenciosamente para a grid e para preencher o fundo da capa
+  await carregarFotos(true);
+}
+
+function irParaGaleria() {
+  document.getElementById('cover-screen').style.display = 'none';
+  iniciarGaleriaNav();
+}
+
+function voltarParaCapa() {
+  document.getElementById('topnav').style.display = 'none';
+  document.getElementById('toolbar').style.display = 'none';
+  document.getElementById('gallery').style.display = 'none';
+  document.getElementById('cover-screen').style.display = 'flex';
+}
+
+function iniciarGaleriaNav() {
   // Nav
   document.getElementById('topnav').style.display = 'flex';
   document.getElementById('toolbar').style.display = 'flex';
+  document.getElementById('gallery').style.display = 'block';
   document.getElementById('galeria-nome').textContent = GALERIA.nome;
-  document.title = GALERIA.nome + ' — CriaVibe';
   atualizarContador();
 
   // Botões (baseado nos módulos da galeria)
@@ -261,19 +312,22 @@ async function iniciarGaleria() {
     document.getElementById('btn-zip-all').style.display = '';
   }
 
-  // Carrega fotos
-  await carregarFotos();
-
   // Música
   carregarMusica();
 }
 
-async function carregarFotos() {
+async function carregarFotos(isFromCover = false) {
   const grid = document.getElementById('gallery');
   try {
     const r = await fetch(`/api/fotos/list.php?galeria_id=${GALERIA.id}`, {credentials:'include'});
     const d = await r.json();
     FOTOS = d.fotos || [];
+    document.getElementById('cover-count').textContent = FOTOS.length + ' FOTOS';
+    
+    if (FOTOS.length > 0) {
+      document.getElementById('cover-bg').style.backgroundImage = `url('/${FOTOS[0].caminho_arquivo}')`;
+    }
+
     if (!FOTOS.length) {
       grid.innerHTML = '<div class="loading" style="color:rgba(255,255,255,.4)"><i class="fa-solid fa-images"></i><br>Nenhuma foto ainda.</div>';
       return;
@@ -512,7 +566,7 @@ function toast(msg) {
       if (g.privacidade === 'publica' && !g.cliente_id) {
         GALERIA = g; dlMax = g.max_selecao ? parseInt(g.max_selecao) : 0;
         document.getElementById('lock-screen').style.display = 'none';
-        iniciarGaleria();
+        prepararCapa();
       }
     }
   } catch {}
