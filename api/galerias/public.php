@@ -4,7 +4,8 @@ require_once __DIR__.'/../config.php';
 $sql = "
     SELECT g.id, g.nome, g.descricao, g.usuario_email
     FROM galerias g
-    WHERE g.privacidade = 'publica'
+    JOIN usuarios u ON (g.usuario_email = u.email OR g.usuario_email = 'admin@criavibe.com')
+    WHERE g.privacidade = 'publica' AND u.id = 1
     ORDER BY g.criado_em DESC
     LIMIT 20
 ";
