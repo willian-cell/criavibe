@@ -429,33 +429,15 @@
       transform: translate(-50%, -50%);
     }
 
-    /* Optional abstract lines element simulating the image background */
-    .abstract-lines {
+    /* Abstract Animated Background Canvas */
+    .canvas-lines {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background:
-        radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 30% 70%, rgba(99, 102, 241, 0.05) 0%, transparent 40%);
       z-index: 1;
       pointer-events: none;
-    }
-
-    .abstract-lines::before {
-      content: '';
-      position: absolute;
-      width: 150%;
-      height: 100%;
-      top: -10%;
-      left: -20%;
-      background-image:
-        repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(59, 130, 246, 0.03) 40px, rgba(59, 130, 246, 0.03) 41px),
-        repeating-linear-gradient(-45deg, transparent, transparent 60px, rgba(99, 102, 241, 0.02) 60px, rgba(99, 102, 241, 0.02) 61px);
-      transform: rotate(-5deg);
-      border-radius: 50%;
-      filter: blur(1px);
     }
 
     .social-section h2 {
@@ -672,7 +654,7 @@
   <section class="social-section fade-in-section scroll-trigger">
     <div class="social-glow glow-1"></div>
     <div class="social-glow glow-2"></div>
-    <div class="abstract-lines"></div>
+    <canvas id="canvas-lines" class="canvas-lines"></canvas>
 
     <h2>Conecte-se <span>Conosco</span></h2>
 
@@ -772,6 +754,62 @@
       const walk = (x - startX) * 2;
       carouselContainer.scrollLeft = scrollLeft - walk;
     });
+    // Canvas Animated Flow Lines
+    (function initFlowLines() {
+      const canvas = document.getElementById('canvas-lines');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let time = 0;
+
+      function resize() {
+        width = canvas.width = canvas.parentElement.offsetWidth;
+        height = canvas.height = canvas.parentElement.offsetHeight;
+      }
+      window.addEventListener('resize', resize);
+      
+      const curves = [];
+      // Quantidade maior de linhas concentradas no centro para formar uma fita densa
+      for (let i = 0; i < 15; i++) {
+        curves.push({
+          yOffset: 0.5 + (Math.random() * 0.1 - 0.05), // Linha base concentrada no centro da seção
+          amplitude: Math.random() * 90 + 30, // Curvaturas variadas
+          speed: Math.random() * 0.001 + 0.0005,
+          frequency: Math.random() * 0.002 + 0.0005,
+          phase: i * (Math.PI / 7) + Math.random(), // Distribuídas organicamente
+          opacity: Math.random() * 0.4 + 0.2, // Mais escuras e visíveis (0.2 a 0.6 opacity)
+          lineWidth: Math.random() * 2 + 1.5 // Linhas mais grossas (1.5px a 3.5px)
+        });
+      }
+
+      function draw() {
+        if (!width) resize();
+        ctx.clearRect(0, 0, width, height);
+
+        curves.forEach(curve => {
+          ctx.beginPath();
+          // "Super Blue" escuro e vibrante inspirado no design (#1d4ed8 / #2563eb)
+          ctx.strokeStyle = `rgba(29, 78, 216, ${curve.opacity})`;
+          ctx.lineWidth = curve.lineWidth;
+
+          for (let x = 0; x <= width; x += 15) {
+            const y = height * curve.yOffset +
+              Math.sin(x * curve.frequency + time * curve.speed + curve.phase) * curve.amplitude +
+              Math.cos(x * curve.frequency * 0.8 - time * curve.speed * 1.1) * (curve.amplitude * 0.5);
+
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        });
+
+        time += 16;
+        requestAnimationFrame(draw);
+      }
+
+      setTimeout(resize, 100);
+      requestAnimationFrame(draw);
+    })();
   </script>
 </body>
 
