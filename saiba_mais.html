@@ -388,19 +388,83 @@
       box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
     }
 
-    /* ── REDES SOCIAIS (NEUMORPHISM LIGHT) ── */
+    /* ── REDES SOCIAIS (MODERN GLASS LIGHT) ── */
     .social-section {
-      background: var(--neu-bg);
+      background: #fafafa;
+      position: relative;
       text-align: center;
-      padding-top: 80px;
+      padding-top: 100px;
       padding-bottom: 120px;
+      overflow: hidden;
+      font-family: inherit;
+    }
+
+    /* Subtle abstract glowing blobs */
+    .social-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .social-glow.glow-1 {
+      width: 450px;
+      height: 450px;
+      background: rgba(59, 130, 246, 0.15); /* Bright blue */
+      top: 50%;
+      left: 20%;
+      transform: translate(-50%, -50%);
+    }
+    .social-glow.glow-2 {
+      width: 450px;
+      height: 450px;
+      background: rgba(99, 102, 241, 0.12); /* Indigo */
+      top: 60%;
+      left: 80%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Optional abstract lines element simulating the image background */
+    .abstract-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 30% 70%, rgba(99, 102, 241, 0.05) 0%, transparent 40%);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .abstract-lines::before {
+      content: '';
+      position: absolute;
+      width: 150%;
+      height: 100%;
+      top: -10%;
+      left: -20%;
+      background-image: 
+        repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(59,130,246,0.03) 40px, rgba(59,130,246,0.03) 41px),
+        repeating-linear-gradient(-45deg, transparent, transparent 60px, rgba(99,102,241,0.02) 60px, rgba(99,102,241,0.02) 61px);
+      transform: rotate(-5deg);
+      border-radius: 50%;
+      filter: blur(1px);
     }
 
     .social-section h2 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 50px;
-      color: var(--text);
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin-bottom: 70px;
+      color: #1e293b;
+      position: relative;
+      z-index: 2;
+      letter-spacing: -0.5px;
+    }
+
+    .social-section h2 span {
+      color: #3b82f6; /* VIBRANT BLUE like the image */
     }
 
     .social-cards {
@@ -408,96 +472,78 @@
       justify-content: center;
       gap: 30px;
       flex-wrap: wrap;
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
+      position: relative;
+      z-index: 2;
     }
 
     .social-card {
-      width: 280px;
-      padding: 40px 20px;
-      border-radius: 20px;
-      background: var(--neu-bg);
-      box-shadow: var(--neu-shadow-dark);
+      width: 310px;
+      padding: 50px 30px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.85); /* Glass effect */
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 1);
       text-align: center;
       cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-    }
-
-    .social-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
-      z-index: 1;
-      border-radius: 20px;
     }
 
     .social-card:hover {
-      transform: translateY(-10px);
-      box-shadow: var(--neu-shadow-inset);
-    }
-
-    .social-card:hover::before {
-      opacity: 1;
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px rgba(59, 130, 246, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 1);
+      background: rgba(255, 255, 255, 0.95);
     }
 
     .icon-wrapper {
-      width: 80px;
-      height: 80px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
-      background: var(--neu-bg);
-      box-shadow: var(--neu-shadow-dark);
+      background: #ffffff;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05), inset 0 2px 4px rgba(255, 255, 255, 1);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 24px;
-      font-size: 2rem;
-      transition: all 0.3s;
-      position: relative;
-      z-index: 2;
-      color: var(--text);
+      margin: 0 auto 30px;
+      font-size: 1.8rem;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .social-card:hover .icon-wrapper {
-      box-shadow: var(--neu-shadow-inset);
-      transform: scale(0.9);
-      color: var(--primary);
+      transform: scale(1.05);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
     }
 
-    .social-card.instagram:hover .icon-wrapper {
-      color: #E1306C;
+    /* Icon Colors */
+    .social-card.instagram .icon-wrapper i {
+      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
     }
 
-    .social-card.facebook:hover .icon-wrapper {
+    .social-card.facebook .icon-wrapper i {
       color: #1877F2;
     }
 
-    .social-card.whatsapp:hover .icon-wrapper {
+    .social-card.whatsapp .icon-wrapper i {
       color: #25D366;
     }
 
     .social-card h3 {
       font-size: 1.25rem;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
       font-weight: 700;
-      position: relative;
-      z-index: 2;
-      color: var(--text);
+      color: #1e293b;
     }
 
     .social-card p {
       font-size: 0.95rem;
-      color: var(--text-muted);
-      position: relative;
-      z-index: 2;
+      color: #64748b;
+      line-height: 1.6;
     }
 
     /* ── FOOTER ── */
@@ -619,9 +665,13 @@
     </a>
   </section>
 
-  <!-- REDES SOCIAIS (NEUMORPHISM LIGHT) -->
+  <!-- REDES SOCIAIS (MODERN GLASS LIGHT) -->
   <section class="social-section fade-in-section scroll-trigger">
-    <h2>Conecte-se Conosco</h2>
+    <div class="social-glow glow-1"></div>
+    <div class="social-glow glow-2"></div>
+    <div class="abstract-lines"></div>
+    
+    <h2>Conecte-se <span>Conosco</span></h2>
 
     <div class="social-cards">
       <!-- Instagram -->
