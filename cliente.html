@@ -211,12 +211,6 @@
 
 <!-- TOOLBAR -->
 <div id="toolbar" style="display:none; justify-content: flex-end; padding-top: 15px; padding-bottom: 15px;">
-  <!-- Ocultando botões antigos para manter o funcionamento do JS -->
-  <button id="btn-toggle-sel" style="display:none;" onclick="toggleModoSelecao()"></button>
-  <button id="btn-select-all" style="display:none;" onclick="selecionarTodas()"></button>
-  <button id="btn-clear" style="display:none;" onclick="limparSelecao()"></button>
-  <span id="sel-count" style="display:none;">0</span>
-  <div id="toolbar-info" style="display:none;"></div>
   
   <button class="tbtn tbtn-primary" id="btn-zip-sel" onclick="baixarZipSelecionadas()" style="display:none; padding: 10px 20px; font-size: 0.95rem; border-radius: 8px;">
     Baixar Selecionadas
@@ -347,11 +341,11 @@ function iniciarGaleriaNav() {
 
   // Botões (baseado nos módulos da galeria)
   if (GALERIA.selecao_ativa) {
-    document.getElementById('btn-select-all').style.display = '';
-    document.getElementById('btn-clear').style.display = '';
+    // Mode is always active
+    isModoSelecao = true;
   }
+  
   if (GALERIA.download_all || GALERIA.entrega_em_alta) {
-    document.getElementById('btn-zip-sel').style.display = '';
     document.getElementById('btn-zip-all').style.display = '';
   }
 
@@ -451,8 +445,8 @@ function clicarFoto(e, idx) {
   
   if (clickCount === 1) {
     clickTimer = setTimeout(() => {
-      // 1 Clique: Seleciona apenas se o modo de seleção estiver ativo
-      if (GALERIA.selecao_ativa && isModoSelecao) {
+      // 1 Clique: Seleciona direto se GALERIA.selecao_ativa (o modo está sempre ativado no bg)
+      if (GALERIA.selecao_ativa) {
         toggleSelecao(idx);
       }
       clickCount = 0;
@@ -513,10 +507,9 @@ function limparSelecao() {
 
 function atualizarToolbar() {
   const n = selecionadas.size;
-  document.getElementById('sel-count').textContent = n;
   
   const btnZipSel = document.getElementById('btn-zip-sel');
-  if (btnZipSel) btnZipSel.style.display = n > 0 ? '' : 'none';
+  if (btnZipSel) btnZipSel.style.display = (GALERIA.selecao_ativa && n > 0) ? '' : 'none';
   
   const floatingBar = document.getElementById('floating-selection');
   if (floatingBar) {
