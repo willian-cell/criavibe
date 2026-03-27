@@ -81,17 +81,18 @@
     .foto-item:hover img{transform:scale(1.04)}
     .foto-item.selected{border-color:#39ff14;box-shadow:0 0 15px rgba(57,255,20,0.6)}
     .foto-item.selected::after{content:'';position:absolute;inset:0;background:rgba(57,255,20,0.25);pointer-events:none}
-    .foto-item .sel-check{position:absolute;top:8px;right:8px;width:26px;height:26px;
+    .foto-item .sel-check{position:absolute;top:8px;left:8px;width:26px;height:26px;
       border-radius:50%;background:#39ff14;display:flex;align-items:center;
       justify-content:center;font-size:.75rem;color:#000;opacity:0;transition:.2s;
       box-shadow:0 2px 8px rgba(0,0,0,.4);pointer-events:none;z-index:2}
     .foto-item.selected .sel-check{opacity:1}
-    .foto-item .dl-btn{position:absolute;bottom:8px;right:8px;padding:5px 10px;
-      background:rgba(0,0,0,.7);color:#fff;border:none;border-radius:6px;cursor:pointer;
-      font-size:.73rem;font-weight:600;font-family:inherit;opacity:0;transition:.2s;
-      display:flex;align-items:center;gap:4px;backdrop-filter:blur(4px)}
+    .foto-item .dl-btn{position:absolute;top:8px;right:8px;width:32px;height:32px;
+      background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;
+      cursor:pointer;font-size:.9rem;opacity:0;transition:.2s;display:flex;align-items:center;
+      justify-content:center;backdrop-filter:blur(4px);z-index:3}
     .foto-item:hover .dl-btn{opacity:1}
-    .foto-item .dl-btn:hover{background:var(--primary)}
+    .foto-item .dl-btn:hover{background:var(--primary);border-color:var(--primary)}
+    @media(max-width: 800px) { .foto-item .dl-btn { opacity: 0.8; } }
     /* ── MUSIC ── */
     #music-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,20,.95);
       backdrop-filter:blur(16px);border-top:1px solid var(--border);
@@ -199,6 +200,9 @@
   </button>
   <div class="logo">✦ CriaVibe</div>
   <div id="galeria-nome"></div>
+  <button id="btn-toggle-sel" class="tbtn tbtn-outline" style="border-color:#39ff14;color:#39ff14;display:none;margin-right:8px;border-radius:20px;padding:6px 16px" onclick="toggleModoSelecao()">
+    <i class="fa-solid fa-check"></i> <span id="lbl-toggle-sel">Ativar</span>
+  </button>
   <div id="dl-counter" style="display:none"></div>
 </nav>
 
@@ -256,6 +260,7 @@ let selecionadas = new Set();
 let lbIndex  = 0;
 let dlCount  = 0;
 let dlMax    = 0;
+let isModoSelecao = false;
 
 // ── AUTH ──────────────────────────────────────────────────────
 async function autenticar() {
@@ -368,8 +373,8 @@ async function carregarFotos(isFromCover = false) {
           <img src="${src}" alt="${nome}" loading="lazy">
           <div class="sel-check"><i class="fa-solid fa-check"></i></div>
           ${(GALERIA.download_individual || GALERIA.entrega_em_alta) ? `
-          <button class="dl-btn" onclick="event.stopPropagation();baixarFoto(${f.id})">
-            <i class="fa-solid fa-download"></i> Baixar
+          <button class="dl-btn" onclick="event.stopPropagation();baixarFoto(${f.id})" title="Baixar">
+            <i class="fa-solid fa-download"></i>
           </button>` : ''}
         </div>`;
     }).join('');
@@ -413,6 +418,20 @@ async function carregarMusica() {
 let clickTimer = null;
 let clickCount = 0;
 
+function toggleModoSelecao() {
+  isModoSelecao = !isModoSelecao;
+  const btn = document.getElementById('btn-toggle-sel');
+  const lbl = document.getElementById('lbl-toggle-sel');
+  if (isModoSelecao) {
+    btn.style.background = 'rgba(57,255,20,0.15)';
+    lbl.textContent = 'Desativar';
+  } else {
+    btn.style.background = 'transparent';
+    lbl.textContent = 'Ativar';
+  }
+  atualizarToolbar();
+}
+
 function clicarFoto(e, idx) {
   if (e.target.classList.contains('dl-btn') || e.target.closest('.dl-btn')) return;
   
@@ -420,11 +439,9 @@ function clicarFoto(e, idx) {
   
   if (clickCount === 1) {
     clickTimer = setTimeout(() => {
-      // 1 Clique: Seleciona
-      if (GALERIA.selecao_ativa) {
+      // 1 Clique: Seleciona apenas se o modo de seleção estiver ativo
+      if (GALERIA.selecao_ativa && isModoSelecao) {
         toggleSelecao(idx);
-      } else {
-        abrirLightbox(idx);
       }
       clickCount = 0;
     }, 280);
@@ -472,9 +489,16 @@ function atualizarToolbar() {
   document.getElementById('sel-count').textContent = n;
   const btnZipSel = document.getElementById('btn-zip-sel');
   if (btnZipSel) btnZipSel.style.display = n > 0 ? '' : 'none';
-  document.getElementById('toolbar-info').innerHTML =
-    n > 0 ? `<b>${n} foto${n>1?'s':''} selecionada${n>1?'s':''}</b><br><span style="font-size:0.7rem;opacity:0.8">* 1 Clique: Seleciona | 2 Cliques: Amplia | 3 Cliques: Seleciona Todas</span>` :
-    (GALERIA.selecao_ativa ? '* 1 Clique na foto para selecionar<br>* 2 Cliques para ampliar a foto na tela<br>* 3 Cliques para selecionar todas possíveis' : `${FOTOS.length} fotos`);
+  
+  let info = '';
+  if (n > 0) {
+    info = `<b>${n} foto${n>1?'s':''} selecionada${n>1?'s':''}</b>`;
+  } else if (GALERIA.selecao_ativa && isModoSelecao) {
+    info = '1 Clique: Selecionar | 3 Cliques: Selecionar Todas';
+  } else {
+    info = `${FOTOS.length} fotos prontas! 2 Cliques: Visualizar Foto.`;
+  }
+  document.getElementById('toolbar-info').innerHTML = info;
 }
 
 // ── DOWNLOADS ─────────────────────────────────────────────────
