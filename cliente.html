@@ -286,48 +286,49 @@
 
     /* ── GALLERY GRID ── */
     #gallery {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 10px;
       padding: 24px 5vw;
-      columns: 2 180px;
-      gap: 12px
-    }
-
-    @media(min-width:600px) {
-      #gallery {
-        columns: 3 200px
-      }
-    }
-
-    @media(min-width:900px) {
-      #gallery {
-        columns: 4 220px
-      }
-    }
-
-    @media(min-width:1200px) {
-      #gallery {
-        columns: 5 240px
-      }
     }
 
     .foto-item {
-      break-inside: avoid;
-      margin-bottom: 12px;
       position: relative;
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
       cursor: pointer;
       border: 2px solid transparent;
-      transition: .2s
+      transition: .25s;
+      background: var(--surface);
+    }
+
+    .foto-item.vertical {
+      grid-column: span 2;
+      aspect-ratio: 4 / 5;
+    }
+
+    .foto-item.horizontal {
+      grid-column: span 5;
+      aspect-ratio: 3 / 2;
+    }
+
+    @media(max-width: 600px) {
+      #gallery {
+        grid-template-columns: repeat(10, 1fr);
+        gap: 6px;
+      }
     }
 
     .foto-item img {
       width: 100%;
+      height: 100%;
+      object-fit: cover;
       display: block;
-      transition: transform .4s
+      transition: transform .45s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .foto-item:hover img {
-      transform: scale(1.04)
+      transform: scale(1.06);
     }
 
     .foto-item.selected {
@@ -953,24 +954,47 @@
       try {
         const r = await fetch(`/api/fotos/list.php?galeria_id=${GALERIA.id}`, { credentials: 'include' });
         const d = await r.json();
-        FOTOS = d.fotos || [];
-        document.getElementById('cover-count').textContent = FOTOS.length + ' FOTOS';
+        const rawFotos = d.fotos || [];
+        document.getElementById('cover-count').textContent = rawFotos.length + ' FOTOS';
 
-        if (FOTOS.length > 0) {
-          document.getElementById('cover-bg').style.backgroundImage = `url('/${FOTOS[0].caminho_arquivo}')`;
+        if (rawFotos.length > 0) {
+          document.getElementById('cover-bg').style.backgroundImage = `url('/${rawFotos[0].caminho_arquivo}')`;
         }
 
-        if (!FOTOS.length) {
+        if (!rawFotos.length) {
           grid.innerHTML = '<div class="loading" style="color:rgba(255,255,255,.4)"><i class="fa-solid fa-images"></i><br>Nenhuma foto ainda.</div>';
           return;
         }
+
+        // Pré-carrega dimensões em paralelo mas com um pequeno timeout de segurança
+        const processadas = await Promise.all(rawFotos.map(f => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              f.orientacao = img.naturalWidth > img.naturalHeight ? 'horizontal' : 'vertical';
+              resolve(f);
+            };
+            img.onerror = () => {
+              f.orientacao = 'vertical'; // Fallback se falhar
+              resolve(f);
+            };
+            img.src = '/' + f.caminho_arquivo;
+          });
+        }));
+
+        // Zera seleção global e reconstrói na nova ordem
+        selecionadas.clear();
+        const v = processadas.filter(f => f.orientacao === 'vertical');
+        const h = processadas.filter(f => f.orientacao === 'horizontal');
+        FOTOS = [...v, ...h];
+        FOTOS.forEach((f, i) => { if (f.selecionada) selecionadas.add(f.id); });
+
         grid.innerHTML = FOTOS.map((f, i) => {
           const src = '/' + f.caminho_arquivo;
           const nome = f.nome_arquivo || 'foto_' + f.id;
-          if (f.selecionada) selecionadas.add(f.id);
           const jaiBaixada = getBaixadas().has(String(f.id));
           return `
-        <div class="foto-item ${f.selecionada ? 'selected' : ''}" data-id="${f.id}" data-idx="${i}" id="foto-${f.id}" onclick="clicarFoto(event,${i})">
+        <div class="foto-item ${f.selecionada ? 'selected' : ''} ${f.orientacao}" data-id="${f.id}" data-idx="${i}" id="foto-${f.id}" onclick="clicarFoto(event,${i})">
           <img src="${src}" alt="${nome}" loading="lazy">
           <div class="sel-check"><i class="fa-solid fa-check"></i></div>
           ${jaiBaixada ? `
@@ -985,6 +1009,7 @@
         }).join('');
         atualizarToolbar();
       } catch (e) {
+        console.error('Erro ao carregar galeria:', e);
         grid.innerHTML = '<div class="loading" style="color:#f87171"><i class="fa-solid fa-triangle-exclamation"></i><br>Erro ao carregar fotos.</div>';
       }
     }
