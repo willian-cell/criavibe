@@ -21,11 +21,21 @@
     :root {
       --bg: #0a0a14;
       --surface: rgba(255, 255, 255, .05);
+      --nav-bg: rgba(10, 10, 20, .8);
       --border: rgba(255, 255, 255, .1);
       --primary: #3b82f6;
       --primary-dk: #2563eb;
       --text: #f8fafc;
       --muted: rgba(255, 255, 255, .55);
+    }
+
+    body.light-mode {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --nav-bg: rgba(241, 245, 249, .8);
+      --border: rgba(0, 0, 0, .08);
+      --text: #0f172a;
+      --muted: #475569;
     }
 
     body {
@@ -66,7 +76,7 @@
     .lock-logo {
       font-size: 1.5rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #fff, var(--primary));
+      background: linear-gradient(135deg, var(--text), var(--primary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 8px
@@ -183,7 +193,7 @@
       align-items: center;
       padding: 0 5vw;
       gap: 16px;
-      background: rgba(10, 10, 20, .8);
+      background: var(--nav-bg);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border)
     }
@@ -191,9 +201,16 @@
     #topnav .logo {
       font-size: 1.1rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #fff, var(--primary));
+      background: linear-gradient(135deg, var(--text), var(--primary));
       -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent
+      -webkit-text-fill-color: transparent;
+      cursor: pointer;
+      user-select: none;
+      transition: .2s
+    }
+
+    #topnav .logo:active {
+      transform: scale(0.96);
     }
 
     #galeria-nome {
@@ -218,7 +235,7 @@
       position: sticky;
       top: 60px;
       z-index: 90;
-      background: rgba(10, 10, 20, .9);
+      background: var(--nav-bg);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 10px 5vw;
@@ -454,7 +471,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(10, 10, 20, .95);
+      background: var(--bg);
       backdrop-filter: blur(16px);
       border-top: 1px solid var(--border);
       padding: 10px 5vw;
@@ -612,14 +629,14 @@
       justify-content: center;
       padding: 40px 8%;
       z-index: 2;
-      background: rgba(10, 10, 20, 0.95);
-      box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+      background: var(--bg);
+      box-shadow: 20px 0 50px rgba(0, 0, 0, 0.1);
     }
 
     .cover-logo {
       font-size: 1.5rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #fff, var(--primary));
+      background: linear-gradient(135deg, var(--text), var(--primary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 40px;
@@ -743,7 +760,7 @@
         onmouseout="this.style.color='var(--text)';this.style.transform=''">
         <i class="fa-solid fa-arrow-left"></i>
       </button>
-      <div class="logo">✦ CriaVibe</div>
+      <div class="logo" id="logoToggle">✦ CriaVibe</div>
       <div id="galeria-nome" style="margin-left:12px; font-weight:600; font-size:1rem;"></div>
     </div>
     <div style="display:flex; align-items:center; gap: 12px; font-size: 0.9rem; color: var(--muted);">
@@ -1447,6 +1464,11 @@
       el.textContent = msg; el.classList.add('show');
       setTimeout(() => el.classList.remove('show'), 2800);
     }
+
+    // Theme Toggle
+    document.getElementById('logoToggle')?.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+    });
 
     // ── INIT: check if gallery is public ──────────────────────────
     (async () => {
