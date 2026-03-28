@@ -72,7 +72,7 @@
           <tr>
             <th style="width:60px">Capa</th>
             <th>Galeria</th>
-            <th>Cliente</th>
+            <th>Playlist</th>
             <th>Fotos</th>
             <th>Seleções do Cliente</th>
             <th>Downloads</th>
@@ -221,7 +221,20 @@ function renderGalerias(lista) {
           ${g.privacidade==='publica'?'Pública':'Privada'}
         </span>
       </td>
-      <td><span style="color:var(--light);font-size:.8rem">—</span></td>
+      <td>
+        ${(() => {
+          if (!g.total_musicas || g.total_musicas == 0) {
+            return `<span style="color:var(--muted);font-size:.8rem">—</span>`;
+          }
+          const nomes = (g.playlist_nomes || '').split('||').filter(Boolean);
+          return nomes.map(n =>
+            `<div style="display:flex;align-items:center;gap:5px;font-size:.78rem;color:var(--light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">
+              <i class="fa-solid fa-music" style="color:var(--primary);font-size:.7rem;flex-shrink:0"></i>
+              <span style="overflow:hidden;text-overflow:ellipsis">${n}</span>
+            </div>`
+          ).join('');
+        })()}
+      </td>
       <td><strong>${g.total_fotos||0}</strong> <span style="color:var(--muted);font-size:.8rem">fotos</span></td>
       <td>
         ${(g.total_selecionadas > 0)
