@@ -1,291 +1,825 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CriaVibe — Sua Galeria</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#0a0a14;--surface:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);
-      --primary:#3b82f6;--primary-dk:#2563eb;--text:#f8fafc;--muted:rgba(255,255,255,.55);
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
     }
-    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-    a{text-decoration:none;color:inherit}
+
+    :root {
+      --bg: #0a0a14;
+      --surface: rgba(255, 255, 255, .05);
+      --border: rgba(255, 255, 255, .1);
+      --primary: #3b82f6;
+      --primary-dk: #2563eb;
+      --text: #f8fafc;
+      --muted: rgba(255, 255, 255, .55);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit
+    }
+
     /* ── PASSWORD SCREEN ── */
-    #lock-screen{
-      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-      background:linear-gradient(135deg,#070711 0%,#0f0f2a 100%);z-index:200;
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #070711 0%, #0f0f2a 100%);
+      z-index: 200;
     }
-    .lock-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
-      border-radius:20px;padding:48px;width:100%;max-width:420px;text-align:center;
-      backdrop-filter:blur(20px);box-shadow:0 32px 80px rgba(0,0,0,.6)}
-    .lock-logo{font-size:1.5rem;font-weight:800;
-      background:linear-gradient(135deg,#fff,var(--primary));-webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;margin-bottom:8px}
-    .lock-sub{font-size:.9rem;color:var(--muted);margin-bottom:32px}
-    .lock-card h2{font-size:1.25rem;font-weight:700;margin-bottom:6px}
-    .lock-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,.15);
-      border:1px solid rgba(99,102,241,.3);border-radius:20px;padding:4px 14px;font-size:.8rem;
-      color:var(--primary);margin-bottom:28px}
-    .form-group{margin-bottom:16px;text-align:left}
-    .form-group label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
-    .form-control{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
-      border-radius:10px;padding:12px 16px;font-size:.95rem;color:var(--text);font-family:inherit;
-      transition:.2s;outline:none}
-    .form-control:focus{border-color:var(--primary);background:rgba(99,102,241,.08)}
-    .form-error{color:#f87171;font-size:.82rem;margin-top:4px;display:none}
-    .form-error.show{display:block}
-    .btn{width:100%;padding:13px;border-radius:10px;font-size:.95rem;font-weight:700;
-      border:none;cursor:pointer;font-family:inherit;transition:.2s;display:flex;
-      align-items:center;justify-content:center;gap:8px}
-    .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 16px rgba(99,102,241,.4)}
-    .btn-primary:hover{background:var(--primary-dk);transform:translateY(-1px)}
-    .btn-disabled{opacity:.5;cursor:not-allowed}
+
+    .lock-card {
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 20px;
+      padding: 48px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 32px 80px rgba(0, 0, 0, .6)
+    }
+
+    .lock-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px
+    }
+
+    .lock-sub {
+      font-size: .9rem;
+      color: var(--muted);
+      margin-bottom: 32px
+    }
+
+    .lock-card h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .lock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, .15);
+      border: 1px solid rgba(99, 102, 241, .3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: .8rem;
+      color: var(--primary);
+      margin-bottom: 28px
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      text-align: left
+    }
+
+    .form-group label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .05em
+    }
+
+    .form-control {
+      width: 100%;
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .15);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: .95rem;
+      color: var(--text);
+      font-family: inherit;
+      transition: .2s;
+      outline: none
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, .08)
+    }
+
+    .form-error {
+      color: #f87171;
+      font-size: .82rem;
+      margin-top: 4px;
+      display: none
+    }
+
+    .form-error.show {
+      display: block
+    }
+
+    .btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      font-size: .95rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, .4)
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dk);
+      transform: translateY(-1px)
+    }
+
+    .btn-disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
     /* ── TOP NAV ── */
-    #topnav{position:sticky;top:0;z-index:100;height:60px;display:flex;align-items:center;
-      padding:0 5vw;gap:16px;background:rgba(10,10,20,.8);backdrop-filter:blur(16px);
-      border-bottom:1px solid var(--border)}
-    #topnav .logo{font-size:1.1rem;font-weight:800;
-      background:linear-gradient(135deg,#fff,var(--primary));-webkit-background-clip:text;
-      -webkit-text-fill-color:transparent}
-    #galeria-nome{font-size:1rem;font-weight:600;flex:1;text-align:center}
-    #dl-counter{font-size:.8rem;color:var(--muted);padding:5px 14px;border-radius:20px;
-      background:rgba(255,255,255,.06);border:1px solid var(--border);white-space:nowrap}
+    #topnav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 5vw;
+      gap: 16px;
+      background: rgba(10, 10, 20, .8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border)
+    }
+
+    #topnav .logo {
+      font-size: 1.1rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    #galeria-nome {
+      font-size: 1rem;
+      font-weight: 600;
+      flex: 1;
+      text-align: center
+    }
+
+    #dl-counter {
+      font-size: .8rem;
+      color: var(--muted);
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid var(--border);
+      white-space: nowrap
+    }
+
     /* ── TOOLBAR ── */
-    #toolbar{position:sticky;top:60px;z-index:90;background:rgba(10,10,20,.9);
-      backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
-      padding:10px 5vw;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .toolbar-info{font-size:.82rem;color:var(--muted);margin-right:auto}
-    .tbtn{padding:8px 16px;border-radius:8px;font-size:.83rem;font-weight:600;
-      border:none;cursor:pointer;font-family:inherit;transition:.2s;
-      display:flex;align-items:center;gap:6px}
-    .tbtn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
-    .tbtn-outline:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.06)}
-    .tbtn-primary{background:var(--primary);color:#fff}
-    .tbtn-primary:hover{background:var(--primary-dk)}
-    .tbtn-green{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
-    .tbtn-green:hover{background:rgba(34,197,94,.25)}
-    .tbtn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+    #toolbar {
+      position: sticky;
+      top: 60px;
+      z-index: 90;
+      background: rgba(10, 10, 20, .9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 5vw;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .toolbar-info {
+      font-size: .82rem;
+      color: var(--muted);
+      margin-right: auto
+    }
+
+    .tbtn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: .83rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .tbtn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border)
+    }
+
+    .tbtn-outline:hover {
+      border-color: rgba(255, 255, 255, .3);
+      background: rgba(255, 255, 255, .06)
+    }
+
+    .tbtn-primary {
+      background: var(--primary);
+      color: #fff
+    }
+
+    .tbtn-primary:hover {
+      background: var(--primary-dk)
+    }
+
+    .tbtn-green {
+      background: rgba(34, 197, 94, .15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, .3)
+    }
+
+    .tbtn-green:hover {
+      background: rgba(34, 197, 94, .25)
+    }
+
+    .tbtn:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+      transform: none !important
+    }
+
     /* ── GALLERY GRID ── */
-    #gallery{padding:24px 5vw;columns:2 180px;gap:12px}
-    @media(min-width:600px){#gallery{columns:3 200px}}
-    @media(min-width:900px){#gallery{columns:4 220px}}
-    @media(min-width:1200px){#gallery{columns:5 240px}}
-    .foto-item{break-inside:avoid;margin-bottom:12px;position:relative;border-radius:10px;
-      overflow:hidden;cursor:pointer;border:2px solid transparent;transition:.2s}
-    .foto-item img{width:100%;display:block;transition:transform .4s}
-    .foto-item:hover img{transform:scale(1.04)}
-    .foto-item.selected{border-color:#3b82f6;box-shadow:0 0 0 1px #3b82f6, 0 0 20px rgba(59,130,246,0.35)}
-    .foto-item.selected::after{content:'';position:absolute;inset:0;background:rgba(59,130,246,0.08);pointer-events:none}
-    .foto-item .sel-check{position:absolute;top:10px;right:10px;width:22px;height:22px;
-      border-radius:4px;background:#fff;display:flex;align-items:center;
-      justify-content:center;font-size:12px;color:transparent;opacity:0.9;transition:.2s;
-      box-shadow:0 2px 8px rgba(0,0,0,.2);pointer-events:none;z-index:2}
-    .foto-item.selected .sel-check{opacity:1;color:#3b82f6}
-    .foto-item:hover .sel-check{opacity:1}
-    .foto-item .dl-btn{position:absolute;top:10px;left:10px;width:32px;height:32px;
-      background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;
-      cursor:pointer;font-size:.9rem;opacity:0;transition:.2s;display:flex;align-items:center;
-      justify-content:center;backdrop-filter:blur(4px);z-index:3}
-    .foto-item:hover .dl-btn{opacity:1}
-    .foto-item .dl-btn:hover{background:var(--primary);border-color:var(--primary)}
-    @media(max-width: 800px) { .foto-item .dl-btn { opacity: 0.8; } .foto-item .sel-check { opacity:1; } }
+    #gallery {
+      padding: 24px 5vw;
+      columns: 2 180px;
+      gap: 12px
+    }
+
+    @media(min-width:600px) {
+      #gallery {
+        columns: 3 200px
+      }
+    }
+
+    @media(min-width:900px) {
+      #gallery {
+        columns: 4 220px
+      }
+    }
+
+    @media(min-width:1200px) {
+      #gallery {
+        columns: 5 240px
+      }
+    }
+
+    .foto-item {
+      break-inside: avoid;
+      margin-bottom: 12px;
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: .2s
+    }
+
+    .foto-item img {
+      width: 100%;
+      display: block;
+      transition: transform .4s
+    }
+
+    .foto-item:hover img {
+      transform: scale(1.04)
+    }
+
+    .foto-item.selected {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px #3b82f6, 0 0 20px rgba(59, 130, 246, 0.35)
+    }
+
+    .foto-item.selected::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(59, 130, 246, 0.08);
+      pointer-events: none
+    }
+
+    .foto-item .sel-check {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: transparent;
+      opacity: 0.9;
+      transition: .2s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+      pointer-events: none;
+      z-index: 2
+    }
+
+    .foto-item.selected .sel-check {
+      opacity: 1;
+      color: #3b82f6
+    }
+
+    .foto-item:hover .sel-check {
+      opacity: 1
+    }
+
+    .foto-item .dl-btn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 32px;
+      height: 32px;
+      background: rgba(0, 0, 0, .5);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .3);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .9rem;
+      opacity: 0;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      z-index: 3
+    }
+
+    .foto-item:hover .dl-btn {
+      opacity: 1
+    }
+
+    .foto-item .dl-btn:hover {
+      background: var(--primary);
+      border-color: var(--primary)
+    }
+
+    @media(max-width: 800px) {
+      .foto-item .dl-btn {
+        opacity: 0.8;
+      }
+
+      .foto-item .sel-check {
+        opacity: 1;
+      }
+    }
+
     /* ── BADGE BAIXADA ────────────────────────────────── */
-    .foto-baixada-badge{
-      position:absolute;bottom:8px;left:8px;z-index:3;
-      background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);
-      backdrop-filter:blur(8px);color:#34d399;
-      font-size:.62rem;font-weight:700;letter-spacing:.04em;
-      padding:3px 9px;border-radius:20px;
-      display:flex;align-items:center;gap:5px;
-      pointer-events:none;text-transform:uppercase;
-      animation:fadeInBadge .5s ease;
+    .foto-baixada-badge {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      z-index: 3;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      backdrop-filter: blur(8px);
+      color: #34d399;
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      padding: 3px 9px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      pointer-events: none;
+      text-transform: uppercase;
+      animation: fadeInBadge .5s ease;
     }
+
     @keyframes fadeInBadge {
-      from{opacity:0;transform:translateY(4px)}
-      to  {opacity:1;transform:translateY(0)}
+      from {
+        opacity: 0;
+        transform: translateY(4px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
     }
+
     /* ── MUSIC ── */
-    #music-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,20,.95);
-      backdrop-filter:blur(16px);border-top:1px solid var(--border);
-      padding:10px 5vw;display:flex;align-items:center;gap:12px;z-index:50}
-    #music-bar audio{flex:1;height:32px;min-width:0}
-    #music-bar .music-title{font-size:.8rem;color:var(--muted);max-width:180px;
-      overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    #music-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 10, 20, .95);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      padding: 10px 5vw;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 50
+    }
+
+    #music-bar audio {
+      flex: 1;
+      height: 32px;
+      min-width: 0
+    }
+
+    #music-bar .music-title {
+      font-size: .8rem;
+      color: var(--muted);
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
     /* ── LIGHTBOX ── */
-    #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);
-      z-index:300;align-items:center;justify-content:center}
-    #lightbox.open{display:flex}
-    #lb-img{max-width:92vw;max-height:90vh;object-fit:contain;border-radius:6px}
-    .lb-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);
-      border:none;color:#fff;font-size:1.5rem;padding:14px 18px;cursor:pointer;
-      border-radius:10px;transition:.2s}
-    .lb-btn:hover{background:rgba(255,255,255,.2)}
-    #lb-prev{left:16px}
-    #lb-next{right:16px}
-    #lb-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);
-      border:none;color:#fff;font-size:1.3rem;padding:8px 12px;cursor:pointer;border-radius:8px}
-    #lb-dl{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
-      background:rgba(34,197,94,0.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-      border:1px solid rgba(34,197,94,0.3);color:#fff;padding:8px 20px;border-radius:30px;
-      font-size:0.85rem;font-weight:500;box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:310;
-      transition:all 0.3s;display:flex;align-items:center;gap:6px;cursor:pointer}
-    #lb-dl:hover{background:rgba(34,197,94,0.3);border-color:rgba(34,197,94,0.5);transform:translateX(-50%) translateY(-2px)}
-    .loading{text-align:center;padding:80px;color:var(--muted)}
-    .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
-      background:#1e1e3a;border:1px solid var(--primary);border-radius:10px;
-      padding:12px 24px;font-size:.85rem;color:#fff;z-index:9999;
-      opacity:0;transition:.3s;white-space:nowrap;pointer-events:none}
-    .toast.show{opacity:1}
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .95);
+      z-index: 300;
+      align-items: center;
+      justify-content: center
+    }
+
+    #lightbox.open {
+      display: flex
+    }
+
+    #lb-img {
+      max-width: 92vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 6px
+    }
+
+    .lb-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, .1);
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      padding: 14px 18px;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: .2s
+    }
+
+    .lb-btn:hover {
+      background: rgba(255, 255, 255, .2)
+    }
+
+    #lb-prev {
+      left: 16px
+    }
+
+    #lb-next {
+      right: 16px
+    }
+
+    #lb-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, .1);
+      border: none;
+      color: #fff;
+      font-size: 1.3rem;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 8px
+    }
+
+    #lb-dl {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(34, 197, 94, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      z-index: 310;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer
+    }
+
+    #lb-dl:hover {
+      background: rgba(34, 197, 94, 0.3);
+      border-color: rgba(34, 197, 94, 0.5);
+      transform: translateX(-50%) translateY(-2px)
+    }
+
+    .loading {
+      text-align: center;
+      padding: 80px;
+      color: var(--muted)
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e1e3a;
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: .85rem;
+      color: #fff;
+      z-index: 9999;
+      opacity: 0;
+      transition: .3s;
+      white-space: nowrap;
+      pointer-events: none
+    }
+
+    .toast.show {
+      opacity: 1
+    }
+
     /* ── COVER SCREEN ── */
-    #cover-screen { flex-direction: row; background: var(--bg); }
+    #cover-screen {
+      flex-direction: row;
+      background: var(--bg);
+    }
+
     .cover-left {
-      flex: 0 0 35%; min-width: 320px; max-width: 450px; display: flex; flex-direction: column;
-      justify-content: center; padding: 40px 8%; z-index: 2; background: rgba(10, 10, 20, 0.95);
+      flex: 0 0 35%;
+      min-width: 320px;
+      max-width: 450px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 8%;
+      z-index: 2;
+      background: rgba(10, 10, 20, 0.95);
       box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
     }
+
     .cover-logo {
-      font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #fff, var(--primary));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 40px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 40px;
     }
-    .cover-title { font-size: 2.8rem; font-weight: 800; margin-bottom: 12px; line-height: 1.1; }
-    .cover-count { font-size: 1.1rem; color: var(--muted); margin-bottom: 40px; letter-spacing: 2px; text-transform: uppercase; }
-    .cover-right { flex: 1; background-size: cover; background-position: center; background-repeat: no-repeat; position: relative; }
+
+    .cover-title {
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      line-height: 1.1;
+    }
+
+    .cover-count {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 40px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .cover-right {
+      flex: 1;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+    }
+
     .cover-right::before {
-      content: ''; position: absolute; inset: 0; pointer-events: none;
-      background: linear-gradient(to right, rgba(10,10,20,0.95) 0%, transparent 15%);
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(to right, rgba(10, 10, 20, 0.95) 0%, transparent 15%);
     }
+
     @media (max-width: 800px) {
-      #cover-screen { flex-direction: column-reverse; }
-      .cover-left { flex: none; height: auto; padding: 40px 20px; width: 100%; max-width: 100%; box-shadow: 0 -20px 50px rgba(0,0,0,0.5); }
-      .cover-right::before { background: linear-gradient(to top, rgba(10,10,20,0.95) 0%, transparent 20%); }
+      #cover-screen {
+        flex-direction: column-reverse;
+      }
+
+      .cover-left {
+        flex: none;
+        height: auto;
+        padding: 40px 20px;
+        width: 100%;
+        max-width: 100%;
+        box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.5);
+      }
+
+      .cover-right::before {
+        background: linear-gradient(to top, rgba(10, 10, 20, 0.95) 0%, transparent 20%);
+      }
     }
+
     @keyframes modalSlide {
-      from { transform: scale(.85) translateY(20px); opacity: 0; }
-      to   { transform: scale(1)   translateY(0);    opacity: 1; }
+      from {
+        transform: scale(.85) translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
     }
   </style>
 </head>
+
 <body>
 
-<!-- LOCK SCREEN -->
-<div id="lock-screen">
-  <div class="lock-card">
-    <div class="lock-logo">✦ CriaVibe</div>
-    <p class="lock-sub">Plataforma de galerias para fotógrafos</p>
-    <div class="lock-badge"><i class="fa-solid fa-lock"></i> Galeria Exclusiva</div>
-    <h2 id="galeria-title-lock">Acessar Galeria</h2>
-    <p style="font-size:.85rem;color:var(--muted);margin:6px 0 24px">Digite sua senha de acesso</p>
-    <div class="form-group">
-      <label>Senha de Acesso</label>
-      <input id="senha-input" class="form-control" type="text" placeholder="Ex: A17086" autocomplete="off">
-      <div class="form-error" id="senha-erro">Senha incorreta. Tente novamente.</div>
-    </div>
-    <button class="btn btn-primary" id="btn-entrar" onclick="autenticar()">
-      <i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar na Galeria
-    </button>
-  </div>
-</div>
-
-<!-- COVER SCREEN (CAPA) -->
-<div id="cover-screen" style="display:none;position:fixed;inset:0;z-index:150;">
-  <!-- Left Content Panel -->
-  <div class="cover-left">
-    <div class="cover-logo">✦ CriaVibe</div>
-    <h1 id="cover-title" class="cover-title">Bem-vinda</h1>
-    <p id="cover-count" class="cover-count">0 FOTOS</p>
-    
-    <div style="display:flex;flex-direction:column;gap:16px;width:100%">
-      <button class="btn btn-primary" onclick="irParaGaleria()" style="border-radius:10px;padding:16px;font-size:1.1rem;background:#fff;color:#000">
-        <i class="fa-solid fa-images"></i> VER FOTOS
-      </button>
-      <button class="btn tbtn-outline" id="btn-cover-dl" onclick="baixarZipTodas()" style="border-color:rgba(255,255,255,0.2);color:#fff;border-radius:10px;padding:16px;font-size:1.1rem;display:none">
-        <i class="fa-solid fa-download"></i> DOWNLOAD
+  <!-- LOCK SCREEN -->
+  <div id="lock-screen">
+    <div class="lock-card">
+      <div class="lock-logo">✦ CriaVibe</div>
+      <p class="lock-sub">Plataforma de galerias para fotógrafos</p>
+      <div class="lock-badge"><i class="fa-solid fa-lock"></i> Galeria Exclusiva</div>
+      <h2 id="galeria-title-lock">Acessar Galeria</h2>
+      <p style="font-size:.85rem;color:var(--muted);margin:6px 0 24px">Digite sua senha de acesso</p>
+      <div class="form-group">
+        <label>Senha de Acesso</label>
+        <input id="senha-input" class="form-control" type="text" placeholder="Ex: A17086" autocomplete="off">
+        <div class="form-error" id="senha-erro">Senha incorreta. Tente novamente.</div>
+      </div>
+      <button class="btn btn-primary" id="btn-entrar" onclick="autenticar()">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar na Galeria
       </button>
     </div>
   </div>
-  
-  <!-- Right Photo Panel -->
-  <div id="cover-bg" class="cover-right"></div>
-</div>
 
-<!-- TOP NAV -->
-<nav id="topnav" style="display:none; justify-content: space-between;">
-  <div style="display:flex; align-items:center;">
-    <button onclick="voltarParaCapa()" style="background:transparent;border:none;color:var(--text);font-size:1.2rem;cursor:pointer;margin-right:16px;transition:0.2s" title="Voltar" onmouseover="this.style.color='var(--primary)';this.style.transform='translateX(-3px)'" onmouseout="this.style.color='var(--text)';this.style.transform=''">
-      <i class="fa-solid fa-arrow-left"></i>
+  <!-- COVER SCREEN (CAPA) -->
+  <div id="cover-screen" style="display:none;position:fixed;inset:0;z-index:150;">
+    <!-- Left Content Panel -->
+    <div class="cover-left">
+      <div class="cover-logo">✦ CriaVibe</div>
+      <h1 id="cover-title" class="cover-title">Bem-vinda</h1>
+      <p id="cover-count" class="cover-count">0 FOTOS</p>
+
+      <div style="display:flex;flex-direction:column;gap:16px;width:100%">
+        <button class="btn btn-primary" onclick="irParaGaleria()"
+          style="border-radius:10px;padding:16px;font-size:1.1rem;background:#fff;color:#000">
+          <i class="fa-solid fa-images"></i> VER FOTOS
+        </button>
+        <button class="btn tbtn-outline" id="btn-cover-dl" onclick="baixarZipTodas()"
+          style="border-color:rgba(255,255,255,0.2);color:#fff;border-radius:10px;padding:16px;font-size:1.1rem;display:none">
+          <i class="fa-solid fa-download"></i> DOWNLOAD
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Photo Panel -->
+    <div id="cover-bg" class="cover-right"></div>
+  </div>
+
+  <!-- TOP NAV -->
+  <nav id="topnav" style="display:none; justify-content: space-between;">
+    <div style="display:flex; align-items:center;">
+      <button onclick="voltarParaCapa()"
+        style="background:transparent;border:none;color:var(--text);font-size:1.2rem;cursor:pointer;margin-right:16px;transition:0.2s"
+        title="Voltar" onmouseover="this.style.color='var(--primary)';this.style.transform='translateX(-3px)'"
+        onmouseout="this.style.color='var(--text)';this.style.transform=''">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div class="logo">✦ CriaVibe</div>
+      <div id="galeria-nome" style="margin-left:12px; font-weight:600; font-size:1rem;"></div>
+    </div>
+    <div style="display:flex; align-items:center; gap: 12px; font-size: 0.9rem; color: var(--muted);">
+      <span id="top-status-text">0 fotos selecionadas • Baixar tudo (ZIP)</span>
+      <div id="dl-counter" style="display:none; margin-left:10px;"></div>
+    </div>
+  </nav>
+
+  <!-- TOOLBAR -->
+  <div id="toolbar" style="display:none; justify-content: flex-end; padding-top: 15px; padding-bottom: 15px;">
+
+    <button class="tbtn tbtn-primary" id="btn-zip-sel" onclick="baixarZipSelecionadas()"
+      style="display:none; padding: 10px 20px; font-size: 0.95rem; border-radius: 8px;">
+      Baixar Selecionadas
     </button>
-    <div class="logo">✦ CriaVibe</div>
-    <div id="galeria-nome" style="margin-left:12px; font-weight:600; font-size:1rem;"></div>
+    <button class="tbtn tbtn-outline" id="btn-zip-all" onclick="baixarZipTodas()"
+      style="display:none; padding: 10px 20px; font-size: 0.95rem; border-radius: 8px; margin-left:12px;">
+      Baixar Tudo
+    </button>
   </div>
-  <div style="display:flex; align-items:center; gap: 12px; font-size: 0.9rem; color: var(--muted);">
-    <span id="top-status-text">0 fotos selecionadas • Baixar tudo (ZIP)</span>
-    <div id="dl-counter" style="display:none; margin-left:10px;"></div>
+
+  <!-- FLOATING SELECTION BAR -->
+  <div id="floating-selection"
+    style="display:none; position:fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(30, 32, 40, 0.95); backdrop-filter: blur(16px); padding: 12px 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); align-items: center; gap: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200;">
+    <span id="floating-count" style="font-weight: 500; font-size: 0.95rem; white-space: nowrap;">0 fotos
+      selecionadas</span>
+    <button class="btn btn-primary" onclick="baixarZipSelecionadas()"
+      style="width: auto; padding: 10px 24px; border-radius: 8px; font-size: 0.9rem; margin: 0; box-shadow: none;">
+      Baixar Selecionadas
+    </button>
+    <button onclick="limparSelecao()"
+      style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 9px 24px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; font-family: inherit; transition: 0.2s;"
+      onmouseover="this.style.background='rgba(255,255,255,0.15)'"
+      onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+      Desmarcar
+    </button>
   </div>
-</nav>
 
-<!-- TOOLBAR -->
-<div id="toolbar" style="display:none; justify-content: flex-end; padding-top: 15px; padding-bottom: 15px;">
-  
-  <button class="tbtn tbtn-primary" id="btn-zip-sel" onclick="baixarZipSelecionadas()" style="display:none; padding: 10px 20px; font-size: 0.95rem; border-radius: 8px;">
-    Baixar Selecionadas
-  </button>
-  <button class="tbtn tbtn-outline" id="btn-zip-all" onclick="baixarZipTodas()" style="display:none; padding: 10px 20px; font-size: 0.95rem; border-radius: 8px; margin-left:12px;">
-    Baixar Tudo
-  </button>
-</div>
-
-<!-- FLOATING SELECTION BAR -->
-<div id="floating-selection" style="display:none; position:fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(30, 32, 40, 0.95); backdrop-filter: blur(16px); padding: 12px 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); align-items: center; gap: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200;">
-  <span id="floating-count" style="font-weight: 500; font-size: 0.95rem; white-space: nowrap;">0 fotos selecionadas</span>
-  <button class="btn btn-primary" onclick="baixarZipSelecionadas()" style="width: auto; padding: 10px 24px; border-radius: 8px; font-size: 0.9rem; margin: 0; box-shadow: none;">
-    Baixar Selecionadas
-  </button>
-  <button onclick="limparSelecao()" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 9px 24px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; font-family: inherit; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-    Desmarcar
-  </button>
-</div>
-
-<!-- GALLERY -->
-<div id="gallery" style="display:none"><div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Carregando fotos...</div></div>
-
-<!-- LIGHTBOX -->
-<div id="lightbox">
-  <button id="lb-close" onclick="fecharLightbox()">✕</button>
-  <button class="lb-btn" id="lb-prev" onclick="navLightbox(-1)">‹</button>
-  <img id="lb-img" src="" alt="">
-  <button class="lb-btn" id="lb-next" onclick="navLightbox(1)">›</button>
-  <button id="lb-dl" onclick="baixarFotoAtual()">
-    <i class="fa-solid fa-download"></i> Baixar
-  </button>
-</div>
-
-<!-- MUSIC BAR -->
-<div id="music-bar" style="display:none">
-  <i class="fa-solid fa-music" style="color:var(--primary)"></i>
-  <span class="music-title" id="music-title"></span>
-  <!-- Player para MP3 -->
-  <audio id="audio-player" controls autoplay style="flex:1;height:32px;min-width:0"></audio>
-  <!-- Container para YouTube IFrame (escondido visualmente mas funcional) -->
-  <div id="yt-player-container" style="display:none; width:1px; height:1px; overflow:hidden; position:absolute; pointer-events:none;">
-    <div id="yt-player"></div>
+  <!-- GALLERY -->
+  <div id="gallery" style="display:none">
+    <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Carregando fotos...</div>
   </div>
-</div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
+  <!-- LIGHTBOX -->
+  <div id="lightbox">
+    <button id="lb-close" onclick="fecharLightbox()">✕</button>
+    <button class="lb-btn" id="lb-prev" onclick="navLightbox(-1)">‹</button>
+    <img id="lb-img" src="" alt="">
+    <button class="lb-btn" id="lb-next" onclick="navLightbox(1)">›</button>
+    <button id="lb-dl" onclick="baixarFotoAtual()">
+      <i class="fa-solid fa-download"></i> Baixar
+    </button>
+  </div>
 
-<!-- MODAL LIMITE DE DOWNLOADS -->
-<div id="modal-limite" style="
+  <!-- MUSIC BAR -->
+  <div id="music-bar" style="display:none">
+    <i class="fa-solid fa-music" style="color:var(--primary)"></i>
+    <span class="music-title" id="music-title"></span>
+    <!-- Player para MP3 -->
+    <audio id="audio-player" controls autoplay style="flex:1;height:32px;min-width:0"></audio>
+    <!-- Container para YouTube IFrame (escondido visualmente mas funcional) -->
+    <div id="yt-player-container"
+      style="display:none; width:1px; height:1px; overflow:hidden; position:absolute; pointer-events:none;">
+      <div id="yt-player"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- MODAL LIMITE DE DOWNLOADS -->
+  <div id="modal-limite" style="
   display:none; position:fixed; inset:0; z-index:500;
   background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
   align-items:center; justify-content:center;
 " onclick="if(event.target===this)fecharModalLimite()">
-  <div style="
+    <div style="
     background:linear-gradient(135deg,#1e1e2e,#16213e);
     border:1px solid rgba(251,113,133,0.35);
     border-radius:20px; padding:40px 36px; max-width:420px; width:90%;
@@ -293,148 +827,149 @@
     box-shadow:0 0 60px rgba(251,113,133,0.2), 0 30px 60px rgba(0,0,0,0.5);
     animation: modalSlide .35s cubic-bezier(.34,1.56,.64,1);
   ">
-    <div style="font-size:3rem;margin-bottom:16px;">⚠️</div>
-    <h2 style="font-size:1.3rem;font-weight:800;color:#fca5a5;margin-bottom:12px;">Limite de downloads atingido</h2>
-    <p id="limite-msg" style="color:rgba(255,255,255,0.75);font-size:.95rem;line-height:1.6;margin-bottom:28px;"></p>
-    <div style="background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.2);border-radius:12px;padding:14px;margin-bottom:28px;">
-      <span id="limite-destaques" style="font-size:1.5rem;font-weight:900;color:#fb7185;"></span>
-      <div id="limite-sub" style="font-size:.8rem;color:rgba(255,255,255,0.5);margin-top:4px;"></div>
-    </div>
-    <button onclick="fecharModalLimite()" style="
+      <div style="font-size:3rem;margin-bottom:16px;">⚠️</div>
+      <h2 style="font-size:1.3rem;font-weight:800;color:#fca5a5;margin-bottom:12px;">Limite de downloads atingido</h2>
+      <p id="limite-msg" style="color:rgba(255,255,255,0.75);font-size:.95rem;line-height:1.6;margin-bottom:28px;"></p>
+      <div
+        style="background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.2);border-radius:12px;padding:14px;margin-bottom:28px;">
+        <span id="limite-destaques" style="font-size:1.5rem;font-weight:900;color:#fb7185;"></span>
+        <div id="limite-sub" style="font-size:.8rem;color:rgba(255,255,255,0.5);margin-top:4px;"></div>
+      </div>
+      <button onclick="fecharModalLimite()" style="
       background:linear-gradient(135deg,#3b82f6,#6366f1);
       color:#fff;border:none;padding:12px 32px;border-radius:10px;
       font-size:1rem;font-weight:700;cursor:pointer;width:100%;
       transition:.2s;font-family:inherit;
     " onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-      Entendido, vou desmarcar
-    </button>
+        Entendido, vou desmarcar
+      </button>
+    </div>
   </div>
-</div>
 
-<script>
-const params = new URLSearchParams(location.search);
-const TOKEN  = params.get('token') || '';
-let GALERIA  = null;
-let FOTOS    = [];
-let selecionadas = new Set();
-let lbIndex  = 0;
-let dlCount  = 0;
-let dlMax    = 0;
-let isModoSelecao = false;
+  <script>
+    const params = new URLSearchParams(location.search);
+    const TOKEN = params.get('token') || '';
+    let GALERIA = null;
+    let FOTOS = [];
+    let selecionadas = new Set();
+    let lbIndex = 0;
+    let dlCount = 0;
+    let dlMax = 0;
+    let isModoSelecao = false;
 
-// ── AUTH ──────────────────────────────────────────────────────
-async function autenticar() {
-  const senha = document.getElementById('senha-input').value.trim();
-  const erro  = document.getElementById('senha-erro');
-  const btn   = document.getElementById('btn-entrar');
-  if (!senha) { erro.style.display='block'; erro.textContent='Digite sua senha.'; return; }
-  btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
-  try {
-    const r = await fetch('/api/galerias/verify_access.php', {
-      method:'POST', credentials:'include',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({token: TOKEN, senha})
+    // ── AUTH ──────────────────────────────────────────────────────
+    async function autenticar() {
+      const senha = document.getElementById('senha-input').value.trim();
+      const erro = document.getElementById('senha-erro');
+      const btn = document.getElementById('btn-entrar');
+      if (!senha) { erro.style.display = 'block'; erro.textContent = 'Digite sua senha.'; return; }
+      btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
+      try {
+        const r = await fetch('/api/galerias/verify_access.php', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: TOKEN, senha })
+        });
+        const d = await r.json();
+        if (d.status === 'ok') {
+          GALERIA = d.galeria;
+          dlCount = d.dl_count || 0;
+          dlMax = d.dl_max || 0;
+          document.getElementById('lock-screen').style.display = 'none';
+          prepararCapa();
+        } else {
+          erro.textContent = d.mensagem || 'Senha incorreta.';
+          erro.style.display = 'block';
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar na Galeria';
+        }
+      } catch {
+        erro.textContent = 'Erro de conexão. Tente novamente.';
+        erro.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar na Galeria';
+      }
+    }
+
+    // Enter key on password
+    document.getElementById('senha-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') autenticar();
     });
-    const d = await r.json();
-    if (d.status === 'ok') {
-      GALERIA = d.galeria;
-      dlCount = d.dl_count || 0;
-      dlMax   = d.dl_max || 0;
-      document.getElementById('lock-screen').style.display = 'none';
-      prepararCapa();
-    } else {
-      erro.textContent = d.mensagem || 'Senha incorreta.';
-      erro.style.display = 'block';
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar na Galeria';
-    }
-  } catch {
-    erro.textContent = 'Erro de conexão. Tente novamente.';
-    erro.style.display = 'block';
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar na Galeria';
-  }
-}
 
-// Enter key on password
-document.getElementById('senha-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') autenticar();
-});
+    // ── INIT ──────────────────────────────────────────────────────
+    async function prepararCapa() {
+      document.getElementById('cover-screen').style.display = 'flex';
+      document.getElementById('cover-title').textContent = 'Bem-vindo(a) ' + GALERIA.nome;
+      document.title = GALERIA.nome + ' — CriaVibe';
 
-// ── INIT ──────────────────────────────────────────────────────
-async function prepararCapa() {
-  document.getElementById('cover-screen').style.display = 'flex';
-  document.getElementById('cover-title').textContent = 'Bem-vindo(a) ' + GALERIA.nome;
-  document.title = GALERIA.nome + ' — CriaVibe';
-  
-  // entrega_em_alta = permite baixar fotos (campo correto do banco)
-  if (GALERIA.entrega_em_alta == 1) {
-    document.getElementById('btn-cover-dl').style.display = 'flex';
-  }
-  
-  // Carrega fotos silenciosamente para a grid e para preencher o fundo da capa
-  await carregarFotos(true);
-}
+      // entrega_em_alta = permite baixar fotos (campo correto do banco)
+      if (GALERIA.entrega_em_alta == 1) {
+        document.getElementById('btn-cover-dl').style.display = 'flex';
+      }
 
-function irParaGaleria() {
-  document.getElementById('cover-screen').style.display = 'none';
-  iniciarGaleriaNav();
-}
-
-function voltarParaCapa() {
-  document.getElementById('topnav').style.display = 'none';
-  document.getElementById('toolbar').style.display = 'none';
-  document.getElementById('gallery').style.display = 'none';
-  document.getElementById('cover-screen').style.display = 'flex';
-}
-
-function iniciarGaleriaNav() {
-  // Nav
-  document.getElementById('topnav').style.display = 'flex';
-  document.getElementById('toolbar').style.display = 'flex';
-  document.getElementById('gallery').style.display = 'block';
-  document.getElementById('galeria-nome').textContent = GALERIA.nome;
-  atualizarContador();
-
-  // Botões (baseado nos módulos da galeria)
-  // Coerce para boolean (MySQL retorna '0'/'1' como string)
-  if (GALERIA.selecao_ativa == 1) {
-    isModoSelecao = true;
-  }
-  
-  // entrega_em_alta == 1: permite baixar. Padronizado com nome do DB.
-  if (GALERIA.entrega_em_alta == 1) {
-    document.getElementById('btn-zip-all').style.display = '';
-  }
-
-  // Música
-  carregarMusica();
-  // Inicia polling automático de atualizações
-  iniciarPolling();
-}
-
-async function carregarFotos(isFromCover = false) {
-  const grid = document.getElementById('gallery');
-  try {
-    const r = await fetch(`/api/fotos/list.php?galeria_id=${GALERIA.id}`, {credentials:'include'});
-    const d = await r.json();
-    FOTOS = d.fotos || [];
-    document.getElementById('cover-count').textContent = FOTOS.length + ' FOTOS';
-    
-    if (FOTOS.length > 0) {
-      document.getElementById('cover-bg').style.backgroundImage = `url('/${FOTOS[0].caminho_arquivo}')`;
+      // Carrega fotos silenciosamente para a grid e para preencher o fundo da capa
+      await carregarFotos(true);
     }
 
-    if (!FOTOS.length) {
-      grid.innerHTML = '<div class="loading" style="color:rgba(255,255,255,.4)"><i class="fa-solid fa-images"></i><br>Nenhuma foto ainda.</div>';
-      return;
+    function irParaGaleria() {
+      document.getElementById('cover-screen').style.display = 'none';
+      iniciarGaleriaNav();
     }
-    grid.innerHTML = FOTOS.map((f,i) => {
-      const src  = '/' + f.caminho_arquivo;
-      const nome = f.nome_arquivo || 'foto_' + f.id;
-      if (f.selecionada) selecionadas.add(f.id);
-      const jaiBaixada = getBaixadas().has(String(f.id));
-      return `
+
+    function voltarParaCapa() {
+      document.getElementById('topnav').style.display = 'none';
+      document.getElementById('toolbar').style.display = 'none';
+      document.getElementById('gallery').style.display = 'none';
+      document.getElementById('cover-screen').style.display = 'flex';
+    }
+
+    function iniciarGaleriaNav() {
+      // Nav
+      document.getElementById('topnav').style.display = 'flex';
+      document.getElementById('toolbar').style.display = 'flex';
+      document.getElementById('gallery').style.display = 'block';
+      document.getElementById('galeria-nome').textContent = GALERIA.nome;
+      atualizarContador();
+
+      // Botões (baseado nos módulos da galeria)
+      // Coerce para boolean (MySQL retorna '0'/'1' como string)
+      if (GALERIA.selecao_ativa == 1) {
+        isModoSelecao = true;
+      }
+
+      // entrega_em_alta == 1: permite baixar. Padronizado com nome do DB.
+      if (GALERIA.entrega_em_alta == 1) {
+        document.getElementById('btn-zip-all').style.display = '';
+      }
+
+      // Música
+      carregarMusica();
+      // Inicia polling automático de atualizações
+      iniciarPolling();
+    }
+
+    async function carregarFotos(isFromCover = false) {
+      const grid = document.getElementById('gallery');
+      try {
+        const r = await fetch(`/api/fotos/list.php?galeria_id=${GALERIA.id}`, { credentials: 'include' });
+        const d = await r.json();
+        FOTOS = d.fotos || [];
+        document.getElementById('cover-count').textContent = FOTOS.length + ' FOTOS';
+
+        if (FOTOS.length > 0) {
+          document.getElementById('cover-bg').style.backgroundImage = `url('/${FOTOS[0].caminho_arquivo}')`;
+        }
+
+        if (!FOTOS.length) {
+          grid.innerHTML = '<div class="loading" style="color:rgba(255,255,255,.4)"><i class="fa-solid fa-images"></i><br>Nenhuma foto ainda.</div>';
+          return;
+        }
+        grid.innerHTML = FOTOS.map((f, i) => {
+          const src = '/' + f.caminho_arquivo;
+          const nome = f.nome_arquivo || 'foto_' + f.id;
+          if (f.selecionada) selecionadas.add(f.id);
+          const jaiBaixada = getBaixadas().has(String(f.id));
+          return `
         <div class="foto-item ${f.selecionada ? 'selected' : ''}" data-id="${f.id}" data-idx="${i}" id="foto-${f.id}" onclick="clicarFoto(event,${i})">
           <img src="${src}" alt="${nome}" loading="lazy">
           <div class="sel-check"><i class="fa-solid fa-check"></i></div>
@@ -447,458 +982,459 @@ async function carregarFotos(isFromCover = false) {
             <i class="fa-solid fa-download"></i>
           </button>` : ''}
         </div>`;
-    }).join('');
-    atualizarToolbar();
-  } catch (e) {
-    grid.innerHTML = '<div class="loading" style="color:#f87171"><i class="fa-solid fa-triangle-exclamation"></i><br>Erro ao carregar fotos.</div>';
-  }
-}
-
-// YouTube IFrame API global instance
-let ytPlayer = null;
-let ytReady  = false;
-window.onYouTubeIframeAPIReady = function() { ytReady = true; };
-
-async function carregarMusica() {
-  // musicas_ativas é o campo correto do banco (não player_ativo)
-  if (GALERIA.musicas_ativas != 1) return;
-  try {
-    const r = await fetch(`/api/musicas/list.php?galeria_id=${GALERIA.id}`, {credentials:'include'});
-    const d = await r.json();
-    const musicas = d.musicas || [];
-    if (!musicas.length) return;
-
-    const bar   = document.getElementById('music-bar');
-    const audio = document.getElementById('audio-player');
-    const title = document.getElementById('music-title');
-    bar.style.display = 'flex';
-    document.getElementById('gallery').style.paddingBottom = '80px';
-
-    let idx = 0;
-
-    function isYoutube(m) {
-      return m.nome_arquivo === 'youtube' ||
-             (m.caminho_arquivo && m.caminho_arquivo.includes('youtube'));
+        }).join('');
+        atualizarToolbar();
+      } catch (e) {
+        grid.innerHTML = '<div class="loading" style="color:#f87171"><i class="fa-solid fa-triangle-exclamation"></i><br>Erro ao carregar fotos.</div>';
+      }
     }
 
-    function extrairVideoId(url) {
-      const m = url.match(/(?:v=|youtu\.be\/)([\w-]{11})/);
-      return m ? m[1] : null;
-    }
+    // YouTube IFrame API global instance
+    let ytPlayer = null;
+    let ytReady = false;
+    window.onYouTubeIframeAPIReady = function () { ytReady = true; };
 
-    function tocarYoutube(videoId, nomeExibicao) {
-      audio.pause();
-      audio.style.display = 'none';
-      document.getElementById('yt-player-container').style.display = 'block';
-      title.textContent = nomeExibicao || 'YouTube';
+    async function carregarMusica() {
+      // musicas_ativas é o campo correto do banco (não player_ativo)
+      if (GALERIA.musicas_ativas != 1) return;
+      try {
+        const r = await fetch(`/api/musicas/list.php?galeria_id=${GALERIA.id}`, { credentials: 'include' });
+        const d = await r.json();
+        const musicas = d.musicas || [];
+        if (!musicas.length) return;
 
-      function iniciarPlayer() {
-        if (ytPlayer && ytPlayer.loadVideoById) {
-          ytPlayer.loadVideoById(videoId);
-        } else {
-          ytPlayer = new YT.Player('yt-player', {
-            videoId: videoId,
-            playerVars: { autoplay: 1, controls: 0, loop: 1, playsinline: 1, rel: 0, enablejsapi: 1 },
-            events: {
-              onStateChange: (e) => {
-                // Quando terminar, toca próxima
-                if (e.data === YT.PlayerState.ENDED) {
-                  idx = (idx + 1) % musicas.length;
-                  tocarMusica(idx);
+        const bar = document.getElementById('music-bar');
+        const audio = document.getElementById('audio-player');
+        const title = document.getElementById('music-title');
+        bar.style.display = 'flex';
+        document.getElementById('gallery').style.paddingBottom = '80px';
+
+        let idx = 0;
+
+        function isYoutube(m) {
+          return m.nome_arquivo === 'youtube' ||
+            (m.caminho_arquivo && m.caminho_arquivo.includes('youtube'));
+        }
+
+        function extrairVideoId(url) {
+          const m = url.match(/(?:v=|youtu\.be\/)([\w-]{11})/);
+          return m ? m[1] : null;
+        }
+
+        function tocarYoutube(videoId, nomeExibicao) {
+          audio.pause();
+          audio.style.display = 'none';
+          document.getElementById('yt-player-container').style.display = 'block';
+          title.textContent = nomeExibicao || 'YouTube';
+
+          function iniciarPlayer() {
+            if (ytPlayer && ytPlayer.loadVideoById) {
+              ytPlayer.loadVideoById(videoId);
+            } else {
+              ytPlayer = new YT.Player('yt-player', {
+                videoId: videoId,
+                playerVars: { autoplay: 1, controls: 0, loop: 1, playsinline: 1, rel: 0, enablejsapi: 1 },
+                events: {
+                  onStateChange: (e) => {
+                    // Quando terminar, toca próxima
+                    if (e.data === YT.PlayerState.ENDED) {
+                      idx = (idx + 1) % musicas.length;
+                      tocarMusica(idx);
+                    }
+                  }
                 }
-              }
+              });
             }
-          });
+          }
+
+          if (ytReady) {
+            iniciarPlayer();
+          } else {
+            // Aguarda YT API carregar
+            const poll = setInterval(() => {
+              if (ytReady) { clearInterval(poll); iniciarPlayer(); }
+            }, 200);
+          }
+        }
+
+        function tocarMp3(m) {
+          if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
+          document.getElementById('yt-player-container').style.display = 'none';
+          audio.style.display = 'flex';
+          audio.src = '/' + m.caminho_arquivo;
+          title.textContent = m.nome_exibicao || m.nome_arquivo || 'Música';
+          audio.play().catch(() => { });
+        }
+
+        function tocarMusica(i) {
+          const m = musicas[i];
+          if (isYoutube(m)) {
+            const vid = extrairVideoId(m.caminho_arquivo);
+            if (vid) tocarYoutube(vid, m.nome_exibicao || m.nome_arquivo);
+          } else {
+            tocarMp3(m);
+          }
+        }
+
+        audio.addEventListener('ended', () => {
+          idx = (idx + 1) % musicas.length;
+          tocarMusica(idx);
+        });
+
+        // Carrega YouTube IFrame API se ainda não está presente
+        if (!document.getElementById('yt-api-script')) {
+          const s = document.createElement('script');
+          s.id = 'yt-api-script';
+          s.src = 'https://www.youtube.com/iframe_api';
+          document.head.appendChild(s);
+        }
+
+        tocarMusica(0);
+      } catch (err) {
+        console.warn('Erro ao carregar música:', err);
+      }
+    }
+
+    // ── SELECTION ─────────────────────────────────────────────────
+    let clickTimer = null;
+    let clickCount = 0;
+
+    function toggleModoSelecao() {
+      isModoSelecao = !isModoSelecao;
+      const btn = document.getElementById('btn-toggle-sel');
+      const lbl = document.getElementById('lbl-toggle-sel');
+      if (isModoSelecao) {
+        btn.style.background = 'rgba(57,255,20,0.15)';
+        lbl.textContent = 'Desativar';
+      } else {
+        btn.style.background = 'transparent';
+        lbl.textContent = 'Ativar';
+      }
+      atualizarToolbar();
+    }
+
+    function clicarFoto(e, idx) {
+      if (e.target.classList.contains('dl-btn') || e.target.closest('.dl-btn')) return;
+
+      clickCount++;
+
+      if (clickCount === 1) {
+        clickTimer = setTimeout(() => {
+          // 1 Clique: Seleciona direto se GALERIA.selecao_ativa
+          if (GALERIA.selecao_ativa == 1) {
+            toggleSelecao(idx);
+          } else {
+            // Se seleção não habilitada, 1 clique amplia
+            abrirLightbox(idx);
+          }
+          clickCount = 0;
+        }, 280);
+      } else if (clickCount === 2) {
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+          // 2 Cliques: Amplia
+          abrirLightbox(idx);
+          clickCount = 0;
+        }, 280);
+      } else if (clickCount === 3) {
+        clearTimeout(clickTimer);
+        // 3 Cliques: Seleciona Todas
+        if (GALERIA.selecao_ativa) {
+          selecionarTodas();
+        }
+        clickCount = 0;
+      }
+    }
+
+    function toggleSelecao(idx) {
+      const id = FOTOS[idx].id;
+      const el = document.querySelector(`.foto-item[data-idx="${idx}"]`);
+      if (selecionadas.has(id)) { selecionadas.delete(id); el?.classList.remove('selected'); }
+      else { selecionadas.add(id); el?.classList.add('selected'); }
+      atualizarToolbar();
+
+      fetch('/api/fotos/client_selecao.php', {
+        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ acao: 'toggle', id: id, galeria_id: GALERIA.id, token: TOKEN })
+      }).catch(() => { });
+    }
+
+    function selecionarTodas() {
+      FOTOS.forEach((f, i) => {
+        selecionadas.add(f.id);
+        document.querySelector(`.foto-item[data-idx="${i}"]`)?.classList.add('selected');
+      });
+      atualizarToolbar();
+
+      fetch('/api/fotos/client_selecao.php', {
+        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ acao: 'all', galeria_id: GALERIA.id, token: TOKEN })
+      }).catch(() => { });
+    }
+
+    function limparSelecao() {
+      selecionadas.clear();
+      document.querySelectorAll('.foto-item.selected').forEach(el => el.classList.remove('selected'));
+      atualizarToolbar();
+
+      fetch('/api/fotos/client_selecao.php', {
+        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ acao: 'clear', galeria_id: GALERIA.id, token: TOKEN })
+      }).catch(() => { });
+    }
+
+    function atualizarToolbar() {
+      const n = selecionadas.size;
+
+      // Botão "Baixar Selecionadas" na toolbar superior
+      const btnZipSel = document.getElementById('btn-zip-sel');
+      if (btnZipSel) btnZipSel.style.display = (GALERIA.entrega_em_alta == 1 && n > 0) ? '' : 'none';
+
+      // Barra flutuante inferior de seleção
+      const floatingBar = document.getElementById('floating-selection');
+      if (floatingBar) {
+        if (n > 0) {
+          floatingBar.style.display = 'flex';
+          document.getElementById('floating-count').textContent = `${n} foto${n > 1 ? 's' : ''} selecionada${n > 1 ? 's' : ''}`;
+        } else {
+          floatingBar.style.display = 'none';
         }
       }
 
-      if (ytReady) {
-        iniciarPlayer();
-      } else {
-        // Aguarda YT API carregar
-        const poll = setInterval(() => {
-          if (ytReady) { clearInterval(poll); iniciarPlayer(); }
-        }, 200);
+      // Status no topo
+      const topStatus = document.getElementById('top-status-text');
+      if (topStatus) {
+        topStatus.textContent = `${n} foto${n !== 1 ? 's' : ''} selecionada${n !== 1 ? 's' : ''} • Baixar tudo (ZIP)`;
       }
     }
 
-    function tocarMp3(m) {
-      if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
-      document.getElementById('yt-player-container').style.display = 'none';
-      audio.style.display = 'flex';
-      audio.src = '/' + m.caminho_arquivo;
-      title.textContent = m.nome_exibicao || m.nome_arquivo || 'Música';
-      audio.play().catch(()=>{});
-    }
-
-    function tocarMusica(i) {
-      const m = musicas[i];
-      if (isYoutube(m)) {
-        const vid = extrairVideoId(m.caminho_arquivo);
-        if (vid) tocarYoutube(vid, m.nome_exibicao || m.nome_arquivo);
-      } else {
-        tocarMp3(m);
+    // ── DOWNLOADS ─────────────────────────────────────────────────
+    function atualizarContador() {
+      if (dlMax > 0) {
+        const el = document.getElementById('dl-counter');
+        el.style.display = '';
+        el.innerHTML = `<i class="fa-solid fa-download"></i> ${dlCount}/${dlMax} downloads`;
+        el.style.color = dlCount >= dlMax ? '#f87171' : '';
       }
     }
 
-    audio.addEventListener('ended', () => {
-      idx = (idx + 1) % musicas.length;
-      tocarMusica(idx);
+    function mostrarModalLimite(qtdSolicitada, restantes) {
+      const excesso = qtdSolicitada - restantes;
+      const modal = document.getElementById('modal-limite');
+
+      if (restantes <= 0) {
+        // Esgotou totalmente
+        document.getElementById('limite-msg').textContent =
+          `Você já utilizou todos os ${dlMax} download${dlMax > 1 ? 's' : ''} disponíveis nesta galeria.`;
+        document.getElementById('limite-destaques').textContent = `Limite atingido!`;
+        document.getElementById('limite-sub').textContent =
+          `Entre em contato com o fotógrafo para solicitar mais downloads.`;
+      } else {
+        // Excedeu parcialmente
+        document.getElementById('limite-msg').textContent =
+          `Você selecionou ${qtdSolicitada} foto${qtdSolicitada > 1 ? 's' : ''}, mas só restam ${restantes} download${restantes > 1 ? 's' : ''} disponíveis nesta galeria.`;
+        document.getElementById('limite-destaques').textContent =
+          `Desmarque ${excesso} foto${excesso > 1 ? 's' : ''}!`;
+        document.getElementById('limite-sub').textContent =
+          `Remova ${excesso} foto${excesso > 1 ? 's' : ''} da seleção para continuar o download.`;
+      }
+      modal.style.display = 'flex';
+    }
+
+    function fecharModalLimite() {
+      document.getElementById('modal-limite').style.display = 'none';
+    }
+
+    // dlMax = total de fotos que o cliente pode baixar
+    // dlCount = fotos já baixadas (persistente no banco)
+    // Retorna true se pode baixar 'qtdFotos' fotos ainda
+    function checarLimite(qtdFotos) {
+      if (dlMax <= 0) return true; // 0 = ilimitado
+      const restantes = Math.max(0, dlMax - dlCount);
+      if (qtdFotos > restantes) {
+        mostrarModalLimite(qtdFotos, restantes);
+        return false;
+      }
+      return true;
+    }
+
+
+    // ── FOTOS BAIXADAS (localStorage por galeria) ──────────────────
+    function _baixadasKey() {
+      return `baixadas_${GALERIA?.id}`;
+    }
+    function getBaixadas() {
+      return new Set(JSON.parse(localStorage.getItem(_baixadasKey()) || '[]'));
+    }
+    function marcarBaixadas(ids) {
+      const s = getBaixadas();
+      ids.forEach(id => s.add(String(id)));
+      localStorage.setItem(_baixadasKey(), JSON.stringify([...s]));
+      aplicarBadgesBaixadas();
+    }
+    function aplicarBadgesBaixadas() {
+      const baixadas = getBaixadas();
+      FOTOS.forEach(f => {
+        const card = document.getElementById(`foto-${f.id}`);
+        if (!card) return;
+        const jaTemBadge = card.querySelector('.foto-baixada-badge');
+        if (baixadas.has(String(f.id)) && !jaTemBadge) {
+          const badge = document.createElement('div');
+          badge.className = 'foto-baixada-badge';
+          badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Baixada';
+          card.appendChild(badge);
+        }
+      });
+    }
+
+    async function baixarFoto(fotoId) {
+      if (!checarLimite(1)) return;
+      const url = `/api/fotos/download.php?foto_id=${fotoId}&token=${TOKEN}`;
+      const a = document.createElement('a');
+      a.href = url; a.download = ''; document.body.appendChild(a); a.click(); a.remove();
+      dlCount++; atualizarContador();
+      marcarBaixadas([fotoId]); // ✔ marca como baixada
+      toast('Download iniciado!');
+    }
+
+    function baixarFotoAtual() { baixarFoto(FOTOS[lbIndex].id); }
+
+    async function baixarZipSelecionadas() {
+      if (!selecionadas.size) { toast('Selecione pelo menos uma foto.'); return; }
+      if (!checarLimite(selecionadas.size)) return;
+      toast('Preparando ZIP...');
+      const r = await fetch('/api/fotos/download_zip.php', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ galeria_id: GALERIA.id, foto_ids: [...selecionadas], token: TOKEN })
+      });
+      if (r.ok) {
+        const blob = await r.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = GALERIA.nome + '_selecionadas.zip';
+        a.click(); URL.revokeObjectURL(url);
+        dlCount += selecionadas.size; atualizarContador();
+        marcarBaixadas([...selecionadas]); // ✔ marca todas como baixadas
+        toast('ZIP baixado!');
+      } else {
+        // 403 = limite do backend atingido → mostra modal correto
+        const err = await r.json().catch(() => ({ mensagem: null }));
+        if (r.status === 403) {
+          const restantes = Math.max(0, dlMax - dlCount);
+          mostrarModalLimite(selecionadas.size, restantes);
+        } else {
+          toast(err.mensagem || 'Erro ao gerar ZIP.', 'error');
+        }
+      }
+    }
+
+    async function baixarZipTodas() {
+      if (!checarLimite(FOTOS.length)) return;  // verifica total de fotos
+      toast('Preparando ZIP de todas as fotos...');
+      const r = await fetch('/api/fotos/download_zip.php', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ galeria_id: GALERIA.id, foto_ids: [], token: TOKEN })
+      });
+      if (r.ok) {
+        const blob = await r.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = GALERIA.nome + '_todas.zip';
+        a.click(); URL.revokeObjectURL(url);
+        dlCount += FOTOS.length; atualizarContador();
+        marcarBaixadas(FOTOS.map(f => f.id)); // ✔ marca todas como baixadas
+        toast('ZIP baixado!');
+      } else {
+        const err = await r.json().catch(() => ({ mensagem: null }));
+        if (r.status === 403) {
+          const restantes = Math.max(0, dlMax - dlCount);
+          mostrarModalLimite(FOTOS.length, restantes);
+        } else {
+          toast(err.mensagem || 'Erro ao gerar ZIP.', 'error');
+        }
+      }
+    }
+
+    // ── AUTO-POLLING (guard: uma única instância) ──────────────────────
+    let _pollingStarted = false;
+    function iniciarPolling() {
+      if (_pollingStarted) return; // evita múltiplos intervals
+      _pollingStarted = true;
+      setInterval(async () => {
+        if (!GALERIA) return;
+        try {
+          const r = await fetch(`/api/fotos/list.php?galeria_id=${GALERIA.id}`, { credentials: 'include' });
+          const d = await r.json();
+          if (d.fotos) {
+            d.fotos.forEach(f => {
+              const card = document.getElementById(`foto-${f.id}`);
+              if (card) {
+                card.classList.toggle('selected', !!f.selecionada);
+                const chk = card.querySelector('.sel-check i');
+                if (chk) chk.style.opacity = f.selecionada ? '1' : '0';
+              }
+            });
+          }
+        } catch { }
+      }, 30000);
+    }
+
+    // ── LIGHTBOX ─────────────────────────────────────────────────
+    function abrirLightbox(idx) {
+      lbIndex = idx;
+      document.getElementById('lb-img').src = '/' + FOTOS[idx].caminho_arquivo;
+      document.getElementById('lightbox').classList.add('open');
+    }
+
+    function fecharLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+    }
+
+    function navLightbox(dir) {
+      lbIndex = (lbIndex + dir + FOTOS.length) % FOTOS.length;
+      document.getElementById('lb-img').src = '/' + FOTOS[lbIndex].caminho_arquivo;
+    }
+
+    document.addEventListener('keydown', e => {
+      if (!document.getElementById('lightbox').classList.contains('open')) return;
+      if (e.key === 'ArrowLeft') navLightbox(-1);
+      if (e.key === 'ArrowRight') navLightbox(1);
+      if (e.key === 'Escape') fecharLightbox();
     });
 
-    // Carrega YouTube IFrame API se ainda não está presente
-    if (!document.getElementById('yt-api-script')) {
-      const s = document.createElement('script');
-      s.id  = 'yt-api-script';
-      s.src = 'https://www.youtube.com/iframe_api';
-      document.head.appendChild(s);
+    // ── TOAST ──────────────────────────────────────────────────────
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg; el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2800);
     }
 
-    tocarMusica(0);
-  } catch(err) {
-    console.warn('Erro ao carregar música:', err);
-  }
-}
-
-// ── SELECTION ─────────────────────────────────────────────────
-let clickTimer = null;
-let clickCount = 0;
-
-function toggleModoSelecao() {
-  isModoSelecao = !isModoSelecao;
-  const btn = document.getElementById('btn-toggle-sel');
-  const lbl = document.getElementById('lbl-toggle-sel');
-  if (isModoSelecao) {
-    btn.style.background = 'rgba(57,255,20,0.15)';
-    lbl.textContent = 'Desativar';
-  } else {
-    btn.style.background = 'transparent';
-    lbl.textContent = 'Ativar';
-  }
-  atualizarToolbar();
-}
-
-function clicarFoto(e, idx) {
-  if (e.target.classList.contains('dl-btn') || e.target.closest('.dl-btn')) return;
-  
-  clickCount++;
-  
-  if (clickCount === 1) {
-    clickTimer = setTimeout(() => {
-      // 1 Clique: Seleciona direto se GALERIA.selecao_ativa
-      if (GALERIA.selecao_ativa == 1) {
-        toggleSelecao(idx);
-      } else {
-        // Se seleção não habilitada, 1 clique amplia
-        abrirLightbox(idx);
+    // ── INIT: check if gallery is public ──────────────────────────
+    (async () => {
+      if (!TOKEN) {
+        document.getElementById('lock-screen').innerHTML =
+          '<div class="lock-card"><div class="lock-logo">✦ CriaVibe</div><p style="color:#f87171;margin-top:16px">Link inválido — token não encontrado.</p></div>';
+        return;
       }
-      clickCount = 0;
-    }, 280);
-  } else if (clickCount === 2) {
-    clearTimeout(clickTimer);
-    clickTimer = setTimeout(() => {
-      // 2 Cliques: Amplia
-      abrirLightbox(idx);
-      clickCount = 0;
-    }, 280);
-  } else if (clickCount === 3) {
-    clearTimeout(clickTimer);
-    // 3 Cliques: Seleciona Todas
-    if (GALERIA.selecao_ativa) {
-      selecionarTodas();
-    }
-    clickCount = 0;
-  }
-}
-
-function toggleSelecao(idx) {
-  const id = FOTOS[idx].id;
-  const el = document.querySelector(`.foto-item[data-idx="${idx}"]`);
-  if (selecionadas.has(id)) { selecionadas.delete(id); el?.classList.remove('selected'); }
-  else { selecionadas.add(id); el?.classList.add('selected'); }
-  atualizarToolbar();
-  
-  fetch('/api/fotos/client_selecao.php', {
-    method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({acao: 'toggle', id: id, galeria_id: GALERIA.id, token: TOKEN})
-  }).catch(()=>{});
-}
-
-function selecionarTodas() {
-  FOTOS.forEach((f,i) => {
-    selecionadas.add(f.id);
-    document.querySelector(`.foto-item[data-idx="${i}"]`)?.classList.add('selected');
-  });
-  atualizarToolbar();
-  
-  fetch('/api/fotos/client_selecao.php', {
-    method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({acao: 'all', galeria_id: GALERIA.id, token: TOKEN})
-  }).catch(()=>{});
-}
-
-function limparSelecao() {
-  selecionadas.clear();
-  document.querySelectorAll('.foto-item.selected').forEach(el => el.classList.remove('selected'));
-  atualizarToolbar();
-  
-  fetch('/api/fotos/client_selecao.php', {
-    method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({acao: 'clear', galeria_id: GALERIA.id, token: TOKEN})
-  }).catch(()=>{});
-}
-
-function atualizarToolbar() {
-  const n = selecionadas.size;
-  
-  // Botão "Baixar Selecionadas" na toolbar superior
-  const btnZipSel = document.getElementById('btn-zip-sel');
-  if (btnZipSel) btnZipSel.style.display = (GALERIA.entrega_em_alta == 1 && n > 0) ? '' : 'none';
-  
-  // Barra flutuante inferior de seleção
-  const floatingBar = document.getElementById('floating-selection');
-  if (floatingBar) {
-    if (n > 0) {
-      floatingBar.style.display = 'flex';
-      document.getElementById('floating-count').textContent = `${n} foto${n>1?'s':''} selecionada${n>1?'s':''}`;
-    } else {
-      floatingBar.style.display = 'none';
-    }
-  }
-
-  // Status no topo
-  const topStatus = document.getElementById('top-status-text');
-  if (topStatus) {
-    topStatus.textContent = `${n} foto${n !== 1 ? 's' : ''} selecionada${n !== 1 ? 's' : ''} • Baixar tudo (ZIP)`;
-  }
-}
-
-// ── DOWNLOADS ─────────────────────────────────────────────────
-function atualizarContador() {
-  if (dlMax > 0) {
-    const el = document.getElementById('dl-counter');
-    el.style.display = '';
-    el.innerHTML = `<i class="fa-solid fa-download"></i> ${dlCount}/${dlMax} downloads`;
-    el.style.color = dlCount >= dlMax ? '#f87171' : '';
-  }
-}
-
-function mostrarModalLimite(qtdSolicitada, restantes) {
-  const excesso = qtdSolicitada - restantes;
-  const modal = document.getElementById('modal-limite');
-
-  if (restantes <= 0) {
-    // Esgotou totalmente
-    document.getElementById('limite-msg').textContent =
-      `Você já utilizou todos os ${dlMax} download${dlMax>1?'s':''} disponíveis nesta galeria.`;
-    document.getElementById('limite-destaques').textContent = `Limite atingido!`;
-    document.getElementById('limite-sub').textContent =
-      `Entre em contato com o fotógrafo para solicitar mais downloads.`;
-  } else {
-    // Excedeu parcialmente
-    document.getElementById('limite-msg').textContent =
-      `Você selecionou ${qtdSolicitada} foto${qtdSolicitada>1?'s':''}, mas só restam ${restantes} download${restantes>1?'s':''} disponíveis nesta galeria.`;
-    document.getElementById('limite-destaques').textContent =
-      `Desmarque ${excesso} foto${excesso>1?'s':''}!`;
-    document.getElementById('limite-sub').textContent =
-      `Remova ${excesso} foto${excesso>1?'s':''} da seleção para continuar o download.`;
-  }
-  modal.style.display = 'flex';
-}
-
-function fecharModalLimite() {
-  document.getElementById('modal-limite').style.display = 'none';
-}
-
-// dlMax = total de fotos que o cliente pode baixar
-// dlCount = fotos já baixadas (persistente no banco)
-// Retorna true se pode baixar 'qtdFotos' fotos ainda
-function checarLimite(qtdFotos) {
-  if (dlMax <= 0) return true; // 0 = ilimitado
-  const restantes = Math.max(0, dlMax - dlCount);
-  if (qtdFotos > restantes) {
-    mostrarModalLimite(qtdFotos, restantes);
-    return false;
-  }
-  return true;
-}
-
-
-// ── FOTOS BAIXADAS (localStorage por galeria) ──────────────────
-function _baixadasKey() {
-  return `baixadas_${GALERIA?.id}`;
-}
-function getBaixadas() {
-  return new Set(JSON.parse(localStorage.getItem(_baixadasKey()) || '[]'));
-}
-function marcarBaixadas(ids) {
-  const s = getBaixadas();
-  ids.forEach(id => s.add(String(id)));
-  localStorage.setItem(_baixadasKey(), JSON.stringify([...s]));
-  aplicarBadgesBaixadas();
-}
-function aplicarBadgesBaixadas() {
-  const baixadas = getBaixadas();
-  FOTOS.forEach(f => {
-    const card = document.getElementById(`foto-${f.id}`);
-    if (!card) return;
-    const jaTemBadge = card.querySelector('.foto-baixada-badge');
-    if (baixadas.has(String(f.id)) && !jaTemBadge) {
-      const badge = document.createElement('div');
-      badge.className = 'foto-baixada-badge';
-      badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Baixada';
-      card.appendChild(badge);
-    }
-  });
-}
-
-async function baixarFoto(fotoId) {
-  if (!checarLimite(1)) return;
-  const url = `/api/fotos/download.php?foto_id=${fotoId}&token=${TOKEN}`;
-  const a = document.createElement('a');
-  a.href = url; a.download = ''; document.body.appendChild(a); a.click(); a.remove();
-  dlCount++; atualizarContador();
-  marcarBaixadas([fotoId]); // ✔ marca como baixada
-  toast('Download iniciado!');
-}
-
-function baixarFotoAtual() { baixarFoto(FOTOS[lbIndex].id); }
-
-async function baixarZipSelecionadas() {
-  if (!selecionadas.size) { toast('Selecione pelo menos uma foto.'); return; }
-  if (!checarLimite(selecionadas.size)) return;
-  toast('Preparando ZIP...');
-  const r = await fetch('/api/fotos/download_zip.php', {
-    method:'POST', credentials:'include',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({galeria_id: GALERIA.id, foto_ids: [...selecionadas], token: TOKEN})
-  });
-  if (r.ok) {
-    const blob = await r.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = GALERIA.nome + '_selecionadas.zip';
-    a.click(); URL.revokeObjectURL(url);
-    dlCount += selecionadas.size; atualizarContador();
-    marcarBaixadas([...selecionadas]); // ✔ marca todas como baixadas
-    toast('ZIP baixado!');
-  } else {
-    // 403 = limite do backend atingido → mostra modal correto
-    const err = await r.json().catch(()=>({mensagem:null}));
-    if (r.status === 403) {
-      const restantes = Math.max(0, dlMax - dlCount);
-      mostrarModalLimite(selecionadas.size, restantes);
-    } else {
-      toast(err.mensagem || 'Erro ao gerar ZIP.', 'error');
-    }
-  }
-}
-
-async function baixarZipTodas() {
-  if (!checarLimite(FOTOS.length)) return;  // verifica total de fotos
-  toast('Preparando ZIP de todas as fotos...');
-  const r = await fetch('/api/fotos/download_zip.php', {
-    method:'POST', credentials:'include',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({galeria_id: GALERIA.id, foto_ids: [], token: TOKEN})
-  });
-  if (r.ok) {
-    const blob = await r.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = GALERIA.nome + '_todas.zip';
-    a.click(); URL.revokeObjectURL(url);
-    dlCount += FOTOS.length; atualizarContador();
-    marcarBaixadas(FOTOS.map(f => f.id)); // ✔ marca todas como baixadas
-    toast('ZIP baixado!');
-  } else {
-    const err = await r.json().catch(()=>({mensagem:null}));
-    if (r.status === 403) {
-      const restantes = Math.max(0, dlMax - dlCount);
-      mostrarModalLimite(FOTOS.length, restantes);
-    } else {
-      toast(err.mensagem || 'Erro ao gerar ZIP.', 'error');
-    }
-  }
-}
-
-// ── AUTO-POLLING (guard: uma única instância) ──────────────────────
-let _pollingStarted = false;
-function iniciarPolling() {
-  if (_pollingStarted) return; // evita múltiplos intervals
-  _pollingStarted = true;
-  setInterval(async () => {
-    if (!GALERIA) return;
-    try {
-      const r = await fetch(`/api/fotos/list.php?galeria_id=${GALERIA.id}`, {credentials:'include'});
-      const d = await r.json();
-      if (d.fotos) {
-        d.fotos.forEach(f => {
-          const card = document.getElementById(`foto-${f.id}`);
-          if (card) {
-            card.classList.toggle('selected', !!f.selecionada);
-            const chk = card.querySelector('.sel-check i');
-            if (chk) chk.style.opacity = f.selecionada ? '1' : '0';
+      // Pré-carrega nome da galeria para mostrar na tela de senha
+      try {
+        const r = await fetch(`/api/galerias/get.php?token=${TOKEN}`, { credentials: 'include' });
+        const d = await r.json();
+        if (d.status === 'ok') {
+          const g = d.galeria;
+          document.getElementById('galeria-title-lock').textContent = g.nome;
+          // Se galeria é pública e sem cliente vinculado, entra direto
+          if (g.privacidade === 'publica' && !g.cliente_id) {
+            GALERIA = g; dlMax = g.max_selecao ? parseInt(g.max_selecao) : 0;
+            document.getElementById('lock-screen').style.display = 'none';
+            prepararCapa();
           }
-        });
-      }
-    } catch {}
-  }, 30000);
-}
-
-// ── LIGHTBOX ─────────────────────────────────────────────────
-function abrirLightbox(idx) {
-  lbIndex = idx;
-  document.getElementById('lb-img').src = '/' + FOTOS[idx].caminho_arquivo;
-  document.getElementById('lightbox').classList.add('open');
-}
-
-function fecharLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-}
-
-function navLightbox(dir) {
-  lbIndex = (lbIndex + dir + FOTOS.length) % FOTOS.length;
-  document.getElementById('lb-img').src = '/' + FOTOS[lbIndex].caminho_arquivo;
-}
-
-document.addEventListener('keydown', e => {
-  if (!document.getElementById('lightbox').classList.contains('open')) return;
-  if (e.key === 'ArrowLeft') navLightbox(-1);
-  if (e.key === 'ArrowRight') navLightbox(1);
-  if (e.key === 'Escape') fecharLightbox();
-});
-
-// ── TOAST ──────────────────────────────────────────────────────
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2800);
-}
-
-// ── INIT: check if gallery is public ──────────────────────────
-(async () => {
-  if (!TOKEN) {
-    document.getElementById('lock-screen').innerHTML =
-      '<div class="lock-card"><div class="lock-logo">✦ CriaVibe</div><p style="color:#f87171;margin-top:16px">Link inválido — token não encontrado.</p></div>';
-    return;
-  }
-  // Pré-carrega nome da galeria para mostrar na tela de senha
-  try {
-    const r = await fetch(`/api/galerias/get.php?token=${TOKEN}`, {credentials:'include'});
-    const d = await r.json();
-    if (d.status === 'ok') {
-      const g = d.galeria;
-      document.getElementById('galeria-title-lock').textContent = g.nome;
-      // Se galeria é pública e sem cliente vinculado, entra direto
-      if (g.privacidade === 'publica' && !g.cliente_id) {
-        GALERIA = g; dlMax = g.max_selecao ? parseInt(g.max_selecao) : 0;
-        document.getElementById('lock-screen').style.display = 'none';
-        prepararCapa();
-      }
-    }
-  } catch {}
-})();
-</script>
+        }
+      } catch { }
+    })();
+  </script>
 </body>
+
 </html>
