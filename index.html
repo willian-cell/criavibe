@@ -24,12 +24,28 @@
       --primary: #6366f1;
       --primary-dk: #4f46e5;
       --bg-dark: #070711;
+      --nav-bg: rgba(7, 7, 17, .8);
       --bg-card: rgba(255, 255, 255, .04);
+      --bg-alt: rgba(255, 255, 255, .02);
       --border-glass: rgba(255, 255, 255, .1);
       --text: #f8fafc;
       --muted: rgba(255, 255, 255, .6);
       --light: rgba(255, 255, 255, .35);
+      --dot-color: rgba(255, 255, 255, .06);
     }
+
+    body.light-mode {
+      --bg-dark: #f1f5f9;
+      --nav-bg: rgba(241, 245, 249, .8);
+      --text: #0f172a;
+      --muted: #475569;
+      --light: #94a3b8;
+      --bg-card: #ffffff;
+      --bg-alt: #f8fafc;
+      --border-glass: rgba(0, 0, 0, .06);
+      --dot-color: rgba(0, 0, 0, .04);
+    }
+
 
     html {
       scroll-behavior: smooth
@@ -60,19 +76,26 @@
       align-items: center;
       padding: 0 5vw;
       gap: 16px;
-      background: rgba(7, 7, 17, .8);
+      background: var(--nav-bg);
       backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      border-bottom: 1px solid var(--border-glass);
       transition: all .3s
     }
 
     .nav-logo {
       font-size: 1.25rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #fff, var(--primary));
+      background: linear-gradient(135deg, var(--text), var(--primary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      letter-spacing: -.5px
+      letter-spacing: -.5px;
+      cursor: pointer;
+      user-select: none;
+      transition: .2s
+    }
+
+    .nav-logo:active {
+      transform: scale(0.95);
     }
 
     .nav-spacer {
@@ -94,8 +117,8 @@
     }
 
     .nav-link:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, .06)
+      color: var(--text);
+      background: var(--bg-card)
     }
 
     .nav-cta {
@@ -138,7 +161,7 @@
     .hero-dots {
       position: absolute;
       inset: 0;
-      background-image: radial-gradient(rgba(255, 255, 255, .06) 1px, transparent 1px);
+      background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
       background-size: 32px 32px
     }
 
@@ -220,13 +243,13 @@
 
     .btn-hero-ghost {
       background: transparent;
-      color: #fff;
-      border: 1.5px solid rgba(255, 255, 255, .2)
+      color: var(--text);
+      border: 1.5px solid var(--border-glass)
     }
 
     .btn-hero-ghost:hover {
-      border-color: rgba(255, 255, 255, .5);
-      background: rgba(255, 255, 255, .06)
+      border-color: var(--muted);
+      background: var(--bg-card)
     }
 
     /* ── DECK SECTION ── */
@@ -464,7 +487,7 @@
 
   <!-- NAV -->
   <nav id="topnav">
-    <a href="https://red-llama-690371.hostingersite.com/" class="nav-logo">✦ CriaVibe</a>
+    <a href="#" class="nav-logo" id="logoToggle">✦ CriaVibe</a>
     <div class="nav-spacer"></div>
     <div class="nav-links">
       <a href="/saiba_mais.html" class="nav-link">Sobre</a>
@@ -513,7 +536,7 @@
   </section>
 
   <!-- FEATURES -->
-  <section class="section" style="background:rgba(255,255,255,.02)">
+  <section class="section" style="background:var(--bg-alt)">
     <div class="section-title">
       <h2>Tudo que você precisa</h2>
       <p>Ferramentas profissionais para simplificar seu fluxo de trabalho</p>
@@ -575,7 +598,7 @@
         const d = await r.json();
         const galerias = d.galerias || [];
         if (!galerias.length) {
-          grid.innerHTML = '<div class="gal-empty" style="color:rgba(255,255,255,.4)"><i class="fa-solid fa-images"></i><br>Nenhuma galeria pública ainda.</div>';
+          grid.innerHTML = '<div class="gal-empty" style="color:var(--muted)"><i class="fa-solid fa-images"></i><br>Nenhuma galeria pública ainda.</div>';
           return;
         }
         grid.innerHTML = galerias.map(g => {
@@ -593,7 +616,7 @@
         </div>`;
         }).join('');
       } catch {
-        grid.innerHTML = '<div class="gal-empty" style="color:rgba(255,255,255,.3)">Não foi possível carregar as galerias.</div>';
+        grid.innerHTML = '<div class="gal-empty" style="color:var(--muted)">Não foi possível carregar as galerias.</div>';
       }
     }
 
@@ -602,10 +625,23 @@
       document.getElementById('lightbox').classList.add('open');
     }
 
-    // Nav scroll effect
-    window.addEventListener('scroll', () => {
-      document.getElementById('topnav').style.background = scrollY > 60 ? 'rgba(7,7,17,.95)' : 'rgba(7,7,17,.8)';
+    // Nav scroll effect & Theme Toggle
+    const logoToggle = document.getElementById('logoToggle');
+    logoToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.body.classList.toggle('light-mode');
+      updateNavBg();
     });
+
+    function updateNavBg() {
+      const isLight = document.body.classList.contains('light-mode');
+      const baseColor = isLight ? '248, 250, 252' : '7, 7, 17';
+      const opacity = window.scrollY > 60 ? '.95' : '.8';
+      document.getElementById('topnav').style.background = `rgba(${baseColor}, ${opacity})`;
+    }
+
+    window.addEventListener('scroll', updateNavBg);
+
 
     carregarGalerias();
   </script>
