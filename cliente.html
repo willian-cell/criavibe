@@ -287,7 +287,8 @@
     /* ── GALLERY GRID ── */
     #gallery {
       display: grid;
-      grid-template-columns: repeat(10, 1fr);
+      grid-template-columns: repeat(var(--grid-cols, 10), 1fr);
+      grid-auto-flow: dense;
       gap: 10px;
       padding: 24px 5vw;
     }
@@ -303,18 +304,17 @@
     }
 
     .foto-item.vertical {
-      grid-column: span 2;
-      aspect-ratio: 4 / 5;
+      grid-column: span var(--span-v, 2);
+      aspect-ratio: 0.75;
     }
 
     .foto-item.horizontal {
-      grid-column: span 5;
-      aspect-ratio: 3 / 2;
+      grid-column: span var(--span-h, 5);
+      aspect-ratio: 1.5;
     }
 
     @media(max-width: 600px) {
       #gallery {
-        grid-template-columns: repeat(10, 1fr);
         gap: 6px;
       }
     }
@@ -858,6 +858,10 @@
     let dlMax = 0;
     let isModoSelecao = false;
 
+    // Configuração de Grade (Variáveis Globais)
+    let QTD_V = 5; // Fotos verticais por linha
+    let QTD_H = 2; // Fotos horizontais por linha
+
     // ── AUTH ──────────────────────────────────────────────────────
     async function autenticar() {
       const senha = document.getElementById('senha-input').value.trim();
@@ -928,7 +932,7 @@
       // Nav
       document.getElementById('topnav').style.display = 'flex';
       document.getElementById('toolbar').style.display = 'flex';
-      document.getElementById('gallery').style.display = 'block';
+      document.getElementById('gallery').style.display = 'grid'; // GARANTIDO como grid
       document.getElementById('galeria-nome').textContent = GALERIA.nome;
       atualizarContador();
 
@@ -966,7 +970,20 @@
           return;
         }
 
-        // Pré-carrega dimensões em paralelo mas com um pequeno timeout de segurança
+        // Calcula colunas do grid e spans baseado nas globais
+        // Usamos MMC (LCM) para garantir que ambos caibam perfeitamente
+        const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+        const lcm = (a, b) => (a * b) / gcd(a, b);
+        
+        const totalCols = lcm(QTD_V, QTD_H);
+        const spanV = totalCols / QTD_V;
+        const spanH = totalCols / QTD_H;
+
+        grid.style.setProperty('--grid-cols', totalCols);
+        grid.style.setProperty('--span-v', spanV);
+        grid.style.setProperty('--span-h', spanH);
+
+        // Processamento de orientação paralelo
         const processadas = await Promise.all(rawFotos.map(f => {
           return new Promise((resolve) => {
             const img = new Image();
@@ -974,19 +991,14 @@
               f.orientacao = img.naturalWidth > img.naturalHeight ? 'horizontal' : 'vertical';
               resolve(f);
             };
-            img.onerror = () => {
-              f.orientacao = 'vertical'; // Fallback se falhar
-              resolve(f);
-            };
+            img.onerror = () => { f.orientacao = 'vertical'; resolve(f); };
             img.src = '/' + f.caminho_arquivo;
           });
         }));
 
-        // Zera seleção global e reconstrói na nova ordem
+        // Mantemos a ordem original (sem agrupar por orientação) para parecer o exemplo da CriaVibe
+        FOTOS = processadas;
         selecionadas.clear();
-        const v = processadas.filter(f => f.orientacao === 'vertical');
-        const h = processadas.filter(f => f.orientacao === 'horizontal');
-        FOTOS = [...v, ...h];
         FOTOS.forEach((f, i) => { if (f.selecionada) selecionadas.add(f.id); });
 
         grid.innerHTML = FOTOS.map((f, i) => {
