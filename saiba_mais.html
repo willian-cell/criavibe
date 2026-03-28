@@ -470,13 +470,14 @@
       width: 310px;
       padding: 50px 30px;
       border-radius: 28px;
-      background: rgba(255, 255, 255, 0.35); /* Glass opacity */
+      background: rgba(255, 255, 255, 0.35);
+      /* Glass opacity */
       /* Glass effect */
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05), 
-                  inset 0 0 0 1px rgba(255, 255, 255, 0.6), 
-                  inset 0 4px 15px rgba(255, 255, 255, 0.6);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+        inset 0 4px 15px rgba(255, 255, 255, 0.6);
       text-align: center;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -485,10 +486,10 @@
 
     .social-card:hover {
       transform: translateY(-8px);
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.1), 
-                  0 0 30px rgba(59, 130, 246, 0.10),
-                  inset 0 0 0 1px rgba(255, 255, 255, 0.9), 
-                  inset 0 4px 15px rgba(255, 255, 255, 0.7);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.1),
+        0 0 30px rgba(59, 130, 246, 0.10),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+        inset 0 4px 15px rgba(255, 255, 255, 0.7);
       background: rgba(255, 255, 255, 0.65);
     }
 
@@ -772,7 +773,7 @@
         height = canvas.height = canvas.parentElement.offsetHeight;
       }
       window.addEventListener('resize', resize);
-      
+
       const curves = [];
       // Quantidade maior de linhas concentradas no centro para formar uma fita densa
       for (let i = 0; i < 15; i++) {
@@ -783,7 +784,7 @@
           frequency: Math.random() * 0.002 + 0.0005,
           phase: i * (Math.PI / 7) + Math.random(), // Distribuídas organicamente
           opacity: Math.random() * 0.4 + 0.2, // Mais escuras e visíveis (0.2 a 0.6 opacity)
-          lineWidth: Math.random() * 2 + 1.5 // Linhas mais grossas (1.5px a 3.5px)
+          lineWidth: Math.random() * 2 + 3.5 // Linhas mais grossas (1.5px a 3.5px)
         });
       }
 
