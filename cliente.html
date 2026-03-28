@@ -703,6 +703,33 @@
         opacity: 1;
       }
     }
+
+    /* ── FLOATING SELECTION ── */
+    #floating-selection {
+      display: none;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(30, 32, 40, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      color: #fff; /* Texto sempre branco no fundo escuro */
+    }
+
+    #floating-count {
+      font-weight: 500;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      color: #fff;
+    }
   </style>
 </head>
 
@@ -783,10 +810,8 @@
   </div>
 
   <!-- FLOATING SELECTION BAR -->
-  <div id="floating-selection"
-    style="display:none; position:fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(30, 32, 40, 0.95); backdrop-filter: blur(16px); padding: 12px 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); align-items: center; gap: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200;">
-    <span id="floating-count" style="font-weight: 500; font-size: 0.95rem; white-space: nowrap;">0 fotos
-      selecionadas</span>
+  <div id="floating-selection">
+    <span id="floating-count">0 fotos selecionadas</span>
     <button class="btn btn-primary" onclick="baixarZipSelecionadas()"
       style="width: auto; padding: 10px 24px; border-radius: 8px; font-size: 0.9rem; margin: 0; box-shadow: none;">
       Baixar Selecionadas
