@@ -13,7 +13,24 @@
     .photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:24px}
     .photo-card{position:relative;border-radius:var(--radius-sm);overflow:hidden;background:var(--surface-2);border:2px solid transparent;transition:var(--tr);aspect-ratio:4/3}
     .photo-card img{width:100%;height:100%;object-fit:cover}
-    .photo-card.sel{border-color:var(--primary)}
+    .photo-card.sel{
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary), 0 0 16px rgba(99,102,241,.3);
+    }
+    .photo-sel-badge{
+      position:absolute;top:7px;left:7px;
+      background:var(--primary);color:#fff;
+      font-size:.68rem;font-weight:700;
+      padding:3px 8px;border-radius:20px;
+      display:flex;align-items:center;gap:4px;
+      box-shadow:0 2px 8px rgba(0,0,0,.3);
+      pointer-events:none;z-index:3;
+      animation: badgePop .3s ease;
+    }
+    @keyframes badgePop {
+      from { transform: scale(0.7); opacity:0; }
+      to   { transform: scale(1);   opacity:1; }
+    }
     .photo-overlay{position:absolute;bottom:0;inset-x:0;padding:6px;background:linear-gradient(to top,rgba(0,0,0,.72)0%,transparent 100%);display:flex;gap:4px;justify-content:flex-end;opacity:0;transition:opacity .2s}
     .photo-card:hover .photo-overlay{opacity:1}
     .photo-btn{width:28px;height:28px;border-radius:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:.8rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--tr);backdrop-filter:blur(4px)}
@@ -233,6 +250,10 @@ function renderFotos() {
   if (!fotos.length) { grid.innerHTML='<div class="empty-state"><div class="icon"><i class="fa-solid fa-images"></i></div><p>Nenhuma foto enviada ainda.</p></div>'; return; }
   grid.innerHTML = fotos.map((f,i) => `
     <div class="photo-card ${f.selecionada?'sel':''}" id="pc-${f.id}">
+      ${f.selecionada ? `
+      <div class="photo-sel-badge">
+        <i class="fa-solid fa-star"></i> Selecionada
+      </div>` : ''}
       <img src="/${f.caminho_arquivo}" alt="${f.nome_arquivo}" loading="lazy" onclick="abrirLightbox(${i})">
       <div class="photo-overlay">
         <button class="photo-btn danger" onclick="excluirFoto(${f.id})" title="Excluir">

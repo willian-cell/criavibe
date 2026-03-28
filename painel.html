@@ -6,6 +6,20 @@
   <title>Painel — CriaVibe</title>
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .sel-alert {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #7c3aed; color: #fff;
+      font-size: .72rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px;
+      animation: pulse 1.8s ease-in-out infinite;
+      white-space: nowrap;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,.5); }
+      50%       { box-shadow: 0 0 0 6px rgba(124,58,237,0); }
+    }
+  </style>
 </head>
 <body>
 
@@ -60,8 +74,8 @@
             <th>Galeria</th>
             <th>Cliente</th>
             <th>Fotos</th>
-            <th>Seleção</th>
-            <th>Entrega em Alta</th>
+            <th>Seleções do Cliente</th>
+            <th>Downloads</th>
             <th style="width:50px">Ações</th>
           </tr>
         </thead>
@@ -206,7 +220,12 @@ function renderGalerias(lista) {
       </td>
       <td><span style="color:var(--light);font-size:.8rem">—</span></td>
       <td><strong>${g.total_fotos||0}</strong> <span style="color:var(--muted);font-size:.8rem">fotos</span></td>
-      <td><span class="badge badge-${g.selecao_ativa?'ativo':'inativo'}">${g.selecao_ativa?'Ativa':'Inativo'}</span></td>
+      <td>
+        ${(g.total_selecionadas > 0)
+          ? `<span class="sel-alert"><i class="fa-solid fa-star"></i> ${g.total_selecionadas} selecionada${g.total_selecionadas>1?'s':''}</span>`
+          : `<span style="color:var(--muted);font-size:.8rem">—</span>`
+        }
+      </td>
       <td><span class="badge badge-${g.entrega_em_alta?'ativo':'inativo'}">${g.entrega_em_alta?'<i class="fa-solid fa-circle-check"></i> Ativo':'Inativo'}</span></td>
       <td>
         <div class="actions-menu">
