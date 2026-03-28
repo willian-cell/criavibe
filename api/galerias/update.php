@@ -11,11 +11,6 @@ $chk = db()->prepare("SELECT id FROM galerias WHERE id=? AND usuario_email=? LIM
 $chk->execute([$id, $u['email']]);
 if (!$chk->fetch()) json_out(['status'=>'erro','mensagem'=>'Galeria não encontrada.'], 404);
 
-// Garante que a coluna dl_count existe (auto-create se não existir)
-try { db()->exec("ALTER TABLE galerias ADD COLUMN dl_count INT NOT NULL DEFAULT 0"); } catch (\PDOException $e) {}
-// Garante que max_selecao existe
-try { db()->exec("ALTER TABLE galerias ADD COLUMN max_selecao INT NOT NULL DEFAULT 0"); } catch (\PDOException $e) {}
-
 $nome        = trim($body['nome'] ?? '');
 $descricao   = trim($body['descricao'] ?? '');
 $privacidade = in_array($body['privacidade']??'', ['publica','privada']) ? $body['privacidade'] : 'privada';

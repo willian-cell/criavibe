@@ -718,7 +718,7 @@ function baixarFotoAtual() { baixarFoto(FOTOS[lbIndex].id); }
 
 async function baixarZipSelecionadas() {
   if (!selecionadas.size) { toast('Selecione pelo menos uma foto.'); return; }
-  if (!checarLimite(selecionadas.size)) return;  // verifica por número de fotos
+  if (!checarLimite(selecionadas.size)) return;
   toast('Preparando ZIP...');
   const r = await fetch('/api/fotos/download_zip.php', {
     method:'POST', credentials:'include',
@@ -734,8 +734,14 @@ async function baixarZipSelecionadas() {
     dlCount += selecionadas.size; atualizarContador();
     toast('ZIP baixado!');
   } else {
-    const err = await r.json().catch(()=>({mensagem:'Erro ao gerar ZIP.'}));
-    toast(err.mensagem || 'Erro ao gerar ZIP.', 'error');
+    // 403 = limite do backend atingido → mostra modal correto
+    const err = await r.json().catch(()=>({mensagem:null}));
+    if (r.status === 403) {
+      const restantes = Math.max(0, dlMax - dlCount);
+      mostrarModalLimite(selecionadas.size, restantes);
+    } else {
+      toast(err.mensagem || 'Erro ao gerar ZIP.', 'error');
+    }
   }
 }
 
@@ -756,21 +762,27 @@ async function baixarZipTodas() {
     dlCount += FOTOS.length; atualizarContador();
     toast('ZIP baixado!');
   } else {
-    const err = await r.json().catch(()=>({mensagem:'Erro ao gerar ZIP.'}));
-    toast(err.mensagem || 'Erro ao gerar ZIP.', 'error');
+    const err = await r.json().catch(()=>({mensagem:null}));
+    if (r.status === 403) {
+      const restantes = Math.max(0, dlMax - dlCount);
+      mostrarModalLimite(FOTOS.length, restantes);
+    } else {
+      toast(err.mensagem || 'Erro ao gerar ZIP.', 'error');
+    }
   }
 }
 
-// ── AUTO-POLLING (atualiza seleções e contador a cada 30s) ────────
+// ── AUTO-POLLING (guard: uma única instância) ──────────────────────
+let _pollingStarted = false;
 function iniciarPolling() {
+  if (_pollingStarted) return; // evita múltiplos intervals
+  _pollingStarted = true;
   setInterval(async () => {
     if (!GALERIA) return;
     try {
-      // Recarrega fotos para atualizar seleções marcadas
       const r = await fetch(`/api/fotos/list.php?galeria_id=${GALERIA.id}`, {credentials:'include'});
       const d = await r.json();
       if (d.fotos) {
-        // Atualiza apenas o estado visual das seleções sem recriar o DOM
         d.fotos.forEach(f => {
           const card = document.getElementById(`foto-${f.id}`);
           if (card) {
@@ -781,7 +793,7 @@ function iniciarPolling() {
         });
       }
     } catch {}
-  }, 30000); // a cada 30 segundos
+  }, 30000);
 }
 
 // ── LIGHTBOX ─────────────────────────────────────────────────

@@ -42,8 +42,9 @@ $dl_count = (int)$g['dl_count'];
 if ($max > 0 && $dl_count >= $max)
     json_out(['status'=>'erro','mensagem'=>"Limite de $max downloads atingido para esta galeria."], 403);
 
-// Incrementa contador no banco (1 por lote ZIP)
-db()->prepare("UPDATE galerias SET dl_count = dl_count + 1 WHERE id = ?")->execute([$galeria_id]);
+// Incrementa contador no banco pelo número real de fotos baixadas
+$qtd_fotos = count($fotos);
+db()->prepare("UPDATE galerias SET dl_count = dl_count + ? WHERE id = ?")->execute([$qtd_fotos, $galeria_id]);
 
 // Cria ZIP temporário
 $tmpZip = tempnam(sys_get_temp_dir(), 'criavibe_') . '.zip';
