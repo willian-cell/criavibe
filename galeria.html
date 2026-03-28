@@ -224,6 +224,24 @@ let lbIdx     = 0;
   preencherConfig();
   await carregarFotos();
   await carregarMusicas();
+
+  // Auto-polling: atualiza seleções do cliente a cada 30 segundos
+  setInterval(async () => {
+    if (!galeriaId) return;
+    try {
+      const r = await API.get(`/fotos/list.php?galeria_id=${galeriaId}`);
+      const novasfotos = r.fotos || [];
+      let mudou = false;
+      novasfotos.forEach(f => {
+        const idx = fotos.findIndex(x => x.id === f.id);
+        if (idx !== -1 && fotos[idx].selecionada !== f.selecionada) {
+          fotos[idx].selecionada = f.selecionada;
+          mudou = true;
+        }
+      });
+      if (mudou) renderFotos();
+    } catch {}
+  }, 30000);
 })();
 
 // ── Tabs ──────────────────────────────────────────────────

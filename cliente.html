@@ -394,6 +394,8 @@ function iniciarGaleriaNav() {
 
   // Música
   carregarMusica();
+  // Inicia polling automático de atualizações
+  iniciarPolling();
 }
 
 async function carregarFotos(isFromCover = false) {
@@ -661,15 +663,26 @@ function atualizarContador() {
   }
 }
 
-function mostrarModalLimite(selecionadas, limite) {
-  const excesso = selecionadas - limite;
+function mostrarModalLimite(qtdSolicitada, restantes) {
+  const excesso = qtdSolicitada - restantes;
   const modal = document.getElementById('modal-limite');
-  document.getElementById('limite-msg').textContent =
-    `Você selecionou ${selecionadas} foto${selecionadas>1?'s':''}, mas o limite desta galeria é de ${limite} download${limite>1?'s':''}.`;
-  document.getElementById('limite-destaques').textContent =
-    `Desmarque ${excesso} foto${excesso>1?'s':''}!`;
-  document.getElementById('limite-sub').textContent =
-    `Remova ${excesso} foto${excesso>1?'s':''} da seleção para continuar o download.`;
+
+  if (restantes <= 0) {
+    // Esgotou totalmente
+    document.getElementById('limite-msg').textContent =
+      `Você já utilizou todos os ${dlMax} download${dlMax>1?'s':''} disponíveis nesta galeria.`;
+    document.getElementById('limite-destaques').textContent = `Limite atingido!`;
+    document.getElementById('limite-sub').textContent =
+      `Entre em contato com o fotógrafo para solicitar mais downloads.`;
+  } else {
+    // Excedeu parcialmente
+    document.getElementById('limite-msg').textContent =
+      `Você selecionou ${qtdSolicitada} foto${qtdSolicitada>1?'s':''}, mas só restam ${restantes} download${restantes>1?'s':''} disponíveis nesta galeria.`;
+    document.getElementById('limite-destaques').textContent =
+      `Desmarque ${excesso} foto${excesso>1?'s':''}!`;
+    document.getElementById('limite-sub').textContent =
+      `Remova ${excesso} foto${excesso>1?'s':''} da seleção para continuar o download.`;
+  }
   modal.style.display = 'flex';
 }
 
@@ -677,18 +690,22 @@ function fecharModalLimite() {
   document.getElementById('modal-limite').style.display = 'none';
 }
 
-function checarLimite(qtdSelecionadas) {
-  if (dlMax <= 0) return true; // sem limite
-  const qtd = qtdSelecionadas ?? selecionadas.size;
-  if (qtd > dlMax) {
-    mostrarModalLimite(qtd, dlMax);
+// dlMax = total de fotos que o cliente pode baixar
+// dlCount = fotos já baixadas (persistente no banco)
+// Retorna true se pode baixar 'qtdFotos' fotos ainda
+function checarLimite(qtdFotos) {
+  if (dlMax <= 0) return true; // 0 = ilimitado
+  const restantes = Math.max(0, dlMax - dlCount);
+  if (qtdFotos > restantes) {
+    mostrarModalLimite(qtdFotos, restantes);
     return false;
   }
   return true;
 }
 
+
 async function baixarFoto(fotoId) {
-  if (!checarLimite()) return;
+  if (!checarLimite(1)) return;  // 1 foto por vez
   const url = `/api/fotos/download.php?foto_id=${fotoId}&token=${TOKEN}`;
   const a = document.createElement('a');
   a.href = url; a.download = ''; document.body.appendChild(a); a.click(); a.remove();
@@ -701,7 +718,7 @@ function baixarFotoAtual() { baixarFoto(FOTOS[lbIndex].id); }
 
 async function baixarZipSelecionadas() {
   if (!selecionadas.size) { toast('Selecione pelo menos uma foto.'); return; }
-  if (!checarLimite()) return;
+  if (!checarLimite(selecionadas.size)) return;  // verifica por número de fotos
   toast('Preparando ZIP...');
   const r = await fetch('/api/fotos/download_zip.php', {
     method:'POST', credentials:'include',
@@ -714,13 +731,16 @@ async function baixarZipSelecionadas() {
     const a = document.createElement('a');
     a.href = url; a.download = GALERIA.nome + '_selecionadas.zip';
     a.click(); URL.revokeObjectURL(url);
-    dlCount++; atualizarContador();
+    dlCount += selecionadas.size; atualizarContador();
     toast('ZIP baixado!');
-  } else { toast('Erro ao gerar ZIP.'); }
+  } else {
+    const err = await r.json().catch(()=>({mensagem:'Erro ao gerar ZIP.'}));
+    toast(err.mensagem || 'Erro ao gerar ZIP.', 'error');
+  }
 }
 
 async function baixarZipTodas() {
-  if (!checarLimite()) return;
+  if (!checarLimite(FOTOS.length)) return;  // verifica total de fotos
   toast('Preparando ZIP de todas as fotos...');
   const r = await fetch('/api/fotos/download_zip.php', {
     method:'POST', credentials:'include',
@@ -733,9 +753,35 @@ async function baixarZipTodas() {
     const a = document.createElement('a');
     a.href = url; a.download = GALERIA.nome + '_todas.zip';
     a.click(); URL.revokeObjectURL(url);
-    dlCount++; atualizarContador();
+    dlCount += FOTOS.length; atualizarContador();
     toast('ZIP baixado!');
-  } else { toast('Erro ao gerar ZIP.'); }
+  } else {
+    const err = await r.json().catch(()=>({mensagem:'Erro ao gerar ZIP.'}));
+    toast(err.mensagem || 'Erro ao gerar ZIP.', 'error');
+  }
+}
+
+// ── AUTO-POLLING (atualiza seleções e contador a cada 30s) ────────
+function iniciarPolling() {
+  setInterval(async () => {
+    if (!GALERIA) return;
+    try {
+      // Recarrega fotos para atualizar seleções marcadas
+      const r = await fetch(`/api/fotos/list.php?galeria_id=${GALERIA.id}`, {credentials:'include'});
+      const d = await r.json();
+      if (d.fotos) {
+        // Atualiza apenas o estado visual das seleções sem recriar o DOM
+        d.fotos.forEach(f => {
+          const card = document.getElementById(`foto-${f.id}`);
+          if (card) {
+            card.classList.toggle('selected', !!f.selecionada);
+            const chk = card.querySelector('.sel-check i');
+            if (chk) chk.style.opacity = f.selecionada ? '1' : '0';
+          }
+        });
+      }
+    } catch {}
+  }, 30000); // a cada 30 segundos
 }
 
 // ── LIGHTBOX ─────────────────────────────────────────────────

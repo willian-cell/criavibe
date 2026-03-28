@@ -187,14 +187,17 @@ let galerias = [];
   await carregarGalerias();
 })();
 
-async function carregarGalerias() {
+async function carregarGalerias(silencioso = false) {
   try {
     const d = await API.get('/galerias/list.php');
     galerias = d.galerias || [];
     renderGalerias(galerias);
-  } catch(e) { showToast(e.message, 'error'); }
-  document.getElementById('loading').style.display = 'none';
+  } catch(e) { if (!silencioso) showToast(e.message, 'error'); }
+  if (!silencioso) document.getElementById('loading').style.display = 'none';
 }
+
+// Auto-polling: atualiza badges de seleção a cada 30 segundos
+setInterval(() => carregarGalerias(true), 30000);
 
 function renderGalerias(lista) {
   const tbody = document.getElementById('gallery-tbody');
