@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,45 +9,67 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     .sel-alert {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: #7c3aed; color: #fff;
-      font-size: .72rem; font-weight: 700;
-      padding: 3px 10px; border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #7c3aed;
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
       animation: pulse 1.8s ease-in-out infinite;
       white-space: nowrap;
     }
+
     @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,.5); }
-      50%       { box-shadow: 0 0 0 6px rgba(124,58,237,0); }
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(124, 58, 237, .5);
+      }
+
+      50% {
+        box-shadow: 0 0 0 6px rgba(124, 58, 237, 0);
+      }
     }
+
     /* ── THUMB ZOOM ──────────────────────────────── */
     .thumb-wrap {
       position: relative;
       display: inline-block;
       line-height: 0;
     }
+
     /* Impede que a tabela corte o preview */
-    table, thead, tbody, tr, td, th {
+    table,
+    thead,
+    tbody,
+    tr,
+    td,
+    th {
       overflow: visible !important;
     }
+
     .thumb-wrap .zoom-preview {
       position: absolute;
       left: 56px;
       top: 50%;
       transform: translateY(-50%) scale(.88);
-      width: 220px;
+      width: 420px;
       height: auto;
       max-height: 280px;
       object-fit: contain;
       background: #111;
       border-radius: 14px;
-      box-shadow: 0 16px 48px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.12);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, .7), 0 0 0 1px rgba(255, 255, 255, .12);
       z-index: 9999;
       visibility: hidden;
       opacity: 0;
       transition: opacity .22s ease, transform .22s ease, visibility 0s linear .22s;
       pointer-events: none;
     }
+
     .thumb-wrap:hover .zoom-preview,
     .thumb-wrap:focus-within .zoom-preview {
       visibility: visible;
@@ -56,194 +79,195 @@
     }
   </style>
 </head>
+
 <body>
 
-<!-- TOP NAV -->
-<nav class="topnav">
-  <div class="topnav-logo">
-    <i class="fa-solid fa-images"></i> CriaVibe
-  </div>
-  <div class="topnav-spacer"></div>
-  <div class="topnav-user">
-    <i class="fa-solid fa-user-circle" style="font-size:1.2rem;color:var(--primary)"></i>
-    <span>Olá, <strong id="nav-nome">...</strong></span>
-    <button class="topnav-logout" onclick="logout()">
-      <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
-    </button>
-  </div>
-</nav>
-
-<div class="painel-layout">
-  <!-- SIDEBAR -->
-  <aside class="painel-sidebar">
-    <h3>Menu</h3>
-    <a href="/painel.html" class="sidebar-link active"><i class="fa-solid fa-images"></i> Galerias</a>
-    <a href="/clientes.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Clientes</a>
-    <h3 style="margin-top:20px">Conta</h3>
-    <a href="/configuracoes.html" class="sidebar-link"><i class="fa-solid fa-gear"></i> Configurações</a>
-    <a href="/saiba_mais.html" class="sidebar-link"><i class="fa-solid fa-circle-info"></i> Sobre</a>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="painel-main">
-    <div class="painel-header">
-      <h2><i class="fa-solid fa-images" style="color:var(--primary)"></i> Minhas Galerias</h2>
-      <div class="search-bar">
-        <i class="fa-solid fa-magnifying-glass" style="color:var(--light)"></i>
-        <input id="search-input" type="text" placeholder="Buscar galeria..." autocomplete="off" oninput="filtrar()">
-      </div>
-      <button class="btn btn-primary" onclick="abrirModalNova()">
-        <i class="fa-solid fa-plus"></i> Nova Galeria
+  <!-- TOP NAV -->
+  <nav class="topnav">
+    <div class="topnav-logo">
+      <i class="fa-solid fa-images"></i> CriaVibe
+    </div>
+    <div class="topnav-spacer"></div>
+    <div class="topnav-user">
+      <i class="fa-solid fa-user-circle" style="font-size:1.2rem;color:var(--primary)"></i>
+      <span>Olá, <strong id="nav-nome">...</strong></span>
+      <button class="topnav-logout" onclick="logout()">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
       </button>
     </div>
+  </nav>
 
-    <div id="loading" style="text-align:center;padding:40px;color:var(--muted)">
-      <i class="fa-solid fa-spinner fa-spin"></i> Carregando...
-    </div>
+  <div class="painel-layout">
+    <!-- SIDEBAR -->
+    <aside class="painel-sidebar">
+      <h3>Menu</h3>
+      <a href="/painel.html" class="sidebar-link active"><i class="fa-solid fa-images"></i> Galerias</a>
+      <a href="/clientes.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Clientes</a>
+      <h3 style="margin-top:20px">Conta</h3>
+      <a href="/configuracoes.html" class="sidebar-link"><i class="fa-solid fa-gear"></i> Configurações</a>
+      <a href="/saiba_mais.html" class="sidebar-link"><i class="fa-solid fa-circle-info"></i> Sobre</a>
+    </aside>
 
-    <div class="galleries-table" id="table-wrap" style="display:none">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:60px">Capa</th>
-            <th>Galeria</th>
-            <th>Playlist</th>
-            <th>Fotos</th>
-            <th>Seleções do Cliente</th>
-            <th>Downloads</th>
-            <th style="width:50px">Ações</th>
-          </tr>
-        </thead>
-        <tbody id="gallery-tbody"></tbody>
-      </table>
-    </div>
-
-    <div class="empty-state" id="empty-state" style="display:none">
-      <div class="icon"><i class="fa-solid fa-images"></i></div>
-      <h3>Nenhuma galeria criada</h3>
-      <p>Crie sua primeira galeria para começar a organizar e entregar seus trabalhos.</p>
-      <button class="btn btn-primary" style="margin-top:20px" onclick="abrirModalNova()">
-        <i class="fa-solid fa-plus"></i> Criar Primeira Galeria
-      </button>
-    </div>
-  </main>
-</div>
-
-<!-- MODAL NOVA GALERIA -->
-<div class="modal-backdrop" id="modal-nova" onclick="if(event.target===this)fecharModal('modal-nova')">
-  <div class="modal">
-    <div class="modal-header">
-      <h3><i class="fa-solid fa-plus" style="color:var(--primary)"></i> Nova Galeria</h3>
-      <button class="modal-close" onclick="fecharModal('modal-nova')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Nome da Galeria</label>
-        <input id="n-nome" class="form-control" type="text" placeholder="Ex: Casamento Silva">
-      </div>
-      <div class="form-group">
-        <label>Descrição</label>
-        <textarea id="n-descricao" class="form-control" rows="3" placeholder="Descrição opcional"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Privacidade</label>
-        <select id="n-privacidade" class="form-control" onchange="toggleSenha('n-senha-g','n-privacidade')">
-          <option value="privada">Privada (com senha)</option>
-          <option value="publica">Pública</option>
-        </select>
-      </div>
-      <div class="form-group" id="n-senha-g">
-        <label>Senha de acesso</label>
-        <input id="n-senha" class="form-control" type="password" placeholder="Senha para o cliente">
-      </div>
-      <div id="n-err" class="form-error"></div>
-      <div style="display:flex;gap:10px;margin-top:8px">
-        <button class="btn btn-primary" style="flex:1" onclick="criarGaleria()">
-          <i class="fa-solid fa-floppy-disk"></i> Criar Galeria
+    <!-- MAIN -->
+    <main class="painel-main">
+      <div class="painel-header">
+        <h2><i class="fa-solid fa-images" style="color:var(--primary)"></i> Minhas Galerias</h2>
+        <div class="search-bar">
+          <i class="fa-solid fa-magnifying-glass" style="color:var(--light)"></i>
+          <input id="search-input" type="text" placeholder="Buscar galeria..." autocomplete="off" oninput="filtrar()">
+        </div>
+        <button class="btn btn-primary" onclick="abrirModalNova()">
+          <i class="fa-solid fa-plus"></i> Nova Galeria
         </button>
-        <button class="btn btn-secondary" onclick="fecharModal('modal-nova')">Cancelar</button>
+      </div>
+
+      <div id="loading" style="text-align:center;padding:40px;color:var(--muted)">
+        <i class="fa-solid fa-spinner fa-spin"></i> Carregando...
+      </div>
+
+      <div class="galleries-table" id="table-wrap" style="display:none">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:60px">Capa</th>
+              <th>Galeria</th>
+              <th>Playlist</th>
+              <th>Fotos</th>
+              <th>Seleções do Cliente</th>
+              <th>Downloads</th>
+              <th style="width:50px">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="gallery-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" id="empty-state" style="display:none">
+        <div class="icon"><i class="fa-solid fa-images"></i></div>
+        <h3>Nenhuma galeria criada</h3>
+        <p>Crie sua primeira galeria para começar a organizar e entregar seus trabalhos.</p>
+        <button class="btn btn-primary" style="margin-top:20px" onclick="abrirModalNova()">
+          <i class="fa-solid fa-plus"></i> Criar Primeira Galeria
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL NOVA GALERIA -->
+  <div class="modal-backdrop" id="modal-nova" onclick="if(event.target===this)fecharModal('modal-nova')">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-plus" style="color:var(--primary)"></i> Nova Galeria</h3>
+        <button class="modal-close" onclick="fecharModal('modal-nova')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Nome da Galeria</label>
+          <input id="n-nome" class="form-control" type="text" placeholder="Ex: Casamento Silva">
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="n-descricao" class="form-control" rows="3" placeholder="Descrição opcional"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Privacidade</label>
+          <select id="n-privacidade" class="form-control" onchange="toggleSenha('n-senha-g','n-privacidade')">
+            <option value="privada">Privada (com senha)</option>
+            <option value="publica">Pública</option>
+          </select>
+        </div>
+        <div class="form-group" id="n-senha-g">
+          <label>Senha de acesso</label>
+          <input id="n-senha" class="form-control" type="password" placeholder="Senha para o cliente">
+        </div>
+        <div id="n-err" class="form-error"></div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-primary" style="flex:1" onclick="criarGaleria()">
+            <i class="fa-solid fa-floppy-disk"></i> Criar Galeria
+          </button>
+          <button class="btn btn-secondary" onclick="fecharModal('modal-nova')">Cancelar</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- MODAL EDITAR GALERIA -->
-<div class="modal-backdrop" id="modal-editar" onclick="if(event.target===this)fecharModal('modal-editar')">
-  <div class="modal">
-    <div class="modal-header">
-      <h3><i class="fa-solid fa-pen-to-square" style="color:var(--primary)"></i> Editar Galeria</h3>
-      <button class="modal-close" onclick="fecharModal('modal-editar')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="e-id">
-      <div class="form-group">
-        <label>Nome da Galeria</label>
-        <input id="e-nome" class="form-control" type="text">
+  <!-- MODAL EDITAR GALERIA -->
+  <div class="modal-backdrop" id="modal-editar" onclick="if(event.target===this)fecharModal('modal-editar')">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen-to-square" style="color:var(--primary)"></i> Editar Galeria</h3>
+        <button class="modal-close" onclick="fecharModal('modal-editar')">&times;</button>
       </div>
-      <div class="form-group">
-        <label>Descrição</label>
-        <textarea id="e-descricao" class="form-control" rows="3"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Privacidade</label>
-        <select id="e-privacidade" class="form-control" onchange="toggleSenha('e-senha-g','e-privacidade')">
-          <option value="privada">Privada (com senha)</option>
-          <option value="publica">Pública</option>
-        </select>
-      </div>
-      <div class="form-group" id="e-senha-g" style="display:none">
-        <label>Nova Senha <small style="color:var(--muted)">(vazio = manter atual)</small></label>
-        <input id="e-senha" class="form-control" type="password" placeholder="Nova senha">
-      </div>
-      <div class="form-group">
-        <label>Limite de Downloads <small style="color:var(--muted)">(0 = ilimitado)</small></label>
-        <input id="e-max-dl" class="form-control" type="number" min="0" placeholder="Ex: 50">
-      </div>
-      <div id="e-err" class="form-error"></div>
-      <div style="display:flex;gap:10px;margin-top:8px">
-        <button class="btn btn-primary" style="flex:1" onclick="salvarEdicao()">
-          <i class="fa-solid fa-floppy-disk"></i> Salvar Alterações
-        </button>
-        <button class="btn btn-secondary" onclick="fecharModal('modal-editar')">Cancelar</button>
+      <div class="modal-body">
+        <input type="hidden" id="e-id">
+        <div class="form-group">
+          <label>Nome da Galeria</label>
+          <input id="e-nome" class="form-control" type="text">
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="e-descricao" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Privacidade</label>
+          <select id="e-privacidade" class="form-control" onchange="toggleSenha('e-senha-g','e-privacidade')">
+            <option value="privada">Privada (com senha)</option>
+            <option value="publica">Pública</option>
+          </select>
+        </div>
+        <div class="form-group" id="e-senha-g" style="display:none">
+          <label>Nova Senha <small style="color:var(--muted)">(vazio = manter atual)</small></label>
+          <input id="e-senha" class="form-control" type="password" placeholder="Nova senha">
+        </div>
+        <div class="form-group">
+          <label>Limite de Downloads <small style="color:var(--muted)">(0 = ilimitado)</small></label>
+          <input id="e-max-dl" class="form-control" type="number" min="0" placeholder="Ex: 50">
+        </div>
+        <div id="e-err" class="form-error"></div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-primary" style="flex:1" onclick="salvarEdicao()">
+            <i class="fa-solid fa-floppy-disk"></i> Salvar Alterações
+          </button>
+          <button class="btn btn-secondary" onclick="fecharModal('modal-editar')">Cancelar</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<script src="/assets/js/api.js"></script>
-<script src="/assets/js/auth.js"></script>
-<script>
-let galerias = [];
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script>
+    let galerias = [];
 
-// ── Init ──────────────────────────────────────────────────
-(async () => {
-  const u = await requireAuth();
-  document.getElementById('nav-nome').textContent = u.nome;
-  await carregarGalerias();
-})();
+    // ── Init ──────────────────────────────────────────────────
+    (async () => {
+      const u = await requireAuth();
+      document.getElementById('nav-nome').textContent = u.nome;
+      await carregarGalerias();
+    })();
 
-async function carregarGalerias(silencioso = false) {
-  try {
-    const d = await API.get('/galerias/list.php');
-    galerias = d.galerias || [];
-    renderGalerias(galerias);
-  } catch(e) { if (!silencioso) showToast(e.message, 'error'); }
-  if (!silencioso) document.getElementById('loading').style.display = 'none';
-}
+    async function carregarGalerias(silencioso = false) {
+      try {
+        const d = await API.get('/galerias/list.php');
+        galerias = d.galerias || [];
+        renderGalerias(galerias);
+      } catch (e) { if (!silencioso) showToast(e.message, 'error'); }
+      if (!silencioso) document.getElementById('loading').style.display = 'none';
+    }
 
-// Auto-polling: atualiza badges de seleção a cada 30 segundos
-setInterval(() => carregarGalerias(true), 30000);
+    // Auto-polling: atualiza badges de seleção a cada 30 segundos
+    setInterval(() => carregarGalerias(true), 30000);
 
-function renderGalerias(lista) {
-  const tbody = document.getElementById('gallery-tbody');
-  const wrap  = document.getElementById('table-wrap');
-  const empty = document.getElementById('empty-state');
+    function renderGalerias(lista) {
+      const tbody = document.getElementById('gallery-tbody');
+      const wrap = document.getElementById('table-wrap');
+      const empty = document.getElementById('empty-state');
 
-  if (!lista.length) { wrap.style.display='none'; empty.style.display='flex'; return; }
-  empty.style.display = 'none';
-  wrap.style.display  = '';
+      if (!lista.length) { wrap.style.display = 'none'; empty.style.display = 'flex'; return; }
+      empty.style.display = 'none';
+      wrap.style.display = '';
 
-  tbody.innerHTML = lista.map(g => `
+      tbody.innerHTML = lista.map(g => `
     <tr data-nome="${g.nome.toLowerCase()}">
       <td>
         ${g.thumb
@@ -255,8 +279,8 @@ function renderGalerias(lista) {
       </td>
       <td>
         <a href="/galeria.html?id=${g.id}" class="gallery-name">${g.nome}</a>
-        <span class="badge badge-${g.privacidade==='publica'?'ativo':'inativo'}" style="margin-top:2px">
-          ${g.privacidade==='publica'?'Pública':'Privada'}
+        <span class="badge badge-${g.privacidade === 'publica' ? 'ativo' : 'inativo'}" style="margin-top:2px">
+          ${g.privacidade === 'publica' ? 'Pública' : 'Privada'}
         </span>
       </td>
       <td>
@@ -273,14 +297,14 @@ function renderGalerias(lista) {
           ).join('');
         })()}
       </td>
-      <td><strong>${g.total_fotos||0}</strong> <span style="color:var(--muted);font-size:.8rem">fotos</span></td>
+      <td><strong>${g.total_fotos || 0}</strong> <span style="color:var(--muted);font-size:.8rem">fotos</span></td>
       <td>
         ${(g.total_selecionadas > 0)
-          ? `<span class="sel-alert"><i class="fa-solid fa-star"></i> ${g.total_selecionadas} selecionada${g.total_selecionadas>1?'s':''}</span>`
+          ? `<span class="sel-alert"><i class="fa-solid fa-star"></i> ${g.total_selecionadas} selecionada${g.total_selecionadas > 1 ? 's' : ''}</span>`
           : `<span style="color:var(--muted);font-size:.8rem">—</span>`
         }
       </td>
-      <td><span class="badge badge-${g.entrega_em_alta?'ativo':'inativo'}">${g.entrega_em_alta?'<i class="fa-solid fa-circle-check"></i> Ativo':'Inativo'}</span></td>
+      <td><span class="badge badge-${g.entrega_em_alta ? 'ativo' : 'inativo'}">${g.entrega_em_alta ? '<i class="fa-solid fa-circle-check"></i> Ativo' : 'Inativo'}</span></td>
       <td>
         <div class="actions-menu">
           <button class="actions-btn" onclick="toggleMenu(this)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
@@ -299,7 +323,7 @@ function renderGalerias(lista) {
               <i class="fa-solid fa-link"></i> Copiar Link
             </button>` : ''}
             <hr>
-            <button class="dd-item danger" onclick="excluirGaleria(${g.id},'${g.nome.replace(/'/g,"\\'")}')">
+            <button class="dd-item danger" onclick="excluirGaleria(${g.id},'${g.nome.replace(/'/g, "\\'")}')">
               <i class="fa-solid fa-trash"></i> Excluir
             </button>
           </div>
@@ -307,90 +331,91 @@ function renderGalerias(lista) {
       </td>
     </tr>
   `).join('');
-}
+    }
 
-function filtrar() {
-  const q = document.getElementById('search-input').value.toLowerCase();
-  document.querySelectorAll('#gallery-tbody tr').forEach(tr => {
-    tr.style.display = tr.dataset.nome.includes(q) ? '' : 'none';
-  });
-}
+    function filtrar() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      document.querySelectorAll('#gallery-tbody tr').forEach(tr => {
+        tr.style.display = tr.dataset.nome.includes(q) ? '' : 'none';
+      });
+    }
 
-// ── Modal helpers ─────────────────────────────────────────
-function abrirModalNova() { document.getElementById('modal-nova').classList.add('open'); }
-function fecharModal(id)  { document.getElementById(id).classList.remove('open'); }
-function toggleSenha(groupId, selId) {
-  const p = document.getElementById(selId).value;
-  document.getElementById(groupId).style.display = p === 'privada' ? '' : 'none';
-}
+    // ── Modal helpers ─────────────────────────────────────────
+    function abrirModalNova() { document.getElementById('modal-nova').classList.add('open'); }
+    function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+    function toggleSenha(groupId, selId) {
+      const p = document.getElementById(selId).value;
+      document.getElementById(groupId).style.display = p === 'privada' ? '' : 'none';
+    }
 
-// ── Criar Galeria ─────────────────────────────────────────
-async function criarGaleria() {
-  const nome       = document.getElementById('n-nome').value.trim();
-  const descricao  = document.getElementById('n-descricao').value.trim();
-  const privacidade= document.getElementById('n-privacidade').value;
-  const senha      = document.getElementById('n-senha').value || null;
-  const err = document.getElementById('n-err');
-  err.classList.remove('show');
-  if (!nome) { err.textContent='Nome obrigatório.'; err.classList.add('show'); return; }
-  try {
-    const d = await API.post('/galerias/create.php', {nome,descricao,privacidade,senha});
-    if (d.status==='ok') { fecharModal('modal-nova'); showToast('Galeria criada!'); await carregarGalerias(); }
-    else { err.textContent=d.mensagem; err.classList.add('show'); }
-  } catch(e) { err.textContent=e.message; err.classList.add('show'); }
-}
+    // ── Criar Galeria ─────────────────────────────────────────
+    async function criarGaleria() {
+      const nome = document.getElementById('n-nome').value.trim();
+      const descricao = document.getElementById('n-descricao').value.trim();
+      const privacidade = document.getElementById('n-privacidade').value;
+      const senha = document.getElementById('n-senha').value || null;
+      const err = document.getElementById('n-err');
+      err.classList.remove('show');
+      if (!nome) { err.textContent = 'Nome obrigatório.'; err.classList.add('show'); return; }
+      try {
+        const d = await API.post('/galerias/create.php', { nome, descricao, privacidade, senha });
+        if (d.status === 'ok') { fecharModal('modal-nova'); showToast('Galeria criada!'); await carregarGalerias(); }
+        else { err.textContent = d.mensagem; err.classList.add('show'); }
+      } catch (e) { err.textContent = e.message; err.classList.add('show'); }
+    }
 
-// ── Editar Galeria ────────────────────────────────────────
-async function abrirEdicao(id) {
-  const g = galerias.find(x => x.id == id);
-  if (!g) return;
-  document.getElementById('e-id').value           = g.id;
-  document.getElementById('e-nome').value          = g.nome;
-  document.getElementById('e-descricao').value     = g.descricao || '';
-  document.getElementById('e-privacidade').value   = g.privacidade;
-  document.getElementById('e-senha').value         = '';
-  document.getElementById('e-max-dl').value        = g.max_selecao || 0;
-  document.getElementById('e-err').classList.remove('show');
-  toggleSenha('e-senha-g','e-privacidade');
-  fecharModal('modal-nova');
-  document.querySelectorAll('.actions-dropdown.open').forEach(d=>d.classList.remove('open'));
-  document.getElementById('modal-editar').classList.add('open');
-}
+    // ── Editar Galeria ────────────────────────────────────────
+    async function abrirEdicao(id) {
+      const g = galerias.find(x => x.id == id);
+      if (!g) return;
+      document.getElementById('e-id').value = g.id;
+      document.getElementById('e-nome').value = g.nome;
+      document.getElementById('e-descricao').value = g.descricao || '';
+      document.getElementById('e-privacidade').value = g.privacidade;
+      document.getElementById('e-senha').value = '';
+      document.getElementById('e-max-dl').value = g.max_selecao || 0;
+      document.getElementById('e-err').classList.remove('show');
+      toggleSenha('e-senha-g', 'e-privacidade');
+      fecharModal('modal-nova');
+      document.querySelectorAll('.actions-dropdown.open').forEach(d => d.classList.remove('open'));
+      document.getElementById('modal-editar').classList.add('open');
+    }
 
-async function salvarEdicao() {
-  const id   = document.getElementById('e-id').value;
-  const nome = document.getElementById('e-nome').value.trim();
-  const err  = document.getElementById('e-err');
-  err.classList.remove('show');
-  if (!nome) { err.textContent='Nome obrigatório.'; err.classList.add('show'); return; }
-  try {
-    const d = await API.post('/galerias/update.php', {
-      id: parseInt(id),
-      nome,
-      descricao: document.getElementById('e-descricao').value.trim(),
-      privacidade: document.getElementById('e-privacidade').value,
-      senha: document.getElementById('e-senha').value || null,
-      max_selecao: parseInt(document.getElementById('e-max-dl').value) || 0,
-    });
-    if (d.status==='ok') { fecharModal('modal-editar'); showToast('Galeria atualizada!'); await carregarGalerias(); }
-    else { err.textContent=d.mensagem; err.classList.add('show'); }
-  } catch(e) { err.textContent=e.message; err.classList.add('show'); }
-}
+    async function salvarEdicao() {
+      const id = document.getElementById('e-id').value;
+      const nome = document.getElementById('e-nome').value.trim();
+      const err = document.getElementById('e-err');
+      err.classList.remove('show');
+      if (!nome) { err.textContent = 'Nome obrigatório.'; err.classList.add('show'); return; }
+      try {
+        const d = await API.post('/galerias/update.php', {
+          id: parseInt(id),
+          nome,
+          descricao: document.getElementById('e-descricao').value.trim(),
+          privacidade: document.getElementById('e-privacidade').value,
+          senha: document.getElementById('e-senha').value || null,
+          max_selecao: parseInt(document.getElementById('e-max-dl').value) || 0,
+        });
+        if (d.status === 'ok') { fecharModal('modal-editar'); showToast('Galeria atualizada!'); await carregarGalerias(); }
+        else { err.textContent = d.mensagem; err.classList.add('show'); }
+      } catch (e) { err.textContent = e.message; err.classList.add('show'); }
+    }
 
-// ── Excluir ───────────────────────────────────────────────
-async function excluirGaleria(id, nome) {
-  if (!confirm(`Excluir a galeria "${nome}"? Esta ação é irreversível.`)) return;
-  try {
-    const d = await API.post('/galerias/delete.php', { id });
-    if (d.status==='ok') { showToast('Galeria excluída.'); await carregarGalerias(); }
-    else showToast(d.mensagem, 'error');
-  } catch(e) { showToast(e.message, 'error'); }
-}
+    // ── Excluir ───────────────────────────────────────────────
+    async function excluirGaleria(id, nome) {
+      if (!confirm(`Excluir a galeria "${nome}"? Esta ação é irreversível.`)) return;
+      try {
+        const d = await API.post('/galerias/delete.php', { id });
+        if (d.status === 'ok') { showToast('Galeria excluída.'); await carregarGalerias(); }
+        else showToast(d.mensagem, 'error');
+      } catch (e) { showToast(e.message, 'error'); }
+    }
 
-function copiarLink(token) {
-  const url = `${location.origin}/cliente.html?token=${token}`;
-  navigator.clipboard.writeText(url).then(() => showToast('Link copiado!'));
-}
-</script>
+    function copiarLink(token) {
+      const url = `${location.origin}/cliente.html?token=${token}`;
+      navigator.clipboard.writeText(url).then(() => showToast('Link copiado!'));
+    }
+  </script>
 </body>
+
 </html>
