@@ -23,29 +23,34 @@
     .thumb-wrap {
       position: relative;
       display: inline-block;
+      line-height: 0;
+    }
+    /* Impede que a tabela corte o preview */
+    table, thead, tbody, tr, td, th {
+      overflow: visible !important;
     }
     .thumb-wrap .zoom-preview {
-      display: none;
       position: absolute;
-      left: 52px;
+      left: 56px;
       top: 50%;
-      transform: translateY(-50%) scale(.92);
-      width: 180px;
-      height: 180px;
+      transform: translateY(-50%) scale(.88);
+      width: 200px;
+      height: 200px;
       object-fit: cover;
-      border-radius: 12px;
-      box-shadow: 0 12px 40px rgba(0,0,0,.55);
-      border: 2px solid rgba(255,255,255,.18);
-      z-index: 999;
+      border-radius: 14px;
+      box-shadow: 0 16px 48px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.12);
+      z-index: 9999;
+      visibility: hidden;
       opacity: 0;
-      transition: opacity .2s ease, transform .2s ease;
+      transition: opacity .22s ease, transform .22s ease, visibility 0s linear .22s;
       pointer-events: none;
     }
     .thumb-wrap:hover .zoom-preview,
     .thumb-wrap:focus-within .zoom-preview {
-      display: block;
+      visibility: visible;
       opacity: 1;
       transform: translateY(-50%) scale(1);
+      transition: opacity .22s ease, transform .22s ease, visibility 0s linear 0s;
     }
   </style>
 </head>
