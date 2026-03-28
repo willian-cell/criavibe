@@ -2,7 +2,7 @@
 require_once __DIR__.'/../config.php';
 
 $foto_id    = (int)($_GET['foto_id'] ?? 0);
-$galeria_id = (int)($_GET['galeria_id'] ?? 0);
+$token      = $_GET['token'] ?? '';
 
 if (!$foto_id) json_out(['status'=>'erro','mensagem'=>'foto_id obrigatório.'], 400);
 
@@ -14,27 +14,33 @@ if (!$foto) json_out(['status'=>'erro','mensagem'=>'Foto não encontrada.'], 404
 
 $gid = $foto['galeria_id'];
 
-// Verifica se galeria permite download individual
-$gal = db()->prepare("SELECT download_individual, entrega_em_alta, max_selecao FROM galerias WHERE id = ? LIMIT 1");
+// Busca galeria — usa entrega_em_alta (campo real do banco)
+$gal = db()->prepare("SELECT entrega_em_alta, max_selecao, dl_count, nome FROM galerias WHERE id = ? LIMIT 1");
 $gal->execute([$gid]);
 $g = $gal->fetch();
 if (!$g) json_out(['status'=>'erro','mensagem'=>'Galeria não encontrada.'], 404);
 
-if (!$g['download_individual'] && !$g['entrega_em_alta'])
+// Verifica se downloads estão habilitados
+if (!$g['entrega_em_alta'])
     json_out(['status'=>'erro','mensagem'=>'Downloads não habilitados nesta galeria.'], 403);
 
-// Verifica limite de downloads
-$max = (int)$g['max_selecao'];
-if ($max > 0) {
-    $dl_count = $_SESSION['dl_count'][$gid] ?? 0;
-    if ($dl_count >= $max)
-        json_out(['status'=>'erro','mensagem'=>"Limite de $max downloads atingido."], 403);
-    $_SESSION['dl_count'][$gid] = $dl_count + 1;
+// Verifica acesso (sessão OU token)
+$acesso = !empty($_SESSION['galeria_access'][$gid]);
+if (!$acesso && $token) {
+    $chk = db()->prepare("SELECT id FROM galerias WHERE id=? AND link_token=? LIMIT 1");
+    $chk->execute([$gid, $token]);
+    if ($chk->fetch()) { $acesso = true; $_SESSION['galeria_access'][$gid] = true; }
 }
+if (!$acesso) json_out(['status'=>'erro','mensagem'=>'Sem acesso à galeria.'], 403);
 
-// Registra visualização como download
-$viz = db()->prepare("INSERT INTO visualizacoes (galeria_id, ip_hash) VALUES (?,?)");
-$viz->execute([$gid, hash('sha256', $_SERVER['REMOTE_ADDR'] ?? '')]);
+// Verifica limite de downloads (persistente no banco)
+$max      = (int)$g['max_selecao'];
+$dl_count = (int)$g['dl_count'];
+if ($max > 0 && $dl_count >= $max)
+    json_out(['status'=>'erro','mensagem'=>"Limite de $max downloads atingido para esta galeria."], 403);
+
+// Incrementa contador no banco (persistente)
+db()->prepare("UPDATE galerias SET dl_count = dl_count + 1 WHERE id = ?")->execute([$gid]);
 
 // Serve o arquivo
 $path = __DIR__.'/../../'.$foto['caminho_arquivo'];
@@ -44,7 +50,7 @@ $nome = $foto['nome_arquivo'] ?: basename($path);
 header('Content-Type: application/octet-stream');
 header('Content-Disposition: attachment; filename="'.$nome.'"');
 header('Content-Length: '.filesize($path));
-header('X-Downloads-Used: '.($_SESSION['dl_count'][$gid] ?? 0));
+header('X-Downloads-Used: '.($dl_count + 1));
 header('X-Downloads-Max: '.$max);
 readfile($path);
 exit;

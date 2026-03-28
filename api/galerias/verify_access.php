@@ -31,7 +31,11 @@ if ($g['cliente_id']) {
 
 // Salva acesso na sessão
 $_SESSION['galeria_access'][$g['id']] = true;
-$_SESSION['dl_count'][$g['id']] = $_SESSION['dl_count'][$g['id']] ?? 0;
 
 unset($g['senha']);
-json_out(['status'=>'ok','galeria'=>$g,'dl_count'=>$_SESSION['dl_count'][$g['id']]]);
+json_out([
+    'status'    => 'ok',
+    'galeria'   => $g,
+    'dl_count'  => (int)($g['dl_count'] ?? 0),
+    'dl_max'    => (int)($g['max_selecao'] ?? 0),
+]);

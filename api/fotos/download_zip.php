@@ -4,14 +4,24 @@ require_once __DIR__.'/../config.php';
 $body       = body();
 $galeria_id = (int)($body['galeria_id'] ?? 0);
 $foto_ids   = $body['foto_ids'] ?? [];
+$token      = $body['token'] ?? '';
 
 if (!$galeria_id) json_out(['status'=>'erro','mensagem'=>'galeria_id obrigatório.'], 400);
 
-// Verifica se galeria permite download_all
-$gal = db()->prepare("SELECT download_all, entrega_em_alta, max_selecao, nome FROM galerias WHERE id = ? LIMIT 1");
+// Verifica acesso (sessão OU token)
+$acesso = !empty($_SESSION['galeria_access'][$galeria_id]);
+if (!$acesso && $token) {
+    $chk = db()->prepare("SELECT id FROM galerias WHERE id=? AND link_token=? LIMIT 1");
+    $chk->execute([$galeria_id, $token]);
+    if ($chk->fetch()) { $acesso = true; $_SESSION['galeria_access'][$galeria_id] = true; }
+}
+if (!$acesso) json_out(['status'=>'erro','mensagem'=>'Sem acesso à galeria.'], 403);
+
+// Busca galeria — usa entrega_em_alta (campo real do banco)
+$gal = db()->prepare("SELECT entrega_em_alta, max_selecao, dl_count, nome FROM galerias WHERE id = ? LIMIT 1");
 $gal->execute([$galeria_id]);
 $g = $gal->fetch();
-if (!$g || (!$g['download_all'] && !$g['entrega_em_alta']))
+if (!$g || !$g['entrega_em_alta'])
     json_out(['status'=>'erro','mensagem'=>'Download em ZIP não habilitado.'], 403);
 
 // Busca fotos (todas ou as selecionadas)
@@ -25,14 +35,15 @@ if (!empty($foto_ids)) {
 $fotos = $stmt->fetchAll();
 if (!$fotos) json_out(['status'=>'erro','mensagem'=>'Nenhuma foto para baixar.'], 400);
 
-// Verifica limite (conta como 1 download por ZIP)
-$max = (int)$g['max_selecao'];
-if ($max > 0) {
-    $dl_count = $_SESSION['dl_count'][$galeria_id] ?? 0;
-    if ($dl_count >= $max)
-        json_out(['status'=>'erro','mensagem'=>"Limite de $max downloads atingido."], 403);
-    $_SESSION['dl_count'][$galeria_id] = $dl_count + 1;
-}
+// Verifica limite de downloads (persistente no banco)
+// Conta como 1 por lote ZIP
+$max      = (int)$g['max_selecao'];
+$dl_count = (int)$g['dl_count'];
+if ($max > 0 && $dl_count >= $max)
+    json_out(['status'=>'erro','mensagem'=>"Limite de $max downloads atingido para esta galeria."], 403);
+
+// Incrementa contador no banco (1 por lote ZIP)
+db()->prepare("UPDATE galerias SET dl_count = dl_count + 1 WHERE id = ?")->execute([$galeria_id]);
 
 // Cria ZIP temporário
 $tmpZip = tempnam(sys_get_temp_dir(), 'criavibe_') . '.zip';
@@ -52,6 +63,8 @@ $nome_galeria = preg_replace('/[^a-zA-Z0-9_-]/', '_', $g['nome']);
 header('Content-Type: application/zip');
 header('Content-Disposition: attachment; filename="'.$nome_galeria.'_fotos.zip"');
 header('Content-Length: '.filesize($tmpZip));
+header('X-Downloads-Used: '.($dl_count + 1));
+header('X-Downloads-Max: '.$max);
 readfile($tmpZip);
 unlink($tmpZip);
 exit;

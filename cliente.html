@@ -288,7 +288,7 @@ async function autenticar() {
     if (d.status === 'ok') {
       GALERIA = d.galeria;
       dlCount = d.dl_count || 0;
-      dlMax   = GALERIA.max_selecao ? parseInt(GALERIA.max_selecao) : 0;
+      dlMax   = d.dl_max || 0;
       document.getElementById('lock-screen').style.display = 'none';
       prepararCapa();
     } else {
@@ -635,7 +635,7 @@ function checarLimite() {
 
 async function baixarFoto(fotoId) {
   if (!checarLimite()) return;
-  const url = `/api/fotos/download.php?foto_id=${fotoId}&galeria_id=${GALERIA.id}`;
+  const url = `/api/fotos/download.php?foto_id=${fotoId}&token=${TOKEN}`;
   const a = document.createElement('a');
   a.href = url; a.download = ''; document.body.appendChild(a); a.click(); a.remove();
   dlCount++;
@@ -652,7 +652,7 @@ async function baixarZipSelecionadas() {
   const r = await fetch('/api/fotos/download_zip.php', {
     method:'POST', credentials:'include',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({galeria_id: GALERIA.id, foto_ids: [...selecionadas]})
+    body: JSON.stringify({galeria_id: GALERIA.id, foto_ids: [...selecionadas], token: TOKEN})
   });
   if (r.ok) {
     const blob = await r.blob();
@@ -671,7 +671,7 @@ async function baixarZipTodas() {
   const r = await fetch('/api/fotos/download_zip.php', {
     method:'POST', credentials:'include',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({galeria_id: GALERIA.id, foto_ids: []})
+    body: JSON.stringify({galeria_id: GALERIA.id, foto_ids: [], token: TOKEN})
   });
   if (r.ok) {
     const blob = await r.blob();

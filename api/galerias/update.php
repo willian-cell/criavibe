@@ -11,19 +11,25 @@ $chk = db()->prepare("SELECT id FROM galerias WHERE id=? AND usuario_email=? LIM
 $chk->execute([$id, $u['email']]);
 if (!$chk->fetch()) json_out(['status'=>'erro','mensagem'=>'Galeria não encontrada.'], 404);
 
+// Garante que a coluna dl_count existe (auto-create se não existir)
+try { db()->exec("ALTER TABLE galerias ADD COLUMN dl_count INT NOT NULL DEFAULT 0"); } catch (\PDOException $e) {}
+// Garante que max_selecao existe
+try { db()->exec("ALTER TABLE galerias ADD COLUMN max_selecao INT NOT NULL DEFAULT 0"); } catch (\PDOException $e) {}
+
 $nome        = trim($body['nome'] ?? '');
 $descricao   = trim($body['descricao'] ?? '');
 $privacidade = in_array($body['privacidade']??'', ['publica','privada']) ? $body['privacidade'] : 'privada';
 $senha_raw   = $body['senha'] ?? null;
+$max_selecao = max(0, (int)($body['max_selecao'] ?? 0));
 
 if (!$nome) json_out(['status'=>'erro','mensagem'=>'Nome obrigatório.'], 400);
 
 if ($senha_raw) {
-    $stmt = db()->prepare("UPDATE galerias SET nome=?,descricao=?,privacidade=?,senha=? WHERE id=?");
-    $stmt->execute([$nome, $descricao, $privacidade, password_hash($senha_raw, PASSWORD_DEFAULT), $id]);
+    $stmt = db()->prepare("UPDATE galerias SET nome=?,descricao=?,privacidade=?,senha=?,max_selecao=? WHERE id=?");
+    $stmt->execute([$nome, $descricao, $privacidade, password_hash($senha_raw, PASSWORD_DEFAULT), $max_selecao, $id]);
 } else {
-    $stmt = db()->prepare("UPDATE galerias SET nome=?,descricao=?,privacidade=? WHERE id=?");
-    $stmt->execute([$nome, $descricao, $privacidade, $id]);
+    $stmt = db()->prepare("UPDATE galerias SET nome=?,descricao=?,privacidade=?,max_selecao=? WHERE id=?");
+    $stmt->execute([$nome, $descricao, $privacidade, $max_selecao, $id]);
 }
 
 json_out(['status'=>'ok','mensagem'=>'Galeria atualizada.']);
