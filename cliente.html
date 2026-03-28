@@ -149,6 +149,10 @@
       .cover-left { flex: none; height: auto; padding: 40px 20px; width: 100%; max-width: 100%; box-shadow: 0 -20px 50px rgba(0,0,0,0.5); }
       .cover-right::before { background: linear-gradient(to top, rgba(10,10,20,0.95) 0%, transparent 20%); }
     }
+    @keyframes modalSlide {
+      from { transform: scale(.85) translateY(20px); opacity: 0; }
+      to   { transform: scale(1)   translateY(0);    opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -259,6 +263,38 @@
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- MODAL LIMITE DE DOWNLOADS -->
+<div id="modal-limite" style="
+  display:none; position:fixed; inset:0; z-index:500;
+  background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center;
+" onclick="if(event.target===this)fecharModalLimite()">
+  <div style="
+    background:linear-gradient(135deg,#1e1e2e,#16213e);
+    border:1px solid rgba(251,113,133,0.35);
+    border-radius:20px; padding:40px 36px; max-width:420px; width:90%;
+    text-align:center; position:relative;
+    box-shadow:0 0 60px rgba(251,113,133,0.2), 0 30px 60px rgba(0,0,0,0.5);
+    animation: modalSlide .35s cubic-bezier(.34,1.56,.64,1);
+  ">
+    <div style="font-size:3rem;margin-bottom:16px;">⚠️</div>
+    <h2 style="font-size:1.3rem;font-weight:800;color:#fca5a5;margin-bottom:12px;">Limite de downloads atingido</h2>
+    <p id="limite-msg" style="color:rgba(255,255,255,0.75);font-size:.95rem;line-height:1.6;margin-bottom:28px;"></p>
+    <div style="background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.2);border-radius:12px;padding:14px;margin-bottom:28px;">
+      <span id="limite-destaques" style="font-size:1.5rem;font-weight:900;color:#fb7185;"></span>
+      <div id="limite-sub" style="font-size:.8rem;color:rgba(255,255,255,0.5);margin-top:4px;"></div>
+    </div>
+    <button onclick="fecharModalLimite()" style="
+      background:linear-gradient(135deg,#3b82f6,#6366f1);
+      color:#fff;border:none;padding:12px 32px;border-radius:10px;
+      font-size:1rem;font-weight:700;cursor:pointer;width:100%;
+      transition:.2s;font-family:inherit;
+    " onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      Entendido, vou desmarcar
+    </button>
+  </div>
+</div>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -625,9 +661,27 @@ function atualizarContador() {
   }
 }
 
-function checarLimite() {
-  if (dlMax > 0 && dlCount >= dlMax) {
-    toast(`Limite de ${dlMax} downloads atingido.`);
+function mostrarModalLimite(selecionadas, limite) {
+  const excesso = selecionadas - limite;
+  const modal = document.getElementById('modal-limite');
+  document.getElementById('limite-msg').textContent =
+    `Você selecionou ${selecionadas} foto${selecionadas>1?'s':''}, mas o limite desta galeria é de ${limite} download${limite>1?'s':''}.`;
+  document.getElementById('limite-destaques').textContent =
+    `Desmarque ${excesso} foto${excesso>1?'s':''}!`;
+  document.getElementById('limite-sub').textContent =
+    `Remova ${excesso} foto${excesso>1?'s':''} da seleção para continuar o download.`;
+  modal.style.display = 'flex';
+}
+
+function fecharModalLimite() {
+  document.getElementById('modal-limite').style.display = 'none';
+}
+
+function checarLimite(qtdSelecionadas) {
+  if (dlMax <= 0) return true; // sem limite
+  const qtd = qtdSelecionadas ?? selecionadas.size;
+  if (qtd > dlMax) {
+    mostrarModalLimite(qtd, dlMax);
     return false;
   }
   return true;
