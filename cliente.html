@@ -730,6 +730,18 @@
       white-space: nowrap;
       color: #fff;
     }
+    #btn-cover-dl {
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 1.1rem;
+      transition: .2s;
+    }
+
+    #btn-cover-dl:hover {
+      background: var(--surface);
+    }
   </style>
 </head>
 
@@ -767,8 +779,7 @@
           style="border-radius:10px;padding:16px;font-size:1.1rem;background:#fff;color:#000">
           <i class="fa-solid fa-images"></i> VER FOTOS
         </button>
-        <button class="btn tbtn-outline" id="btn-cover-dl" onclick="baixarZipTodas()"
-          style="border-color:rgba(255,255,255,0.2);color:#fff;border-radius:10px;padding:16px;font-size:1.1rem;display:none">
+        <button class="btn tbtn-outline" id="btn-cover-dl" onclick="baixarZipTodas()" style="display:none">
           <i class="fa-solid fa-download"></i> DOWNLOAD
         </button>
       </div>
