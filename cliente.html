@@ -94,6 +94,21 @@
     .foto-item:hover .dl-btn{opacity:1}
     .foto-item .dl-btn:hover{background:var(--primary);border-color:var(--primary)}
     @media(max-width: 800px) { .foto-item .dl-btn { opacity: 0.8; } .foto-item .sel-check { opacity:1; } }
+    /* ── BADGE BAIXADA ────────────────────────────────── */
+    .foto-baixada-badge{
+      position:absolute;bottom:8px;left:8px;z-index:3;
+      background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);
+      backdrop-filter:blur(8px);color:#34d399;
+      font-size:.62rem;font-weight:700;letter-spacing:.04em;
+      padding:3px 9px;border-radius:20px;
+      display:flex;align-items:center;gap:5px;
+      pointer-events:none;text-transform:uppercase;
+      animation:fadeInBadge .5s ease;
+    }
+    @keyframes fadeInBadge {
+      from{opacity:0;transform:translateY(4px)}
+      to  {opacity:1;transform:translateY(0)}
+    }
     /* ── MUSIC ── */
     #music-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,20,.95);
       backdrop-filter:blur(16px);border-top:1px solid var(--border);
@@ -415,13 +430,18 @@ async function carregarFotos(isFromCover = false) {
       return;
     }
     grid.innerHTML = FOTOS.map((f,i) => {
-      const src = '/' + f.caminho_arquivo;
+      const src  = '/' + f.caminho_arquivo;
       const nome = f.nome_arquivo || 'foto_' + f.id;
       if (f.selecionada) selecionadas.add(f.id);
+      const jaiBaixada = getBaixadas().has(String(f.id));
       return `
-        <div class="foto-item ${f.selecionada ? 'selected' : ''}" data-id="${f.id}" data-idx="${i}" onclick="clicarFoto(event,${i})">
+        <div class="foto-item ${f.selecionada ? 'selected' : ''}" data-id="${f.id}" data-idx="${i}" id="foto-${f.id}" onclick="clicarFoto(event,${i})">
           <img src="${src}" alt="${nome}" loading="lazy">
           <div class="sel-check"><i class="fa-solid fa-check"></i></div>
+          ${jaiBaixada ? `
+          <div class="foto-baixada-badge">
+            <i class="fa-solid fa-circle-check"></i> Baixada
+          </div>` : ''}
           ${(GALERIA.entrega_em_alta == 1) ? `
           <button class="dl-btn" onclick="event.stopPropagation();baixarFoto(${f.id})" title="Baixar">
             <i class="fa-solid fa-download"></i>
@@ -704,13 +724,41 @@ function checarLimite(qtdFotos) {
 }
 
 
+// ── FOTOS BAIXADAS (localStorage por galeria) ──────────────────
+function _baixadasKey() {
+  return `baixadas_${GALERIA?.id}`;
+}
+function getBaixadas() {
+  return new Set(JSON.parse(localStorage.getItem(_baixadasKey()) || '[]'));
+}
+function marcarBaixadas(ids) {
+  const s = getBaixadas();
+  ids.forEach(id => s.add(String(id)));
+  localStorage.setItem(_baixadasKey(), JSON.stringify([...s]));
+  aplicarBadgesBaixadas();
+}
+function aplicarBadgesBaixadas() {
+  const baixadas = getBaixadas();
+  FOTOS.forEach(f => {
+    const card = document.getElementById(`foto-${f.id}`);
+    if (!card) return;
+    const jaTemBadge = card.querySelector('.foto-baixada-badge');
+    if (baixadas.has(String(f.id)) && !jaTemBadge) {
+      const badge = document.createElement('div');
+      badge.className = 'foto-baixada-badge';
+      badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Baixada';
+      card.appendChild(badge);
+    }
+  });
+}
+
 async function baixarFoto(fotoId) {
-  if (!checarLimite(1)) return;  // 1 foto por vez
+  if (!checarLimite(1)) return;
   const url = `/api/fotos/download.php?foto_id=${fotoId}&token=${TOKEN}`;
   const a = document.createElement('a');
   a.href = url; a.download = ''; document.body.appendChild(a); a.click(); a.remove();
-  dlCount++;
-  atualizarContador();
+  dlCount++; atualizarContador();
+  marcarBaixadas([fotoId]); // ✔ marca como baixada
   toast('Download iniciado!');
 }
 
@@ -732,6 +780,7 @@ async function baixarZipSelecionadas() {
     a.href = url; a.download = GALERIA.nome + '_selecionadas.zip';
     a.click(); URL.revokeObjectURL(url);
     dlCount += selecionadas.size; atualizarContador();
+    marcarBaixadas([...selecionadas]); // ✔ marca todas como baixadas
     toast('ZIP baixado!');
   } else {
     // 403 = limite do backend atingido → mostra modal correto
@@ -760,6 +809,7 @@ async function baixarZipTodas() {
     a.href = url; a.download = GALERIA.nome + '_todas.zip';
     a.click(); URL.revokeObjectURL(url);
     dlCount += FOTOS.length; atualizarContador();
+    marcarBaixadas(FOTOS.map(f => f.id)); // ✔ marca todas como baixadas
     toast('ZIP baixado!');
   } else {
     const err = await r.json().catch(()=>({mensagem:null}));
