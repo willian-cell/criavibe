@@ -249,7 +249,12 @@
 <div id="music-bar" style="display:none">
   <i class="fa-solid fa-music" style="color:var(--primary)"></i>
   <span class="music-title" id="music-title"></span>
-  <audio id="audio-player" controls autoplay></audio>
+  <!-- Player para MP3 -->
+  <audio id="audio-player" controls autoplay style="flex:1;height:32px;min-width:0"></audio>
+  <!-- Container para YouTube IFrame (escondido visualmente mas funcional) -->
+  <div id="yt-player-container" style="display:none; width:1px; height:1px; overflow:hidden; position:absolute; pointer-events:none;">
+    <div id="yt-player"></div>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -391,6 +396,11 @@ async function carregarFotos(isFromCover = false) {
   }
 }
 
+// YouTube IFrame API global instance
+let ytPlayer = null;
+let ytReady  = false;
+window.onYouTubeIframeAPIReady = function() { ytReady = true; };
+
 async function carregarMusica() {
   // musicas_ativas é o campo correto do banco (não player_ativo)
   if (GALERIA.musicas_ativas != 1) return;
@@ -399,28 +409,97 @@ async function carregarMusica() {
     const d = await r.json();
     const musicas = d.musicas || [];
     if (!musicas.length) return;
+
     const bar   = document.getElementById('music-bar');
     const audio = document.getElementById('audio-player');
     const title = document.getElementById('music-title');
     bar.style.display = 'flex';
     document.getElementById('gallery').style.paddingBottom = '80px';
+
     let idx = 0;
-    function tocarMusica(i) {
-      const m = musicas[i];
-      title.textContent = m.titulo || m.nome_arquivo || 'Música';
-      if (m.url_youtube) {
-        audio.style.display = 'none';
+
+    function isYoutube(m) {
+      return m.nome_arquivo === 'youtube' ||
+             (m.caminho_arquivo && m.caminho_arquivo.includes('youtube'));
+    }
+
+    function extrairVideoId(url) {
+      const m = url.match(/(?:v=|youtu\.be\/)([\w-]{11})/);
+      return m ? m[1] : null;
+    }
+
+    function tocarYoutube(videoId, nomeExibicao) {
+      audio.pause();
+      audio.style.display = 'none';
+      document.getElementById('yt-player-container').style.display = 'block';
+      title.textContent = nomeExibicao || 'YouTube';
+
+      function iniciarPlayer() {
+        if (ytPlayer && ytPlayer.loadVideoById) {
+          ytPlayer.loadVideoById(videoId);
+        } else {
+          ytPlayer = new YT.Player('yt-player', {
+            videoId: videoId,
+            playerVars: { autoplay: 1, controls: 0, loop: 1, playsinline: 1, rel: 0, enablejsapi: 1 },
+            events: {
+              onStateChange: (e) => {
+                // Quando terminar, toca próxima
+                if (e.data === YT.PlayerState.ENDED) {
+                  idx = (idx + 1) % musicas.length;
+                  tocarMusica(idx);
+                }
+              }
+            }
+          });
+        }
+      }
+
+      if (ytReady) {
+        iniciarPlayer();
       } else {
-        audio.src = '/' + m.caminho_arquivo;
-        audio.play().catch(()=>{});
+        // Aguarda YT API carregar
+        const poll = setInterval(() => {
+          if (ytReady) { clearInterval(poll); iniciarPlayer(); }
+        }, 200);
       }
     }
+
+    function tocarMp3(m) {
+      if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
+      document.getElementById('yt-player-container').style.display = 'none';
+      audio.style.display = 'flex';
+      audio.src = '/' + m.caminho_arquivo;
+      title.textContent = m.nome_exibicao || m.nome_arquivo || 'Música';
+      audio.play().catch(()=>{});
+    }
+
+    function tocarMusica(i) {
+      const m = musicas[i];
+      if (isYoutube(m)) {
+        const vid = extrairVideoId(m.caminho_arquivo);
+        if (vid) tocarYoutube(vid, m.nome_exibicao || m.nome_arquivo);
+      } else {
+        tocarMp3(m);
+      }
+    }
+
     audio.addEventListener('ended', () => {
       idx = (idx + 1) % musicas.length;
       tocarMusica(idx);
     });
+
+    // Carrega YouTube IFrame API se ainda não está presente
+    if (!document.getElementById('yt-api-script')) {
+      const s = document.createElement('script');
+      s.id  = 'yt-api-script';
+      s.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(s);
+    }
+
     tocarMusica(0);
-  } catch {}
+  } catch(err) {
+    console.warn('Erro ao carregar música:', err);
+  }
 }
 
 // ── SELECTION ─────────────────────────────────────────────────
