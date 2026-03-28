@@ -19,6 +19,34 @@
       0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,.5); }
       50%       { box-shadow: 0 0 0 6px rgba(124,58,237,0); }
     }
+    /* ── THUMB ZOOM ──────────────────────────────── */
+    .thumb-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .thumb-wrap .zoom-preview {
+      display: none;
+      position: absolute;
+      left: 52px;
+      top: 50%;
+      transform: translateY(-50%) scale(.92);
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.55);
+      border: 2px solid rgba(255,255,255,.18);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity .2s ease, transform .2s ease;
+      pointer-events: none;
+    }
+    .thumb-wrap:hover .zoom-preview,
+    .thumb-wrap:focus-within .zoom-preview {
+      display: block;
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
   </style>
 </head>
 <body>
@@ -212,7 +240,10 @@ function renderGalerias(lista) {
     <tr data-nome="${g.nome.toLowerCase()}">
       <td>
         ${g.thumb
-          ? `<img class="gallery-thumb" src="/${g.thumb}" alt="${g.nome}">`
+          ? `<div class="thumb-wrap">
+               <img class="gallery-thumb" src="/${g.thumb}" alt="${g.nome}">
+               <img class="zoom-preview" src="/${g.thumb}" alt="${g.nome}">
+             </div>`
           : `<div class="gallery-thumb-empty"><i class="fa-solid fa-image"></i></div>`}
       </td>
       <td>
