@@ -802,19 +802,30 @@
     }
 
     .cover-logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--text), var(--primary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 40px;
+      margin-bottom: 50px;
+    }
+
+    .cover-logo img {
+      max-width: 180px;
+      height: auto;
+      filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+    }
+
+    .cover-welcome {
+      font-size: 1.25rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
     }
 
     .cover-title {
-      font-size: 2.8rem;
+      font-size: 4.5rem;
       font-weight: 800;
       margin-bottom: 12px;
-      line-height: 1.1;
+      line-height: 1.0;
+      color: #fff;
+      text-transform: capitalize;
     }
 
     .cover-count {
@@ -938,8 +949,9 @@
   <div id="cover-screen" style="display:none;position:fixed;inset:0;z-index:150;">
     <!-- Left Content Panel -->
     <div class="cover-left">
-      <div class="cover-logo">✦ CriaVibe</div>
-      <h1 id="cover-title" class="cover-title">Bem-vinda</h1>
+      <div class="cover-logo"><img src="/logo/logo-criavibe-fotografia.jpeg" alt="Logo CriaVibe"></div>
+      <p class="cover-welcome">Bem-vindo(a)</p>
+      <h1 id="cover-title" class="cover-title">Carregando...</h1>
       <p id="cover-count" class="cover-count">0 FOTOS</p>
 
       <div style="display:flex;flex-direction:column;gap:16px;width:100%">
@@ -966,7 +978,9 @@
         onmouseout="this.style.color='var(--text)';this.style.transform=''">
         <i class="fa-solid fa-arrow-left"></i>
       </button>
-      <div class="logo" id="logoToggle">✦ CriaVibe</div>
+      <div class="logo" id="logoToggle">
+        <img src="/logo/logo-criavibe-fotografia.jpeg" alt="Logo" style="height: 32px; width: auto; vertical-align: middle;">
+      </div>
       <div id="galeria-nome" style="margin-left:12px; font-weight:600; font-size:1rem;"></div>
     </div>
     <div style="display:flex; align-items:center; gap: 12px; font-size: 0.9rem; color: var(--muted);">
@@ -1146,7 +1160,7 @@
     // ── INIT ──────────────────────────────────────────────────────
     async function prepararCapa() {
       document.getElementById('cover-screen').style.display = 'flex';
-      document.getElementById('cover-title').textContent = 'Bem-vindo(a) ' + GALERIA.nome;
+      document.getElementById('cover-title').textContent = GALERIA.nome;
       document.title = GALERIA.nome + ' — CriaVibe';
 
       // entrega_em_alta = permite baixar fotos (campo correto do banco)
