@@ -182,7 +182,7 @@
         </div>
         <div id="n-err" class="form-error"></div>
         <div style="display:flex;gap:10px;margin-top:8px">
-          <button class="btn btn-primary" style="flex:1" onclick="criarGaleria()">
+          <button id="btn-new-save" class="btn btn-primary" style="flex:1" onclick="criarGaleria()">
             <i class="fa-solid fa-floppy-disk"></i> Criar Galeria
           </button>
           <button class="btn btn-secondary" onclick="fecharModal('modal-nova')">Cancelar</button>
@@ -229,7 +229,7 @@
         </div>
         <div id="e-err" class="form-error"></div>
         <div style="display:flex;gap:10px;margin-top:8px">
-          <button class="btn btn-primary" style="flex:1" onclick="salvarEdicao()">
+          <button id="btn-edit-save" class="btn btn-primary" style="flex:1" onclick="salvarEdicao()">
             <i class="fa-solid fa-floppy-disk"></i> Salvar Alterações
           </button>
           <button class="btn btn-secondary" onclick="fecharModal('modal-editar')">Cancelar</button>
@@ -354,18 +354,41 @@
 
     // ── Criar Galeria ─────────────────────────────────────────
     async function criarGaleria() {
+      const btn = document.getElementById('btn-new-save');
+      const original = btn.innerHTML;
       const nome = document.getElementById('n-nome').value.trim();
       const descricao = document.getElementById('n-descricao').value.trim();
       const privacidade = document.getElementById('n-privacidade').value;
       const senha = document.getElementById('n-senha').value || null;
       const err = document.getElementById('n-err');
+      
       err.classList.remove('show');
       if (!nome) { err.textContent = 'Nome obrigatório.'; err.classList.add('show'); return; }
+      
       try {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Criando...';
+        
         const d = await API.post('/galerias/create.php', { nome, descricao, privacidade, senha });
-        if (d.status === 'ok') { fecharModal('modal-nova'); showToast('Galeria criada!'); await carregarGalerias(); }
-        else { err.textContent = d.mensagem; err.classList.add('show'); }
-      } catch (e) { err.textContent = e.message; err.classList.add('show'); }
+        if (d.status === 'ok') { 
+          btn.innerHTML = '<i class="fa-solid fa-check"></i> Criada!';
+          btn.style.background = '#059669';
+          setTimeout(async () => {
+            fecharModal('modal-nova'); 
+            showToast('Galeria criada com sucesso!'); 
+            await carregarGalerias(); 
+            btn.disabled = false;
+            btn.innerHTML = original;
+            btn.style.background = '';
+          }, 800);
+        } else {
+          err.textContent = d.mensagem; err.classList.add('show');
+          btn.disabled = false; btn.innerHTML = original;
+        }
+      } catch (e) {
+        err.textContent = e.message; err.classList.add('show');
+        btn.disabled = false; btn.innerHTML = original;
+      }
     }
 
     // ── Editar Galeria ────────────────────────────────────────
@@ -387,12 +410,19 @@
     }
 
     async function salvarEdicao() {
+      const btn = document.getElementById('btn-edit-save');
+      const original = btn.innerHTML;
       const id = document.getElementById('e-id').value;
       const nome = document.getElementById('e-nome').value.trim();
       const err = document.getElementById('e-err');
+      
       err.classList.remove('show');
       if (!nome) { err.textContent = 'Nome obrigatório.'; err.classList.add('show'); return; }
+      
       try {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+
         const d = await API.post('/galerias/update.php', {
           id: parseInt(id),
           nome,
@@ -402,9 +432,27 @@
           max_downloads: parseInt(document.getElementById('e-max-dl').value) || 0,
           max_selecao: parseInt(document.getElementById('e-max-sel').value) || 0,
         });
-        if (d.status === 'ok') { fecharModal('modal-editar'); showToast('Galeria atualizada!'); await carregarGalerias(); }
-        else { err.textContent = d.mensagem; err.classList.add('show'); }
-      } catch (e) { err.textContent = e.message; err.classList.add('show'); }
+        
+        if (d.status === 'ok') { 
+          btn.innerHTML = '<i class="fa-solid fa-check"></i> Salvo!';
+          btn.style.background = '#059669';
+          
+          setTimeout(async () => {
+            fecharModal('modal-editar'); 
+            showToast('Alterações salvas com sucesso!'); 
+            await carregarGalerias(); 
+            btn.disabled = false;
+            btn.innerHTML = original;
+            btn.style.background = '';
+          }, 800);
+        } else { 
+          err.textContent = d.mensagem; err.classList.add('show'); 
+          btn.disabled = false; btn.innerHTML = original;
+        }
+      } catch (e) { 
+        err.textContent = e.message; err.classList.add('show'); 
+        btn.disabled = false; btn.innerHTML = original;
+      }
     }
 
     // ── Excluir ───────────────────────────────────────────────

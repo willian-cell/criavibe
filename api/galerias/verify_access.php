@@ -37,5 +37,5 @@ json_out([
     'status'    => 'ok',
     'galeria'   => $g,
     'dl_count'  => (int)($g['dl_count'] ?? 0),
-    'dl_max'    => (int)($g['max_selecao'] ?? 0),
+    'dl_max'    => (int)($g['max_downloads'] ?? 0),
 ]);

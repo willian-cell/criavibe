@@ -35,14 +35,54 @@ const API = {
   },
 };
 
-// Toast global
+// Toast global — Estilo Premium
 function showToast(msg, type = 'success') {
+  const existing = document.querySelectorAll('.toast');
+  existing.forEach(e => e.remove());
+
   const t = document.createElement('div');
-  t.className = 'toast';
-  t.style.background = type === 'error' ? '#dc2626' : '#1e293b';
-  t.textContent = msg;
+  t.className = `toast toast-${type}`;
+  
+  const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+  t.innerHTML = `
+    <i class="fa-solid ${icon}"></i>
+    <span>${msg}</span>
+  `;
+  
+  // Estilo dinâmico injetado se não houver no CSS
+  t.style.position = 'fixed';
+  t.style.bottom = '30px';
+  t.style.right = '30px';
+  t.style.padding = '12px 24px';
+  t.style.borderRadius = '12px';
+  t.style.background = type === 'success' ? '#059669' : '#dc2626';
+  t.style.color = '#fff';
+  t.style.display = 'flex';
+  t.style.alignItems = 'center';
+  t.style.gap = '10px';
+  t.style.boxShadow = '0 10px 25px rgba(0,0,0,0.3)';
+  t.style.zIndex = '10000';
+  t.style.animation = 'toastIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+  t.style.fontFamily = 'inherit';
+  t.style.fontSize = '0.9rem';
+  t.style.fontWeight = '600';
+
+  if (!document.getElementById('toast-style')) {
+    const s = document.createElement('style');
+    s.id = 'toast-style';
+    s.innerHTML = `
+      @keyframes toastIn { from { transform: translateX(100%) opacity: 0; } to { transform: translateX(0) opacity: 1; } }
+      .toast { transition: 0.3s; }
+    `;
+    document.head.appendChild(s);
+  }
+
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2800);
+  setTimeout(() => {
+    t.style.transform = 'translateX(120%)';
+    t.style.opacity = '0';
+    setTimeout(() => t.remove(), 300);
+  }, 3500);
 }
 
 // Fechar dropdowns ao clicar fora

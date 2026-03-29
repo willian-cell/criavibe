@@ -523,6 +523,17 @@
       border-color: rgba(59, 130, 246, 0.4);
     }
 
+    /* ── Efeito de Opacidade ao atingir o limite de seleção ── */
+    #gallery.selection-limit-reached .foto-item:not(.selected) {
+      filter: grayscale(0.8) brightness(0.35);
+      transition: filter 0.5s ease, opacity 0.5s ease;
+      cursor: not-allowed;
+    }
+
+    #gallery.selection-limit-reached .foto-item:not(.selected) img {
+      opacity: 0.5;
+    }
+
     @keyframes fadeInBadge {
       from {
         opacity: 0;
@@ -1544,7 +1555,16 @@
 
     function atualizarToolbar() {
       const n = selecionadas.size;
+      const maxSel = parseInt(GALERIA.max_selecao) || 0;
       const isGalleryVisible = document.getElementById('gallery').style.display !== 'none';
+
+      // Gerencia o feedback visual de limite atingido na galeria
+      const galleryEl = document.getElementById('gallery');
+      if (maxSel > 0 && n >= maxSel) {
+        galleryEl.classList.add('selection-limit-reached');
+      } else {
+        galleryEl.classList.remove('selection-limit-reached');
+      }
 
       // Botão "Baixar Selecionadas" na toolbar superior
       const btnZipSel = document.getElementById('btn-zip-sel');
