@@ -518,13 +518,21 @@
 
     /* Manter a borda apenas para CAPA */
     .foto-item.selected {
-       border-width: 1px; /* Diminui a borda de seleção na grid */
-       border-color: rgba(59, 130, 246, 0.4); 
+      border-width: 1px;
+      /* Diminui a borda de seleção na grid */
+      border-color: rgba(59, 130, 246, 0.4);
     }
 
     @keyframes fadeInBadge {
-      from { opacity: 0; transform: translateY(4px) }
-      to { opacity: 1; transform: translateY(0) }
+      from {
+        opacity: 0;
+        transform: translateY(4px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
     }
 
     /* ── MUSIC ── */
@@ -583,7 +591,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
       z-index: 350;
     }
 
@@ -599,7 +607,7 @@
       gap: 2px;
       margin-left: 10px;
       font-size: 0.75rem;
-      color: rgba(255,255,255,0.7);
+      color: rgba(255, 255, 255, 0.7);
     }
 
     .lb-meta span {
@@ -681,7 +689,8 @@
 
     #lb-img {
       max-width: 92vw;
-      max-height: 85vh; /* Diminuído para dar espaço à barra superior */
+      max-height: 85vh;
+      /* Diminuído para dar espaço à barra superior */
       object-fit: contain;
       border-radius: 6px
     }
@@ -803,12 +812,13 @@
 
     .cover-logo {
       margin-bottom: 50px;
+      border-radius: 50%;
     }
 
     .cover-logo img {
       max-width: 180px;
       height: auto;
-      filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
     }
 
     .cover-welcome {
@@ -900,7 +910,8 @@
       gap: 20px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
       z-index: 200;
-      color: #fff; /* Texto sempre branco no fundo escuro */
+      color: #fff;
+      /* Texto sempre branco no fundo escuro */
     }
 
     #floating-count {
@@ -909,6 +920,7 @@
       white-space: nowrap;
       color: #fff;
     }
+
     #btn-cover-dl {
       border: 1px solid var(--border);
       color: var(--text);
@@ -979,7 +991,8 @@
         <i class="fa-solid fa-arrow-left"></i>
       </button>
       <div class="logo" id="logoToggle">
-        <img src="/logo/logo-criavibe-fotografia.jpeg" alt="Logo" style="height: 32px; width: auto; vertical-align: middle;">
+        <img src="/logo/logo-criavibe-fotografia.jpeg" alt="Logo"
+          style="height: 32px; width: auto; vertical-align: middle;">
       </div>
       <div id="galeria-nome" style="margin-left:12px; font-weight:600; font-size:1rem;"></div>
     </div>
@@ -1036,7 +1049,7 @@
           <i class="fa-solid fa-download"></i> BAIXAR
         </button>
       </div>
-      
+
       <div class="lb-meta">
         <span id="lb-stat-foto">
           <i class="fa-solid fa-download"></i> Foto baixada: <b>0 vez</b>
@@ -1046,7 +1059,8 @@
         </span>
       </div>
 
-      <button id="lb-close" onclick="fecharLightbox()" style="position:static; padding:8px 12px; background:rgba(255,255,255,0.1); border:none; color:#fff; font-size:1.3rem; cursor:pointer; border-radius:8px;">✕</button>
+      <button id="lb-close" onclick="fecharLightbox()"
+        style="position:static; padding:8px 12px; background:rgba(255,255,255,0.1); border:none; color:#fff; font-size:1.3rem; cursor:pointer; border-radius:8px;">✕</button>
     </div>
 
     <button class="lb-btn" id="lb-prev" onclick="navLightbox(-1)">‹</button>
@@ -1209,7 +1223,7 @@
 
       // Garante que a barra de seleção apareça se houver fotos já selecionadas
       atualizarToolbar();
-      
+
       // Inicia polling automático de atualizações
       iniciarPolling();
     }
@@ -1235,7 +1249,7 @@
         // Usamos MMC (LCM) para garantir que ambos caibam perfeitamente
         const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
         const lcm = (a, b) => (a * b) / gcd(a, b);
-        
+
         const totalCols = lcm(QTD_V, QTD_H);
         const spanV = totalCols / QTD_V;
         const spanH = totalCols / QTD_H;
@@ -1591,8 +1605,8 @@
       const url = `/api/fotos/download.php?foto_id=${fotoId}&token=${TOKEN}`;
       const a = document.createElement('a');
       a.href = url; a.download = ''; document.body.appendChild(a); a.click(); a.remove();
-      
-      dlCount++; 
+
+      dlCount++;
       atualizarContador();
       marcarBaixadas([fotoId]); // ✔ marca como baixada
 
@@ -1688,8 +1702,8 @@
               // Atualiza o objeto FOTOS local para manter paridade com o db
               const idx = FOTOS.findIndex(x => x.id === f.id);
               if (idx !== -1) {
-                 FOTOS[idx].selecionada = f.selecionada;
-                 FOTOS[idx].is_capa = f.is_capa;
+                FOTOS[idx].selecionada = f.selecionada;
+                FOTOS[idx].is_capa = f.is_capa;
               }
             });
           }
@@ -1718,14 +1732,14 @@
     async function definirCapa() {
       const foto = FOTOS[lbIndex];
       const btn = document.getElementById('lb-capa');
-      
+
       FOTOS.forEach(f => f.is_capa = 0);
       foto.is_capa = 1;
-      
+
       document.querySelectorAll('.foto-item').forEach(el => el.classList.remove('is-capa'));
       document.getElementById(`foto-${foto.id}`)?.classList.add('is-capa');
       atualizarControlesLightbox();
-      
+
       try {
         await fetch('/api/fotos/set_capa.php', {
           method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
@@ -1736,15 +1750,15 @@
     }
 
     function toggleSelecaoDeDentroDoLightbox() {
-        toggleSelecao(lbIndex);
-        atualizarControlesLightbox();
+      toggleSelecao(lbIndex);
+      atualizarControlesLightbox();
     }
 
     function atualizarControlesLightbox() {
       const foto = FOTOS[lbIndex];
       const btnCapa = document.getElementById('lb-capa');
       const btnSel = document.getElementById('lb-select-btn');
-      
+
       // Botão Capa
       if (foto.is_capa == 1) {
         btnCapa.innerHTML = '<i class="fa-solid fa-star"></i> ESTA É A CAPA';
@@ -1767,11 +1781,11 @@
       const nSel = selecionadas.size;
       const tTot = FOTOS.length;
       const downloadsFoto = foto.downloads || 0;
-      
-      document.getElementById('lb-stat-foto').innerHTML = 
+
+      document.getElementById('lb-stat-foto').innerHTML =
         `<i class="fa-solid fa-download"></i> Foto baixada: <b>${downloadsFoto} vez${downloadsFoto != 1 ? 'es' : ''}</b>`;
-      
-      document.getElementById('lb-stat-galeria').innerHTML = 
+
+      document.getElementById('lb-stat-galeria').innerHTML =
         `<i class="fa-solid fa-images"></i> Galeria: <b>${dlCount}/${dlMax || '∞'} baixadas • ${nSel}/${tTot} selecionadas</b>`;
     }
 
