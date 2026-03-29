@@ -566,49 +566,62 @@
       white-space: nowrap
     }
 
-    /* ── LIGHTBOX BASE ── */
+    /* ── LIGHTBOX DEFINITIVE UI ── */
     #lightbox {
       display: none;
       position: fixed;
       inset: 0;
-      background: #050505;
-      z-index: 300;
+      background: #000;
+      z-index: 900; /* Prioridade máxima */
       flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      overflow: hidden;
     }
 
-    #lightbox.open {
-      display: flex;
-    }
+    #lightbox.open { display: flex; }
 
-    /* ── LIGHTBOX TOPBAR ── */
     #lb-topbar {
-      flex: 0 0 auto;
-      width: 100%;
-      padding: 0 20px;
+      flex: 0 0 70px;
       height: 70px;
+      padding: 0 20px;
+      background: #0a0c10;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #0a0c10;
-      border-bottom: 2px solid #332b1a; /* Linha dourada escura sutil */
-      z-index: 350;
-      gap: 10px;
+      border-bottom: 2px solid #332b1a;
+      z-index: 1000;
+      position: relative;
     }
 
     .lb-controls-left {
       display: flex;
       align-items: center;
       height: 100%;
+      flex: 1;
     }
 
     .lb-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      margin-right: 15px;
-      font-size: 0.72rem;
-      color: rgba(255, 255, 255, 0.6);
+      flex: 0 0 auto;
       text-align: right;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.6);
+      margin-right: 20px;
+      line-height: 1.4;
+    }
+
+    .lb-meta b { color: #fff; font-weight: 500; }
+
+    .lb-main-content {
+      flex: 1;
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 30px;
+      background: #000;
     }
 
     .lb-meta span {
@@ -621,50 +634,49 @@
       color: #fff;
     }
 
-    /* Botões Flat Estilo Premium */
+    /* Buttons */
     #lb-capa, #lb-select-btn, #lb-dl-btn {
-      background: transparent;
-      border: none;
-      color: #fff;
-      padding: 0 20px;
-      height: 100%;
+      background: transparent !important;
+      border: none !important;
+      height: 100% !important;
+      padding: 0 24px !important;
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 10px;
+      color: #fff;
       transition: 0.2s;
-      border-right: 1px solid rgba(255,255,255,0.1);
-      letter-spacing: 0.5px;
+      border-right: 1px solid rgba(255,255,255,0.08) !important;
+      position: static !important; /* Force static */
+      transform: none !important;
     }
 
-    #lb-capa { color: #ccac5d; } /* Dourado do exemplo */
-    #lb-capa:hover { background: rgba(204, 172, 93, 0.1); }
-    
-    #lb-dl-btn { color: #d1d1d1; }
-    #lb-dl-btn:hover { background: rgba(255,255,255,0.05); }
+    #lb-capa { color: #ccac5d !important; }
+    #lb-capa:hover { background: rgba(204,172,93,0.1) !important; }
 
-    #lb-select-btn { border-right: 1px solid rgba(255,255,255,0.1); color: #d1d1d1; }
-    #lb-select-btn.selected { color: #8ab4f8; }
+    #lb-dl-btn { color: #d1d1d1 !important; }
+    #lb-dl-btn:hover { background: rgba(255,255,255,0.05) !important; }
+
+    #lb-select-btn { border-right: 1px solid rgba(255,255,255,0.1) !important; color: #d1d1d1; }
+    #lb-select-btn.selected { color: #8ab4f8 !important; }
 
     #lb-close {
       background: transparent;
       border: none;
-      color: rgba(255,255,255,0.5);
-      font-size: 1.5rem;
+      color: #777;
+      font-size: 1.8rem;
+      width: 50px;
+      height: 50px;
       cursor: pointer;
-      transition: 0.2s;
-      padding: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: 0.2s;
     }
 
-    #lb-close:hover {
-      color: #fff;
-      transform: scale(1.1);
-    }
+    #lb-close:hover { color: #fff; transform: scale(1.1); }
 
     /* Ocultar o antigo lb-dl da parte inferior */
     #lb-dl {
@@ -675,7 +687,8 @@
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      border-radius: 8px;
+      border-radius: 4px;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.8);
     }
 
     .lb-btn {
@@ -708,41 +721,45 @@
     @media (max-width: 800px) {
       #lb-topbar {
         height: auto;
-        padding: 10px;
+        padding: 5px 10px;
         flex-direction: column;
-        align-items: flex-start;
+        gap: 0;
       }
 
       .lb-controls-left {
         width: 100%;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        padding-bottom: 5px;
-        margin-bottom: 5px;
-        height: 45px;
+        height: 50px;
+        order: 2;
+        border-top: 1px solid rgba(255,255,255,0.05);
       }
 
       #lb-capa, #lb-select-btn, #lb-dl-btn {
-        padding: 0 10px;
-        font-size: 0.75rem;
+        padding: 0 10px !important;
+        font-size: 0.7rem;
         flex: 1;
-        border-right: 1px solid rgba(255,255,255,0.05);
+        justify-content: center;
       }
 
       .lb-meta {
         width: 100%;
-        text-align: left;
-        margin-right: 0;
-      }
-
-      .lb-meta span {
-        justify-content: flex-start;
+        text-align: center;
+        margin: 0;
+        padding: 10px 0;
+        order: 1;
       }
 
       #lb-close {
         position: absolute;
-        top: 5px;
-        right: 5px;
+        top: 4px;
+        right: 4px;
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
       }
+
+      .lb-main-content { padding: 10px; }
+      #lb-prev { left: 5px; }
+      #lb-next { right: 5px; }
     }
 
     #lb-dl {
