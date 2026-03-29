@@ -522,6 +522,57 @@
        border-color: rgba(59, 130, 246, 0.4); 
     }
 
+    @keyframes fadeInBadge {
+      from { opacity: 0; transform: translateY(4px) }
+      to { opacity: 1; transform: translateY(0) }
+    }
+
+    /* ── MUSIC ── */
+    #music-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      padding: 10px 5vw;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 50
+    }
+
+    #music-bar audio {
+      flex: 1;
+      height: 32px;
+      min-width: 0
+    }
+
+    #music-bar .music-title {
+      font-size: .8rem;
+      color: var(--muted);
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    /* ── LIGHTBOX BASE ── */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .95);
+      z-index: 300;
+      align-items: center;
+      justify-content: center
+    }
+
+    #lightbox.open {
+      display: flex
+    }
+
     /* ── LIGHTBOX CONTROLS (Nova Topbar) ── */
     #lb-topbar {
       position: absolute;
@@ -1626,8 +1677,7 @@
       }, 30000);
     }
 
-    // ── LIGHTBOX ─────────────────────────────────────────────────
-    // ── LIGHTBOX ──
+    // ── LIGHTBOX ───────────────────────────────────────────────
     function abrirLightbox(idx) {
       lbIndex = idx;
       document.getElementById('lb-img').src = '/' + FOTOS[idx].caminho_arquivo;
