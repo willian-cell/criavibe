@@ -39,7 +39,10 @@ $dl_count = (int)$g['dl_count'];
 if ($max > 0 && $dl_count >= $max)
     json_out(['status'=>'erro','mensagem'=>"Limite de $max downloads atingido para esta galeria."], 403);
 
-// Incrementa contador no banco (persistente)
+// Incrementa contador na imagem específica
+db()->prepare("UPDATE imagens SET downloads = downloads + 1 WHERE id = ?")->execute([$foto_id]);
+
+// Incrementa contador no banco (persistente na galeria geral)
 db()->prepare("UPDATE galerias SET dl_count = dl_count + 1 WHERE id = ?")->execute([$gid]);
 
 // Serve o arquivo

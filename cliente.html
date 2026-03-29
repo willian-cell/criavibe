@@ -508,67 +508,129 @@
       animation: fadeInBadge .5s ease;
     }
 
-    @keyframes fadeInBadge {
-      from {
-        opacity: 0;
-        transform: translateY(4px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
+    /* ── GRID CLEANER (Oculta marcações na galeria) ── */
+    .foto-item .sel-check,
+    .foto-item .dl-btn,
+    .foto-item .foto-baixada-badge,
+    .foto-item.is-capa::before {
+      display: none !important;
     }
 
-    /* ── MUSIC ── */
-    #music-bar {
-      position: fixed;
-      bottom: 0;
+    /* Manter a borda apenas para CAPA */
+    .foto-item.selected {
+       border-width: 1px; /* Diminui a borda de seleção na grid */
+       border-color: rgba(59, 130, 246, 0.4); 
+    }
+
+    /* ── LIGHTBOX CONTROLS (Nova Topbar) ── */
+    #lb-topbar {
+      position: absolute;
+      top: 0;
       left: 0;
       right: 0;
-      background: var(--bg);
-      backdrop-filter: blur(16px);
-      border-top: 1px solid var(--border);
-      padding: 10px 5vw;
+      padding: 16px 20px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      z-index: 50
+      justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+      z-index: 350;
     }
 
-    #music-bar audio {
-      flex: 1;
-      height: 32px;
-      min-width: 0
-    }
-
-    #music-bar .music-title {
-      font-size: .8rem;
-      color: var(--muted);
-      max-width: 180px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap
-    }
-
-    /* ── LIGHTBOX ── */
-    #lightbox {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .95);
-      z-index: 300;
+    .lb-controls-left {
+      display: flex;
       align-items: center;
-      justify-content: center
+      gap: 10px;
     }
 
-    #lightbox.open {
-      display: flex
+    .lb-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-left: 10px;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .lb-meta span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .lb-meta b {
+      color: #fff;
+    }
+
+    /* Botão CAPA (Atualizado) */
+    #lb-capa {
+      background: linear-gradient(135deg, #ffd700, #b8860b);
+      color: #000;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+      transition: 0.2s;
+    }
+
+    /* Botão SELEÇÃO */
+    #lb-select-btn {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(10px);
+      transition: 0.2s;
+    }
+
+    #lb-select-btn.selected {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Botão DOWNLOAD */
+    #lb-dl-btn {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(10px);
+      transition: 0.2s;
+    }
+
+    #lb-dl-btn:hover {
+      background: #22c55e;
+      border-color: #22c55e;
+    }
+
+    /* Ocultar o antigo lb-dl da parte inferior */
+    #lb-dl {
+      display: none !important;
     }
 
     #lb-img {
       max-width: 92vw;
-      max-height: 90vh;
+      max-height: 85vh; /* Diminuído para dar espaço à barra superior */
       object-fit: contain;
       border-radius: 6px
     }
@@ -897,16 +959,34 @@
 
   <!-- LIGHTBOX -->
   <div id="lightbox">
-    <button id="lb-close" onclick="fecharLightbox()">✕</button>
-    <button id="lb-capa" onclick="definirCapa()">
-      <i class="fa-solid fa-star"></i> CAPA
-    </button>
+    <div id="lb-topbar">
+      <div class="lb-controls-left">
+        <button id="lb-capa" onclick="definirCapa()">
+          <i class="fa-solid fa-star"></i> CAPA
+        </button>
+        <button id="lb-select-btn" onclick="toggleSelecaoDeDentroDoLightbox()">
+          <i class="fa-solid fa-check"></i> SELECIONAR
+        </button>
+        <button id="lb-dl-btn" onclick="baixarFotoAtual()">
+          <i class="fa-solid fa-download"></i> BAIXAR
+        </button>
+      </div>
+      
+      <div class="lb-meta">
+        <span id="lb-stat-foto">
+          <i class="fa-solid fa-download"></i> Foto baixada: <b>0 vez</b>
+        </span>
+        <span id="lb-stat-galeria">
+          <i class="fa-solid fa-images"></i> Galeria: <b>0/0 baixadas • 0/0 selecionadas</b>
+        </span>
+      </div>
+
+      <button id="lb-close" onclick="fecharLightbox()" style="position:static; padding:8px 12px; background:rgba(255,255,255,0.1); border:none; color:#fff; font-size:1.3rem; cursor:pointer; border-radius:8px;">✕</button>
+    </div>
+
     <button class="lb-btn" id="lb-prev" onclick="navLightbox(-1)">‹</button>
     <img id="lb-img" src="" alt="">
     <button class="lb-btn" id="lb-next" onclick="navLightbox(1)">›</button>
-    <button id="lb-dl" onclick="baixarFotoAtual()">
-      <i class="fa-solid fa-download"></i> Baixar
-    </button>
   </div>
 
   <!-- MUSIC BAR -->
@@ -1440,8 +1520,18 @@
       const url = `/api/fotos/download.php?foto_id=${fotoId}&token=${TOKEN}`;
       const a = document.createElement('a');
       a.href = url; a.download = ''; document.body.appendChild(a); a.click(); a.remove();
-      dlCount++; atualizarContador();
+      
+      dlCount++; 
+      atualizarContador();
       marcarBaixadas([fotoId]); // ✔ marca como baixada
+
+      // Incrementa localmente para feedback visual imediato
+      const foto = FOTOS.find(f => f.id == fotoId);
+      if (foto) {
+        foto.downloads = (parseInt(foto.downloads) || 0) + 1;
+        atualizarControlesLightbox();
+      }
+
       toast('Download iniciado!');
     }
 
@@ -1537,11 +1627,12 @@
     }
 
     // ── LIGHTBOX ─────────────────────────────────────────────────
+    // ── LIGHTBOX ──
     function abrirLightbox(idx) {
       lbIndex = idx;
       document.getElementById('lb-img').src = '/' + FOTOS[idx].caminho_arquivo;
       document.getElementById('lightbox').classList.add('open');
-      atualizarBotaoCapa();
+      atualizarControlesLightbox();
     }
 
     function fecharLightbox() {
@@ -1551,20 +1642,19 @@
     function navLightbox(dir) {
       lbIndex = (lbIndex + dir + FOTOS.length) % FOTOS.length;
       document.getElementById('lb-img').src = '/' + FOTOS[lbIndex].caminho_arquivo;
-      atualizarBotaoCapa();
+      atualizarControlesLightbox();
     }
 
     async function definirCapa() {
       const foto = FOTOS[lbIndex];
       const btn = document.getElementById('lb-capa');
       
-      // Feedback imediato
       FOTOS.forEach(f => f.is_capa = 0);
       foto.is_capa = 1;
       
       document.querySelectorAll('.foto-item').forEach(el => el.classList.remove('is-capa'));
       document.getElementById(`foto-${foto.id}`)?.classList.add('is-capa');
-      atualizarBotaoCapa();
+      atualizarControlesLightbox();
       
       try {
         await fetch('/api/fotos/set_capa.php', {
@@ -1572,23 +1662,47 @@
           body: JSON.stringify({ id: foto.id, galeria_id: GALERIA.id, token: TOKEN })
         });
         toast('Foto de capa definida!');
-      } catch (err) {
-        toast('Erro ao definir capa.', 'error');
-      }
+      } catch (err) { }
     }
 
-    function atualizarBotaoCapa() {
+    function toggleSelecaoDeDentroDoLightbox() {
+        toggleSelecao(lbIndex);
+        atualizarControlesLightbox();
+    }
+
+    function atualizarControlesLightbox() {
       const foto = FOTOS[lbIndex];
-      const btn = document.getElementById('lb-capa');
+      const btnCapa = document.getElementById('lb-capa');
+      const btnSel = document.getElementById('lb-select-btn');
+      
+      // Botão Capa
       if (foto.is_capa == 1) {
-        btn.innerHTML = '<i class="fa-solid fa-star"></i> ESTA É A CAPA';
-        btn.style.opacity = '1';
-        btn.style.background = '#ffd700';
+        btnCapa.innerHTML = '<i class="fa-solid fa-star"></i> ESTA É A CAPA';
+        btnCapa.style.background = '#ffd700';
       } else {
-        btn.innerHTML = '<i class="fa-regular fa-star"></i> DEFINIR CAPA';
-        btn.style.opacity = '0.8';
-        btn.style.background = 'linear-gradient(135deg, #ffd700, #b8860b)';
+        btnCapa.innerHTML = '<i class="fa-regular fa-star"></i> DEFINIR CAPA';
+        btnCapa.style.background = 'linear-gradient(135deg, #ffd700, #b8860b)';
       }
+
+      // Botão Seleção
+      if (selecionadas.has(foto.id)) {
+        btnSel.classList.add('selected');
+        btnSel.innerHTML = '<i class="fa-solid fa-check"></i> SELECIONADA';
+      } else {
+        btnSel.classList.remove('selected');
+        btnSel.innerHTML = '<i class="fa-regular fa-square"></i> SELECIONAR';
+      }
+
+      // Estatísticas
+      const nSel = selecionadas.size;
+      const tTot = FOTOS.length;
+      const downloadsFoto = foto.downloads || 0;
+      
+      document.getElementById('lb-stat-foto').innerHTML = 
+        `<i class="fa-solid fa-download"></i> Foto baixada: <b>${downloadsFoto} vez${downloadsFoto != 1 ? 'es' : ''}</b>`;
+      
+      document.getElementById('lb-stat-galeria').innerHTML = 
+        `<i class="fa-solid fa-images"></i> Galeria: <b>${dlCount}/${dlMax || '∞'} baixadas • ${nSel}/${tTot} selecionadas</b>`;
     }
 
     document.addEventListener('keydown', e => {
