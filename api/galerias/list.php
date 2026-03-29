@@ -2,6 +2,11 @@
 require_once __DIR__.'/../config.php';
 $u = require_fotografo();
 
+// Tenta adicionar a coluna is_capa caso ainda não exista (Lazy migration)
+try {
+    db()->exec("ALTER TABLE imagens ADD COLUMN is_capa TINYINT(1) DEFAULT 0");
+} catch (Exception $e) {}
+
 $sql = "
     SELECT g.*,
            COUNT(i.id) as total_fotos,
