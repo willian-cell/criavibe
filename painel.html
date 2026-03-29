@@ -77,6 +77,13 @@
       transform: translateY(-50%) scale(1);
       transition: opacity .22s ease, transform .22s ease, visibility 0s linear 0s;
     }
+
+    /* Realce de linha ao salvar */
+    @keyframes highlightRow {
+      0% { background: rgba(5, 150, 105, 0.2); }
+      100% { background: transparent; }
+    }
+    .row-highlight { animation: highlightRow 2s ease-out; }
   </style>
 </head>
 
@@ -375,12 +382,12 @@
           btn.style.background = '#059669';
           setTimeout(async () => {
             fecharModal('modal-nova'); 
-            showToast('Galeria criada com sucesso!'); 
+            showToast(`Galeria "${nome}" criada com sucesso!`); 
             await carregarGalerias(); 
             btn.disabled = false;
             btn.innerHTML = original;
             btn.style.background = '';
-          }, 800);
+          }, 1500);
         } else {
           err.textContent = d.mensagem; err.classList.add('show');
           btn.disabled = false; btn.innerHTML = original;
@@ -439,12 +446,22 @@
           
           setTimeout(async () => {
             fecharModal('modal-editar'); 
-            showToast('Alterações salvas com sucesso!'); 
+            showToast(`Galeria "${nome}" atualizada com sucesso!`); 
             await carregarGalerias(); 
             btn.disabled = false;
             btn.innerHTML = original;
             btn.style.background = '';
-          }, 800);
+
+            // Realce visual na linha da tabela
+            const rows = document.querySelectorAll('#gallery-tbody tr');
+            rows.forEach(r => {
+               if (r.querySelector('.gallery-name')?.textContent === nome) {
+                  r.classList.add('row-highlight');
+                  setTimeout(() => r.classList.remove('row-highlight'), 2000);
+               }
+            });
+
+          }, 1500);
         } else { 
           err.textContent = d.mensagem; err.classList.add('show'); 
           btn.disabled = false; btn.innerHTML = original;
