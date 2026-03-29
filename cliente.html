@@ -1492,8 +1492,19 @@
     function toggleSelecao(idx) {
       const id = FOTOS[idx].id;
       const el = document.querySelector(`.foto-item[data-idx="${idx}"]`);
-      if (selecionadas.has(id)) { selecionadas.delete(id); el?.classList.remove('selected'); }
-      else { selecionadas.add(id); el?.classList.add('selected'); }
+      const maxSel = parseInt(GALERIA.max_selecao) || 0;
+
+      if (!selecionadas.has(id)) {
+        if (maxSel > 0 && selecionadas.size >= maxSel) {
+          toast(`Limite de seleção atingido (${maxSel} fotos).`);
+          return;
+        }
+        selecionadas.add(id);
+        el?.classList.add('selected');
+      } else {
+        selecionadas.delete(id);
+        el?.classList.remove('selected');
+      }
       atualizarToolbar();
 
       fetch('/api/fotos/client_selecao.php', {
@@ -1503,7 +1514,12 @@
     }
 
     function selecionarTodas() {
+      const maxSel = parseInt(GALERIA.max_selecao) || 0;
+      selecionadas.clear();
+      document.querySelectorAll('.foto-item.selected').forEach(el => el.classList.remove('selected'));
+
       FOTOS.forEach((f, i) => {
+        if (maxSel > 0 && selecionadas.size >= maxSel) return;
         selecionadas.add(f.id);
         document.querySelector(`.foto-item[data-idx="${i}"]`)?.classList.add('selected');
       });
@@ -1539,7 +1555,9 @@
       if (floatingBar) {
         if (n > 0) {
           floatingBar.style.display = 'flex';
-          document.getElementById('floating-count').textContent = `${n} foto${n > 1 ? 's' : ''} selecionada${n > 1 ? 's' : ''}`;
+          const maxSel = parseInt(GALERIA.max_selecao) || 0;
+          document.getElementById('floating-count').textContent =
+            `${n} foto${n > 1 ? 's' : ''} selecionada${n > 1 ? 's' : ''}${maxSel > 0 ? ` de ${maxSel}` : ''}`;
         } else {
           floatingBar.style.display = 'none';
         }
@@ -1812,12 +1830,13 @@
       const nSel = selecionadas.size;
       const tTot = FOTOS.length;
       const downloadsFoto = foto.downloads || 0;
+      const maxSel = parseInt(GALERIA.max_selecao) || 0;
 
       document.getElementById('lb-stat-foto').innerHTML =
         `<i class="fa-solid fa-download"></i> Foto baixada: <b>${downloadsFoto} vez${downloadsFoto != 1 ? 'es' : ''}</b>`;
 
       document.getElementById('lb-stat-galeria').innerHTML =
-        `<i class="fa-solid fa-images"></i> Galeria: <b>${dlCount}/${dlMax || '∞'} baixadas • ${nSel}/${tTot} selecionadas</b>`;
+        `<i class="fa-solid fa-images"></i> Galeria: <b>${dlCount}/${dlMax || '∞'} baixadas • ${nSel}/${maxSel > 0 ? maxSel : tTot} selecionadas</b>`;
     }
 
     document.addEventListener('keydown', e => {

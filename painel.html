@@ -223,6 +223,10 @@
           <label>Limite de Downloads <small style="color:var(--muted)">(0 = ilimitado)</small></label>
           <input id="e-max-dl" class="form-control" type="number" min="0" placeholder="Ex: 50">
         </div>
+        <div class="form-group">
+          <label>Limite de Seleção <small style="color:var(--muted)">(0 = ilimitado)</small></label>
+          <input id="e-max-sel" class="form-control" type="number" min="0" placeholder="Ex: 50">
+        </div>
         <div id="e-err" class="form-error"></div>
         <div style="display:flex;gap:10px;margin-top:8px">
           <button class="btn btn-primary" style="flex:1" onclick="salvarEdicao()">
@@ -373,7 +377,8 @@
       document.getElementById('e-descricao').value = g.descricao || '';
       document.getElementById('e-privacidade').value = g.privacidade;
       document.getElementById('e-senha').value = '';
-      document.getElementById('e-max-dl').value = g.max_selecao || 0;
+      document.getElementById('e-max-dl').value = g.max_downloads || 0;
+      document.getElementById('e-max-sel').value = g.max_selecao || 0;
       document.getElementById('e-err').classList.remove('show');
       toggleSenha('e-senha-g', 'e-privacidade');
       fecharModal('modal-nova');
@@ -394,7 +399,8 @@
           descricao: document.getElementById('e-descricao').value.trim(),
           privacidade: document.getElementById('e-privacidade').value,
           senha: document.getElementById('e-senha').value || null,
-          max_selecao: parseInt(document.getElementById('e-max-dl').value) || 0,
+          max_downloads: parseInt(document.getElementById('e-max-dl').value) || 0,
+          max_selecao: parseInt(document.getElementById('e-max-sel').value) || 0,
         });
         if (d.status === 'ok') { fecharModal('modal-editar'); showToast('Galeria atualizada!'); await carregarGalerias(); }
         else { err.textContent = d.mensagem; err.classList.add('show'); }

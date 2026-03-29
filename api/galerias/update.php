@@ -15,16 +15,17 @@ $nome        = trim($body['nome'] ?? '');
 $descricao   = trim($body['descricao'] ?? '');
 $privacidade = in_array($body['privacidade']??'', ['publica','privada']) ? $body['privacidade'] : 'privada';
 $senha_raw   = $body['senha'] ?? null;
-$max_selecao = max(0, (int)($body['max_selecao'] ?? 0));
+$max_downloads = max(0, (int)($body['max_downloads'] ?? 0));
+$max_selecao  = max(0, (int)($body['max_selecao'] ?? 0));
 
 if (!$nome) json_out(['status'=>'erro','mensagem'=>'Nome obrigatório.'], 400);
 
 if ($senha_raw) {
-    $stmt = db()->prepare("UPDATE galerias SET nome=?,descricao=?,privacidade=?,senha=?,max_selecao=? WHERE id=?");
-    $stmt->execute([$nome, $descricao, $privacidade, password_hash($senha_raw, PASSWORD_DEFAULT), $max_selecao, $id]);
+    $stmt = db()->prepare("UPDATE galerias SET nome=?,descricao=?,privacidade=?,senha=?,max_downloads=?,max_selecao=? WHERE id=?");
+    $stmt->execute([$nome, $descricao, $privacidade, password_hash($senha_raw, PASSWORD_DEFAULT), $max_downloads, $max_selecao, $id]);
 } else {
-    $stmt = db()->prepare("UPDATE galerias SET nome=?,descricao=?,privacidade=?,max_selecao=? WHERE id=?");
-    $stmt->execute([$nome, $descricao, $privacidade, $max_selecao, $id]);
+    $stmt = db()->prepare("UPDATE galerias SET nome=?,descricao=?,privacidade=?,max_downloads=?,max_selecao=? WHERE id=?");
+    $stmt->execute([$nome, $descricao, $privacidade, $max_downloads, $max_selecao, $id]);
 }
 
 json_out(['status'=>'ok','mensagem'=>'Galeria atualizada.']);

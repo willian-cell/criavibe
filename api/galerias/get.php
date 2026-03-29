@@ -4,9 +4,10 @@ require_once __DIR__.'/../config.php';
 $id    = (int)($_GET['id'] ?? 0);
 $token = $_GET['token'] ?? '';
 
-// Tenta adicionar a coluna is_capa caso ainda não exista (Lazy migration)
+// Tenta adicionar a coluna is_capa e max_downloads caso ainda não existam (Lazy migration)
 try {
     db()->exec("ALTER TABLE imagens ADD COLUMN is_capa TINYINT(1) DEFAULT 0");
+    db()->exec("ALTER TABLE galerias ADD COLUMN max_downloads INT DEFAULT 0");
 } catch (Exception $e) {}
 
 if ($id) {
