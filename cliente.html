@@ -1156,6 +1156,9 @@
 
       // Carrega fotos silenciosamente para a grid e para preencher o fundo da capa
       await carregarFotos(true);
+
+      // Tocar música automaticamente na capa (se habilitada)
+      carregarMusica();
     }
 
     function irParaGaleria() {
@@ -1168,6 +1171,7 @@
       document.getElementById('toolbar').style.display = 'none';
       document.getElementById('gallery').style.display = 'none';
       document.getElementById('cover-screen').style.display = 'flex';
+      atualizarToolbar();
     }
 
     function iniciarGaleriaNav() {
@@ -1189,8 +1193,9 @@
         document.getElementById('btn-zip-all').style.display = '';
       }
 
-      // Música
-      carregarMusica();
+      // Garante que a barra de seleção apareça se houver fotos já selecionadas
+      atualizarToolbar();
+      
       // Inicia polling automático de atualizações
       iniciarPolling();
     }
@@ -1464,10 +1469,11 @@
 
     function atualizarToolbar() {
       const n = selecionadas.size;
+      const isGalleryVisible = document.getElementById('gallery').style.display !== 'none';
 
       // Botão "Baixar Selecionadas" na toolbar superior
       const btnZipSel = document.getElementById('btn-zip-sel');
-      if (btnZipSel) btnZipSel.style.display = (GALERIA.entrega_em_alta == 1 && n > 0) ? '' : 'none';
+      if (btnZipSel) btnZipSel.style.display = (GALERIA.entrega_em_alta == 1 && n > 0 && isGalleryVisible) ? '' : 'none';
 
       // Barra flutuante inferior de seleção
       const floatingBar = document.getElementById('floating-selection');
