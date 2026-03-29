@@ -31,6 +31,20 @@
       from { transform: scale(0.7); opacity:0; }
       to   { transform: scale(1);   opacity:1; }
     }
+    .photo-card.is-capa {
+      border-color: #ffd700;
+      box-shadow: 0 0 0 1px #ffd700, 0 0 16px rgba(255, 215, 0, 0.4);
+    }
+    .photo-capa-badge {
+      position:absolute;top:7px;right:7px;
+      background:linear-gradient(135deg, #ffd700, #b8860b);
+      color:#000;
+      font-size:.62rem;font-weight:800;
+      padding:3px 8px;border-radius:20px;
+      display:flex;align-items:center;gap:4px;
+      box-shadow:0 2px 8px rgba(0,0,0,.3);
+      pointer-events:none;z-index:3;
+    }
     .photo-overlay{position:absolute;bottom:0;inset-x:0;padding:6px;background:linear-gradient(to top,rgba(0,0,0,.72)0%,transparent 100%);display:flex;gap:4px;justify-content:flex-end;opacity:0;transition:opacity .2s}
     .photo-card:hover .photo-overlay{opacity:1}
     .photo-btn{width:28px;height:28px;border-radius:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:.8rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--tr);backdrop-filter:blur(4px)}
@@ -234,8 +248,9 @@ let lbIdx     = 0;
       let mudou = false;
       novasfotos.forEach(f => {
         const idx = fotos.findIndex(x => x.id === f.id);
-        if (idx !== -1 && fotos[idx].selecionada !== f.selecionada) {
+        if (idx !== -1 && (fotos[idx].selecionada !== f.selecionada || fotos[idx].is_capa !== f.is_capa)) {
           fotos[idx].selecionada = f.selecionada;
+          fotos[idx].is_capa = f.is_capa;
           mudou = true;
         }
       });
@@ -267,10 +282,14 @@ function renderFotos() {
   const grid = document.getElementById('photos-grid');
   if (!fotos.length) { grid.innerHTML='<div class="empty-state"><div class="icon"><i class="fa-solid fa-images"></i></div><p>Nenhuma foto enviada ainda.</p></div>'; return; }
   grid.innerHTML = fotos.map((f,i) => `
-    <div class="photo-card ${f.selecionada?'sel':''}" id="pc-${f.id}">
+    <div class="photo-card ${f.selecionada?'sel':''} ${f.is_capa == 1 ? 'is-capa' : ''}" id="pc-${f.id}">
       ${f.selecionada ? `
       <div class="photo-sel-badge">
         <i class="fa-solid fa-star"></i> Selecionada
+      </div>` : ''}
+      ${f.is_capa == 1 ? `
+      <div class="photo-capa-badge">
+        <i class="fa-solid fa-crown"></i> CAPA
       </div>` : ''}
       <img src="/${f.caminho_arquivo}" alt="${f.nome_arquivo}" loading="lazy" onclick="abrirLightbox(${i})">
       <div class="photo-overlay">

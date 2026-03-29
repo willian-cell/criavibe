@@ -6,6 +6,11 @@ require_once __DIR__.'/../config.php';
 $galeria_id = (int)($_GET['galeria_id'] ?? 0);
 if (!$galeria_id) json_out(['status'=>'erro','mensagem'=>'galeria_id obrigatório.'], 400);
 
+// Tenta adicionar a coluna is_capa caso ainda não exista (Lazy migration)
+try {
+    db()->exec("ALTER TABLE imagens ADD COLUMN is_capa TINYINT(1) DEFAULT 0");
+} catch (Exception $e) {}
+
 $ordem = $_GET['ordem'] ?? 'ordem';
 $col   = $ordem === 'data' ? 'enviado_em' : 'ordem';
 

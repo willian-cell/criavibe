@@ -430,6 +430,61 @@
       }
     }
 
+    /* ── CAPA (Destaque Amarelo Ouro) ── */
+    .foto-item.is-capa {
+      border-color: #ffd700 !important;
+      box-shadow: 0 0 0 1px #ffd700, 0 0 25px rgba(255, 215, 0, 0.5) !important;
+      z-index: 10;
+    }
+
+    .foto-item.is-capa::before {
+      content: 'CAPA';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: linear-gradient(135deg, #ffd700, #b8860b);
+      color: #000;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      z-index: 4;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    #lb-capa {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: linear-gradient(135deg, #ffd700, #b8860b);
+      color: #000;
+      padding: 10px 22px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 320;
+    }
+
+    #lb-capa:hover {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+    }
+
+    #lb-capa:active {
+      transform: scale(0.95);
+    }
+
+    #lb-capa .fa-star {
+      font-size: 1.1rem;
+    }
+
     /* ── BADGE BAIXADA ────────────────────────────────── */
     .foto-baixada-badge {
       position: absolute;
@@ -843,6 +898,9 @@
   <!-- LIGHTBOX -->
   <div id="lightbox">
     <button id="lb-close" onclick="fecharLightbox()">✕</button>
+    <button id="lb-capa" onclick="definirCapa()">
+      <i class="fa-solid fa-star"></i> CAPA
+    </button>
     <button class="lb-btn" id="lb-prev" onclick="navLightbox(-1)">‹</button>
     <img id="lb-img" src="" alt="">
     <button class="lb-btn" id="lb-next" onclick="navLightbox(1)">›</button>
@@ -1059,7 +1117,7 @@
           const nome = f.nome_arquivo || 'foto_' + f.id;
           const jaiBaixada = getBaixadas().has(String(f.id));
           return `
-        <div class="foto-item ${f.selecionada ? 'selected' : ''} ${f.orientacao}" data-id="${f.id}" data-idx="${i}" id="foto-${f.id}" onclick="clicarFoto(event,${i})">
+        <div class="foto-item ${f.selecionada ? 'selected' : ''} ${f.is_capa == 1 ? 'is-capa' : ''} ${f.orientacao}" data-id="${f.id}" data-idx="${i}" id="foto-${f.id}" onclick="clicarFoto(event,${i})">
           <img src="${src}" alt="${nome}" loading="lazy">
           <div class="sel-check"><i class="fa-solid fa-check"></i></div>
           ${jaiBaixada ? `
@@ -1462,8 +1520,15 @@
               const card = document.getElementById(`foto-${f.id}`);
               if (card) {
                 card.classList.toggle('selected', !!f.selecionada);
+                card.classList.toggle('is-capa', !!f.is_capa);
                 const chk = card.querySelector('.sel-check i');
                 if (chk) chk.style.opacity = f.selecionada ? '1' : '0';
+              }
+              // Atualiza o objeto FOTOS local para manter paridade com o db
+              const idx = FOTOS.findIndex(x => x.id === f.id);
+              if (idx !== -1) {
+                 FOTOS[idx].selecionada = f.selecionada;
+                 FOTOS[idx].is_capa = f.is_capa;
               }
             });
           }
@@ -1476,6 +1541,7 @@
       lbIndex = idx;
       document.getElementById('lb-img').src = '/' + FOTOS[idx].caminho_arquivo;
       document.getElementById('lightbox').classList.add('open');
+      atualizarBotaoCapa();
     }
 
     function fecharLightbox() {
@@ -1485,6 +1551,44 @@
     function navLightbox(dir) {
       lbIndex = (lbIndex + dir + FOTOS.length) % FOTOS.length;
       document.getElementById('lb-img').src = '/' + FOTOS[lbIndex].caminho_arquivo;
+      atualizarBotaoCapa();
+    }
+
+    async function definirCapa() {
+      const foto = FOTOS[lbIndex];
+      const btn = document.getElementById('lb-capa');
+      
+      // Feedback imediato
+      FOTOS.forEach(f => f.is_capa = 0);
+      foto.is_capa = 1;
+      
+      document.querySelectorAll('.foto-item').forEach(el => el.classList.remove('is-capa'));
+      document.getElementById(`foto-${foto.id}`)?.classList.add('is-capa');
+      atualizarBotaoCapa();
+      
+      try {
+        await fetch('/api/fotos/set_capa.php', {
+          method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: foto.id, galeria_id: GALERIA.id, token: TOKEN })
+        });
+        toast('Foto de capa definida!');
+      } catch (err) {
+        toast('Erro ao definir capa.', 'error');
+      }
+    }
+
+    function atualizarBotaoCapa() {
+      const foto = FOTOS[lbIndex];
+      const btn = document.getElementById('lb-capa');
+      if (foto.is_capa == 1) {
+        btn.innerHTML = '<i class="fa-solid fa-star"></i> ESTA É A CAPA';
+        btn.style.opacity = '1';
+        btn.style.background = '#ffd700';
+      } else {
+        btn.innerHTML = '<i class="fa-regular fa-star"></i> DEFINIR CAPA';
+        btn.style.opacity = '0.8';
+        btn.style.background = 'linear-gradient(135deg, #ffd700, #b8860b)';
+      }
     }
 
     document.addEventListener('keydown', e => {
