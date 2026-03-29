@@ -584,39 +584,31 @@
     #lb-topbar {
       flex: 0 0 auto;
       width: 100%;
-      padding: 12px 20px;
+      padding: 0 20px;
+      height: 70px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #0a0a0a;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      background: #0a0c10;
+      border-bottom: 2px solid #332b1a; /* Linha dourada escura sutil */
       z-index: 350;
-      gap: 15px;
-    }
-
-    .lb-main-content {
-      flex: 1;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      overflow: hidden;
+      gap: 10px;
     }
 
     .lb-controls-left {
       display: flex;
       align-items: center;
-      gap: 10px;
+      height: 100%;
     }
 
     .lb-meta {
       display: flex;
       flex-direction: column;
-      gap: 2px;
-      margin-left: 10px;
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.7);
+      gap: 1px;
+      margin-right: 15px;
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.6);
+      text-align: right;
     }
 
     .lb-meta span {
@@ -629,66 +621,49 @@
       color: #fff;
     }
 
-    /* Botão CAPA (Atualizado) */
-    #lb-capa {
-      background: linear-gradient(135deg, #ffd700, #b8860b);
-      color: #000;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 800;
+    /* Botões Flat Estilo Premium */
+    #lb-capa, #lb-select-btn, #lb-dl-btn {
+      background: transparent;
       border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
-      transition: 0.2s;
-    }
-
-    /* Botão SELEÇÃO */
-    #lb-select-btn {
-      background: rgba(59, 130, 246, 0.2);
-      border: 1px solid rgba(59, 130, 246, 0.4);
       color: #fff;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
+      padding: 0 20px;
+      height: 100%;
+      font-size: 0.85rem;
+      font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      backdrop-filter: blur(10px);
+      gap: 10px;
       transition: 0.2s;
+      border-right: 1px solid rgba(255,255,255,0.1);
+      letter-spacing: 0.5px;
     }
 
-    #lb-select-btn.selected {
-      background: #3b82f6;
-      border-color: #3b82f6;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    #lb-capa { color: #ccac5d; } /* Dourado do exemplo */
+    #lb-capa:hover { background: rgba(204, 172, 93, 0.1); }
+    
+    #lb-dl-btn { color: #d1d1d1; }
+    #lb-dl-btn:hover { background: rgba(255,255,255,0.05); }
+
+    #lb-select-btn { border-right: 1px solid rgba(255,255,255,0.1); color: #d1d1d1; }
+    #lb-select-btn.selected { color: #8ab4f8; }
+
+    #lb-close {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: 0.2s;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Botão DOWNLOAD */
-    #lb-dl-btn {
-      background: rgba(34, 197, 94, 0.2);
-      border: 1px solid rgba(34, 197, 94, 0.4);
+    #lb-close:hover {
       color: #fff;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      backdrop-filter: blur(10px);
-      transition: 0.2s;
-    }
-
-    #lb-dl-btn:hover {
-      background: #22c55e;
-      border-color: #22c55e;
+      transform: scale(1.1);
     }
 
     /* Ocultar o antigo lb-dl da parte inferior */
@@ -732,51 +707,42 @@
     /* ── MOBILE LIGHTBOX ── */
     @media (max-width: 800px) {
       #lb-topbar {
-        padding: 5px 10px;
-        flex-wrap: wrap;
-        gap: 8px;
-        justify-content: center;
+        height: auto;
+        padding: 10px;
+        flex-direction: column;
+        align-items: flex-start;
       }
 
       .lb-controls-left {
         width: 100%;
-        justify-content: space-between;
-        order: 2;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 5px;
+        margin-bottom: 5px;
+        height: 45px;
+      }
+
+      #lb-capa, #lb-select-btn, #lb-dl-btn {
+        padding: 0 10px;
+        font-size: 0.75rem;
+        flex: 1;
+        border-right: 1px solid rgba(255,255,255,0.05);
       }
 
       .lb-meta {
-        width: calc(100% - 40px);
-        order: 1;
-        margin-left: 0;
-        text-align: center;
-        align-items: center;
+        width: 100%;
+        text-align: left;
+        margin-right: 0;
+      }
+
+      .lb-meta span {
+        justify-content: flex-start;
       }
 
       #lb-close {
-        order: 3;
         position: absolute;
-        top: 8px;
-        right: 8px;
+        top: 5px;
+        right: 5px;
       }
-
-      .lb-meta span { font-size: 0.65rem; }
-      
-      #lb-capa, #lb-select-btn, #lb-dl-btn {
-        padding: 6px 12px;
-        font-size: 0.7rem;
-        flex: 1;
-        justify-content: center;
-      }
-
-      .lb-btn {
-        background: rgba(0,0,0,0.3);
-        font-size: 1.3rem;
-        width: 40px;
-        height: 40px;
-      }
-      
-      #lb-prev { left: 10px; }
-      #lb-next { right: 10px; }
     }
 
     #lb-dl {
@@ -1087,13 +1053,13 @@
     <div id="lb-topbar">
       <div class="lb-controls-left">
         <button id="lb-capa" onclick="definirCapa()">
-          <i class="fa-solid fa-star"></i> CAPA
-        </button>
-        <button id="lb-select-btn" onclick="toggleSelecaoDeDentroDoLightbox()">
-          <i class="fa-solid fa-check"></i> SELECIONAR
+          <i class="fa-solid fa-star"></i> DEFINIR CAPA
         </button>
         <button id="lb-dl-btn" onclick="baixarFotoAtual()">
           <i class="fa-solid fa-download"></i> BAIXAR
+        </button>
+        <button id="lb-select-btn" onclick="toggleSelecaoDeDentroDoLightbox()">
+          <i class="fa-solid fa-check"></i> SELECIONAR
         </button>
       </div>
 
@@ -1106,8 +1072,7 @@
         </span>
       </div>
 
-      <button id="lb-close" onclick="fecharLightbox()"
-        style="position:static; padding:8px 14px; background:rgba(255,255,255,0.08); border:none; color:#fff; font-size:1.4rem; cursor:pointer; border-radius:8px;">✕</button>
+      <button id="lb-close" onclick="fecharLightbox()">✕</button>
     </div>
 
     <div class="lb-main-content">
@@ -1811,10 +1776,10 @@
       // Botão Capa
       if (foto.is_capa == 1) {
         btnCapa.innerHTML = '<i class="fa-solid fa-star"></i> ESTA É A CAPA';
-        btnCapa.style.background = '#ffd700';
+        btnCapa.style.color = '#ccac5d';
       } else {
         btnCapa.innerHTML = '<i class="fa-regular fa-star"></i> DEFINIR CAPA';
-        btnCapa.style.background = 'linear-gradient(135deg, #ffd700, #b8860b)';
+        btnCapa.style.color = '#ccac5d';
       }
 
       // Botão Seleção
