@@ -84,6 +84,40 @@
       100% { background: transparent; }
     }
     .row-highlight { animation: highlightRow 2s ease-out; }
+
+    /* Tela de Sucesso no Modal */
+    .modal-success-screen {
+      position: absolute;
+      inset: 0;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 30px;
+      z-index: 100;
+      border-radius: var(--radius);
+      animation: modalIn .3s ease forwards;
+    }
+    .success-icon-circle {
+      width: 80px;
+      height: 80px;
+      background: #dcfce7;
+      color: #059669;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      animation: scaleCheck .5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes scaleCheck {
+      0% { transform: scale(0); }
+      90% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
   </style>
 </head>
 
@@ -205,41 +239,54 @@
         <h3><i class="fa-solid fa-pen-to-square" style="color:var(--primary)"></i> Editar Galeria</h3>
         <button class="modal-close" onclick="fecharModal('modal-editar')">&times;</button>
       </div>
-      <div class="modal-body">
-        <input type="hidden" id="e-id">
-        <div class="form-group">
-          <label>Nome da Galeria</label>
-          <input id="e-nome" class="form-control" type="text">
+      <div class="modal-body" style="position:relative; min-height: 400px;">
+        <!-- Conteúdo do Formulário -->
+        <div id="e-form-content">
+          <input type="hidden" id="e-id">
+          <div class="form-group">
+            <label>Nome da Galeria</label>
+            <input id="e-nome" class="form-control" type="text">
+          </div>
+          <div class="form-group">
+            <label>Descrição</label>
+            <textarea id="e-descricao" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Privacidade</label>
+            <select id="e-privacidade" class="form-control" onchange="toggleSenha('e-senha-g','e-privacidade')">
+              <option value="privada">Privada (com senha)</option>
+              <option value="publica">Pública</option>
+            </select>
+          </div>
+          <div class="form-group" id="e-senha-g" style="display:none">
+            <label>Nova Senha <small style="color:var(--muted)">(vazio = manter atual)</small></label>
+            <input id="e-senha" class="form-control" type="password" placeholder="Nova senha">
+          </div>
+          <div class="form-group">
+            <label>Limite de Downloads <small style="color:var(--muted)">(0 = ilimitado)</small></label>
+            <input id="e-max-dl" class="form-control" type="number" min="0" placeholder="Ex: 50">
+          </div>
+          <div class="form-group">
+            <label>Limite de Seleção <small style="color:var(--muted)">(0 = ilimitado)</small></label>
+            <input id="e-max-sel" class="form-control" type="number" min="0" placeholder="Ex: 50">
+          </div>
+          <div id="e-err" class="form-error"></div>
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button id="btn-edit-save" class="btn btn-primary" style="flex:1" onclick="salvarEdicao()">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Alterações
+            </button>
+            <button class="btn btn-secondary" onclick="fecharModal('modal-editar')">Cancelar</button>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Descrição</label>
-          <textarea id="e-descricao" class="form-control" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-          <label>Privacidade</label>
-          <select id="e-privacidade" class="form-control" onchange="toggleSenha('e-senha-g','e-privacidade')">
-            <option value="privada">Privada (com senha)</option>
-            <option value="publica">Pública</option>
-          </select>
-        </div>
-        <div class="form-group" id="e-senha-g" style="display:none">
-          <label>Nova Senha <small style="color:var(--muted)">(vazio = manter atual)</small></label>
-          <input id="e-senha" class="form-control" type="password" placeholder="Nova senha">
-        </div>
-        <div class="form-group">
-          <label>Limite de Downloads <small style="color:var(--muted)">(0 = ilimitado)</small></label>
-          <input id="e-max-dl" class="form-control" type="number" min="0" placeholder="Ex: 50">
-        </div>
-        <div class="form-group">
-          <label>Limite de Seleção <small style="color:var(--muted)">(0 = ilimitado)</small></label>
-          <input id="e-max-sel" class="form-control" type="number" min="0" placeholder="Ex: 50">
-        </div>
-        <div id="e-err" class="form-error"></div>
-        <div style="display:flex;gap:10px;margin-top:8px">
-          <button id="btn-edit-save" class="btn btn-primary" style="flex:1" onclick="salvarEdicao()">
-            <i class="fa-solid fa-floppy-disk"></i> Salvar Alterações
-          </button>
-          <button class="btn btn-secondary" onclick="fecharModal('modal-editar')">Cancelar</button>
+
+        <!-- Tela de Sucesso (Overlay) -->
+        <div id="e-success-screen" class="modal-success-screen" style="display:none">
+          <div class="success-icon-circle">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          <h3 style="margin-bottom:8px">Edição Salva!</h3>
+          <p style="color:var(--muted); font-size:0.9rem">As alterações na galeria foram aplicadas com sucesso.</p>
+          <button class="btn btn-primary" style="margin-top:25px; min-width:120px" onclick="fecharModal('modal-editar')">Entendido</button>
         </div>
       </div>
     </div>
@@ -402,6 +449,11 @@
     async function abrirEdicao(id) {
       const g = galerias.find(x => x.id == id);
       if (!g) return;
+      
+      // Resetar estado do modal
+      document.getElementById('e-form-content').style.display = '';
+      document.getElementById('e-success-screen').style.display = 'none';
+      
       document.getElementById('e-id').value = g.id;
       document.getElementById('e-nome').value = g.nome;
       document.getElementById('e-descricao').value = g.descricao || '';
@@ -444,9 +496,13 @@
           btn.innerHTML = '<i class="fa-solid fa-check"></i> Salvo!';
           btn.style.background = '#059669';
           
+          // Mostrar tela de sucesso por cima
+          setTimeout(() => {
+            document.getElementById('e-form-content').style.display = 'none';
+            document.getElementById('e-success-screen').style.display = 'flex';
+          }, 300);
+          
           setTimeout(async () => {
-            fecharModal('modal-editar'); 
-            showToast(`Galeria "${nome}" atualizada com sucesso!`); 
             await carregarGalerias(); 
             btn.disabled = false;
             btn.innerHTML = original;
@@ -460,8 +516,7 @@
                   setTimeout(() => r.classList.remove('row-highlight'), 2000);
                }
             });
-
-          }, 1500);
+          }, 2500);
         } else { 
           err.textContent = d.mensagem; err.classList.add('show'); 
           btn.disabled = false; btn.innerHTML = original;
