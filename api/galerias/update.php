@@ -3,9 +3,10 @@ require_once __DIR__.'/../config.php';
 $u = require_fotografo();
 $body = body();
 
-// Garantir que as colunas de limite existam
+// Garantir que as colunas de limite e contador existam
 try { @db()->exec("ALTER TABLE galerias ADD COLUMN max_downloads INT DEFAULT 0"); } catch(Exception $e){}
 try { @db()->exec("ALTER TABLE galerias ADD COLUMN max_selecao INT DEFAULT 0"); } catch(Exception $e){}
+try { @db()->exec("ALTER TABLE galerias ADD COLUMN dl_count INT DEFAULT 0"); } catch(Exception $e){}
 
 $id = (int)($body['id'] ?? 0);
 if (!$id) json_out(['status'=>'erro','mensagem'=>'ID inválido.'], 400);

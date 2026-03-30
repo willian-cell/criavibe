@@ -1905,9 +1905,9 @@
         if (d.status === 'ok') {
           const g = d.galeria;
           document.getElementById('galeria-title-lock').textContent = g.nome;
-          // Se galeria é pública e sem cliente vinculado, entra direto
           if (g.privacidade === 'publica' && !g.cliente_id) {
             GALERIA = g; 
+            dlCount = parseInt(g.dl_count) || 0;
             dlMax = parseInt(g.max_downloads) || 0;
             document.getElementById('lock-screen').style.display = 'none';
             prepararCapa();
