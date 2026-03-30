@@ -17,12 +17,12 @@ if (!$acesso && $token) {
 }
 if (!$acesso) json_out(['status'=>'erro','mensagem'=>'Sem acesso à galeria.'], 403);
 
-// Busca galeria — usa entrega_em_alta (campo real do banco)
-$gal = db()->prepare("SELECT entrega_em_alta, max_selecao, dl_count, nome FROM galerias WHERE id = ? LIMIT 1");
+// Busca galeria — usa entrega_em_alta (campo real do banco) e separa os limites
+$gal = db()->prepare("SELECT entrega_em_alta, max_downloads, dl_count, nome FROM galerias WHERE id = ? LIMIT 1");
 $gal->execute([$galeria_id]);
 $g = $gal->fetch();
 if (!$g || !$g['entrega_em_alta'])
-    json_out(['status'=>'erro','mensagem'=>'Download em ZIP não habilitado.'], 403);
+    json_out(['status'=>'erro','mensagem'=>'Download em ZIP não habilitado nesta galeria.'], 403);
 
 // Busca fotos (todas ou as selecionadas)
 if (!empty($foto_ids)) {
@@ -35,12 +35,18 @@ if (!empty($foto_ids)) {
 $fotos = $stmt->fetchAll();
 if (!$fotos) json_out(['status'=>'erro','mensagem'=>'Nenhuma foto para baixar.'], 400);
 
-// Verifica limite de downloads (persistente no banco)
-// Conta como 1 por lote ZIP
-$max      = (int)$g['max_selecao'];
-$dl_count = (int)$g['dl_count'];
-if ($max > 0 && $dl_count >= $max)
+// Verifica limite de downloads (persistente no banco) usando max_downloads
+$max      = (int)($g['max_downloads'] ?? 0);
+$dl_count = (int)($g['dl_count'] ?? 0);
+if ($max > 0 && ($dl_count >= $max))
     json_out(['status'=>'erro','mensagem'=>"Limite de $max downloads atingido para esta galeria."], 403);
+
+// Verifica se a quantidade solicitada agora extrapola o limite
+$futuro_dl = $dl_count + 1; // ZIP conta como 1 "sessão de download" ou contabiliza por fotos?
+// O sistema parece usar dl_count + count($fotos) na linha 47. Vamos respeitar isso.
+if ($max > 0 && ($dl_count + count($fotos) > $max)) {
+    json_out(['status'=>'erro','mensagem'=>"Este download excede seu limite restante."], 403);
+}
 
 // Incrementa contador no banco pelo número real de fotos baixadas
 $qtd_fotos = count($fotos);

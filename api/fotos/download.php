@@ -14,8 +14,8 @@ if (!$foto) json_out(['status'=>'erro','mensagem'=>'Foto não encontrada.'], 404
 
 $gid = $foto['galeria_id'];
 
-// Busca galeria — usa entrega_em_alta (campo real do banco)
-$gal = db()->prepare("SELECT entrega_em_alta, max_selecao, dl_count, nome FROM galerias WHERE id = ? LIMIT 1");
+// Busca galeria — usa entrega_em_alta (campo real do banco) e separa os limites
+$gal = db()->prepare("SELECT entrega_em_alta, max_downloads, dl_count, nome FROM galerias WHERE id = ? LIMIT 1");
 $gal->execute([$gid]);
 $g = $gal->fetch();
 if (!$g) json_out(['status'=>'erro','mensagem'=>'Galeria não encontrada.'], 404);
@@ -33,9 +33,9 @@ if (!$acesso && $token) {
 }
 if (!$acesso) json_out(['status'=>'erro','mensagem'=>'Sem acesso à galeria.'], 403);
 
-// Verifica limite de downloads (persistente no banco)
-$max      = (int)$g['max_selecao'];
-$dl_count = (int)$g['dl_count'];
+// Verifica limite de downloads (persistente no banco) usando max_downloads
+$max      = (int)($g['max_downloads'] ?? 0);
+$dl_count = (int)($g['dl_count'] ?? 0);
 if ($max > 0 && $dl_count >= $max)
     json_out(['status'=>'erro','mensagem'=>"Limite de $max downloads atingido para esta galeria."], 403);
 

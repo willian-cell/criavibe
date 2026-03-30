@@ -1126,7 +1126,7 @@
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
-  <!-- MODAL LIMITE DE DOWNLOADS -->
+  <!-- MODAL LIMITE (UNIFICADO MAS DINÂMICO) -->
   <div id="modal-limite" style="
   display:none; position:fixed; inset:0; z-index:500;
   background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
@@ -1140,10 +1140,10 @@
     box-shadow:0 0 60px rgba(251,113,133,0.2), 0 30px 60px rgba(0,0,0,0.5);
     animation: modalSlide .35s cubic-bezier(.34,1.56,.64,1);
   ">
-      <div style="font-size:3rem;margin-bottom:16px;">⚠️</div>
-      <h2 style="font-size:1.3rem;font-weight:800;color:#fca5a5;margin-bottom:12px;">Limite de downloads atingido</h2>
+      <div id="limite-icon" style="font-size:3rem;margin-bottom:16px;">⚠️</div>
+      <h2 id="limite-titulo" style="font-size:1.3rem;font-weight:800;color:#fca5a5;margin-bottom:12px;">Limite Atingido</h2>
       <p id="limite-msg" style="color:rgba(255,255,255,0.75);font-size:.95rem;line-height:1.6;margin-bottom:28px;"></p>
-      <div
+      <div id="limite-box"
         style="background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.2);border-radius:12px;padding:14px;margin-bottom:28px;">
         <span id="limite-destaques" style="font-size:1.5rem;font-weight:900;color:#fb7185;"></span>
         <div id="limite-sub" style="font-size:.8rem;color:rgba(255,255,255,0.5);margin-top:4px;"></div>
@@ -1154,7 +1154,7 @@
       font-size:1rem;font-weight:700;cursor:pointer;width:100%;
       transition:.2s;font-family:inherit;
     " onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-        Entendido, vou desmarcar
+        Entendido
       </button>
     </div>
   </div>
@@ -1507,7 +1507,7 @@
 
       if (!selecionadas.has(id)) {
         if (maxSel > 0 && selecionadas.size >= maxSel) {
-          toast(`Limite de seleção atingido (${maxSel} fotos).`);
+          mostrarModalLimite(0, 0, 'selecao');
           return;
         }
         selecionadas.add(id);
@@ -1600,25 +1600,38 @@
       }
     }
 
-    function mostrarModalLimite(qtdSolicitada, restantes) {
-      const excesso = qtdSolicitada - restantes;
+    function mostrarModalLimite(qtdSolicitada, restantes, tipo = 'download') {
       const modal = document.getElementById('modal-limite');
+      const titulo = document.getElementById('limite-titulo');
+      const msg = document.getElementById('limite-msg');
+      const destaques = document.getElementById('limite-destaques');
+      const sub = document.getElementById('limite-sub');
+      const box = document.getElementById('limite-box');
 
-      if (restantes <= 0) {
-        // Esgotou totalmente
-        document.getElementById('limite-msg').textContent =
-          `Você já utilizou todos os ${dlMax} download${dlMax > 1 ? 's' : ''} disponíveis nesta galeria.`;
-        document.getElementById('limite-destaques').textContent = `Limite atingido!`;
-        document.getElementById('limite-sub').textContent =
-          `Entre em contato com o fotógrafo para solicitar mais downloads.`;
+      if (tipo === 'selecao') {
+        const maxSel = parseInt(GALERIA.max_selecao) || 0;
+        titulo.textContent = 'Limite de seleção atingido';
+        msg.textContent = `O fotógrafo definiu um limite de ${maxSel} foto${maxSel > 1 ? 's' : ''} para seleção nesta galeria.`;
+        destaques.textContent = `${maxSel} fotos no máximo!`;
+        sub.textContent = 'Desmarque alguma foto para poder selecionar outra.';
+        box.style.border = '1px solid rgba(99, 102, 241, 0.35)';
+        box.style.background = 'rgba(99, 102, 241, 0.1)';
+        destaques.style.color = '#8ab4f8';
       } else {
-        // Excedeu parcialmente
-        document.getElementById('limite-msg').textContent =
-          `Você selecionou ${qtdSolicitada} foto${qtdSolicitada > 1 ? 's' : ''}, mas só restam ${restantes} download${restantes > 1 ? 's' : ''} disponíveis nesta galeria.`;
-        document.getElementById('limite-destaques').textContent =
-          `Desmarque ${excesso} foto${excesso > 1 ? 's' : ''}!`;
-        document.getElementById('limite-sub').textContent =
-          `Remova ${excesso} foto${excesso > 1 ? 's' : ''} da seleção para continuar o download.`;
+        const excesso = Math.max(0, qtdSolicitada - restantes);
+        titulo.textContent = 'Limite de downloads atingido';
+        if (restantes <= 0) {
+          msg.textContent = `Você já utilizou todos os ${dlMax} download${dlMax > 1 ? 's' : ''} disponíveis nesta galeria.`;
+          destaques.textContent = `Limite atingido!`;
+          sub.textContent = `Entre em contato com o fotógrafo para solicitar mais créditos de download.`;
+        } else {
+          msg.textContent = `Você solicitou ${qtdSolicitada} foto${qtdSolicitada > 1 ? 's' : ''}, mas só restam ${restantes} download${restantes > 1 ? 's' : ''} disponíveis.`;
+          destaques.textContent = `Remova ${excesso} foto${excesso > 1 ? 's' : ''}!`;
+          sub.textContent = `Deixe apenas ${restantes} foto${restantes > 1 ? 's' : ''} selecionada${restantes > 1 ? 's' : ''} para continuar o download.`;
+        }
+        destaques.style.color = '#fb7185';
+        box.style.border = '1px solid rgba(251, 113, 133, 0.35)';
+        box.style.background = 'rgba(251, 113, 133, 0.1)';
       }
       modal.style.display = 'flex';
     }
