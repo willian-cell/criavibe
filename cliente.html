@@ -73,11 +73,19 @@
       box-shadow: 0 32px 80px rgba(0, 0, 0, .6)
     }
 
+    @media (max-width: 480px) {
+      .lock-card {
+        padding: 32px 24px;
+        width: 92%;
+      }
+    }
+
     .lock-logo {
       font-size: 1.5rem;
       font-weight: 800;
       background: linear-gradient(135deg, var(--text), var(--primary));
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 8px
     }
@@ -203,6 +211,7 @@
       font-weight: 800;
       background: linear-gradient(135deg, var(--text), var(--primary));
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       cursor: pointer;
       user-select: none;
@@ -889,18 +898,45 @@
 
     .cover-right {
       flex: 1;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
       position: relative;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover; /* Servirá apenas como container da imagem herdada */
+      overflow: hidden;
+      background-color: var(--bg);
     }
 
+    /* Fundo desfocado (Blurred Backdrop) para preencher os espaços sem cortar a foto */
     .cover-right::before {
       content: '';
       position: absolute;
+      inset: -20px;
+      background-image: inherit;
+      background-size: cover;
+      background-position: center;
+      filter: blur(40px) brightness(0.4);
+      z-index: 1;
+    }
+
+    /* A foto nítida e completa (Sharp Foreground) */
+    .cover-right::after {
+      content: '';
+      position: absolute;
       inset: 0;
+      background-image: inherit;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 2;
+    }
+
+    /* Gradiente de transição sobre as fotos */
+    .cover-gradient {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
       pointer-events: none;
-      background: linear-gradient(to right, rgba(10, 10, 20, 0.95) 0%, transparent 15%);
+      background: linear-gradient(to right, rgba(10, 10, 20, 1) 0%, rgba(10,10,20,0.4) 15%, transparent 40%);
     }
 
     @media (max-width: 800px) {
@@ -911,14 +947,37 @@
       .cover-left {
         flex: none;
         height: auto;
-        padding: 40px 20px;
+        padding: 60px 24px;
         width: 100%;
         max-width: 100%;
-        box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.5);
+        background: var(--bg);
+        box-shadow: 0 -30px 60px rgba(0, 0, 0, 0.8);
+        border-top: 1px solid var(--border);
+        text-align: center;
+        align-items: center;
       }
 
-      .cover-right::before {
-        background: linear-gradient(to top, rgba(10, 10, 20, 0.95) 0%, transparent 20%);
+      .cover-logo {
+        margin-bottom: 30px;
+      }
+
+      .cover-logo img {
+        width: 120px;
+        height: 120px;
+      }
+
+      .cover-title {
+        font-size: 2.8rem;
+        margin-bottom: 20px;
+      }
+
+      .cover-right {
+        height: 55vh; /* Garante tamanho generoso na foto */
+        flex: none;
+      }
+
+      .cover-gradient {
+        background: linear-gradient(to top, rgba(10, 10, 20, 1) 0%, rgba(10,10,20,0.4) 15%, transparent 40%);
       }
     }
 
@@ -1019,7 +1078,9 @@
     </div>
 
     <!-- Right Photo Panel -->
-    <div id="cover-bg" class="cover-right"></div>
+    <div id="cover-bg" class="cover-right">
+      <div class="cover-gradient"></div>
+    </div>
   </div>
 
   <!-- TOP NAV -->
@@ -1279,7 +1340,9 @@
         document.getElementById('cover-count').textContent = rawFotos.length + ' FOTOS';
 
         if (rawFotos.length > 0) {
-          document.getElementById('cover-bg').style.backgroundImage = `url('/${rawFotos[0].caminho_arquivo}')`;
+          // Busca prioritária pela foto de capa (is_capa == 1)
+          const fotoCapa = rawFotos.find(f => f.is_capa == 1) || rawFotos[0];
+          document.getElementById('cover-bg').style.backgroundImage = `url('/${fotoCapa.caminho_arquivo}')`;
         }
 
         if (!rawFotos.length) {
