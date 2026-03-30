@@ -143,7 +143,7 @@
 
     /* ── HERO ── */
     .hero {
-      min-height: 100vh;
+      min-height: 50vh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -502,6 +502,7 @@
         display: flex;
         align-items: center;
       }
+
       .nav-links {
         position: fixed;
         top: 90px;
@@ -516,28 +517,35 @@
         transform: translateY(-150%);
         transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 100;
-        box-shadow: 0 16px 32px rgba(0,0,0,0.2);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
       }
+
       .nav-links.open {
         transform: translateY(0);
         opacity: 1;
         visibility: visible;
         pointer-events: all;
       }
-      .nav-logo, .nav-toggle, .nav-cta {
+
+      .nav-logo,
+      .nav-toggle,
+      .nav-cta {
         position: relative;
         z-index: 301;
       }
+
       .nav-toggle {
         display: block;
       }
+
       .nav-cta {
         padding: 9px 18px;
         font-size: .85rem;
       }
+
       .nav-logo {
         font-size: 1.2rem;
       }
@@ -546,19 +554,23 @@
         padding-top: 170px;
         padding-bottom: 60px;
       }
+
       .hero-title {
         font-size: clamp(2.2rem, 10vw, 3.2rem);
       }
+
       .hero-badge {
         font-size: .75rem;
         padding: 4px 12px;
       }
+
       .hero-actions {
         flex-direction: column;
         width: 100%;
         max-width: 320px;
         margin: 0 auto;
       }
+
       .btn-hero {
         width: 100%;
         justify-content: center;
@@ -567,12 +579,15 @@
       .section {
         padding: 40px 5vw;
       }
+
       .section-title h2 {
         font-size: 1.8rem;
       }
+
       .gals-grid {
         grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
       }
+
       .features {
         grid-template-columns: 1fr;
       }
@@ -582,6 +597,7 @@
         text-align: center;
         gap: 20px;
       }
+
       footer span {
         text-align: center;
       }
