@@ -2,10 +2,11 @@
 require_once __DIR__.'/../config.php';
 $u = require_fotografo();
 
-// Tenta adicionar a coluna is_capa e max_downloads caso ainda não existam (Lazy migration)
+// Tenta adicionar a coluna is_capa, max_downloads e max_selecao caso ainda não existam (Lazy migration)
 try {
     db()->exec("ALTER TABLE imagens ADD COLUMN is_capa TINYINT(1) DEFAULT 0");
     db()->exec("ALTER TABLE galerias ADD COLUMN max_downloads INT DEFAULT 0");
+    db()->exec("ALTER TABLE galerias ADD COLUMN max_selecao INT DEFAULT 0");
 } catch (Exception $e) {}
 
 $sql = "

@@ -1894,7 +1894,8 @@
           document.getElementById('galeria-title-lock').textContent = g.nome;
           // Se galeria é pública e sem cliente vinculado, entra direto
           if (g.privacidade === 'publica' && !g.cliente_id) {
-            GALERIA = g; dlMax = g.max_selecao ? parseInt(g.max_selecao) : 0;
+            GALERIA = g; 
+            dlMax = parseInt(g.max_downloads) || 0;
             document.getElementById('lock-screen').style.display = 'none';
             prepararCapa();
           }
