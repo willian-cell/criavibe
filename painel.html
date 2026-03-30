@@ -125,8 +125,11 @@
 
   <!-- TOP NAV -->
   <nav class="topnav">
+    <button class="topnav-toggle" onclick="document.body.classList.toggle('sidebar-open')">
+      <i class="fa-solid fa-bars"></i>
+    </button>
     <div class="topnav-logo">
-      <i class="fa-solid fa-images"></i> CriaVibe
+      <i class="fa-solid fa-images"></i> <span>CriaVibe</span>
     </div>
     <div class="topnav-spacer"></div>
     <div class="topnav-user">
@@ -167,20 +170,22 @@
       </div>
 
       <div class="galleries-table" id="table-wrap" style="display:none">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:60px">Capa</th>
-              <th>Galeria</th>
-              <th>Playlist</th>
-              <th>Fotos</th>
-              <th>Seleções do Cliente</th>
-              <th>Downloads</th>
-              <th style="width:50px">Ações</th>
-            </tr>
-          </thead>
-          <tbody id="gallery-tbody"></tbody>
-        </table>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:60px">Capa</th>
+                <th>Galeria</th>
+                <th>Playlist</th>
+                <th>Fotos</th>
+                <th>Seleções do Cliente</th>
+                <th>Downloads</th>
+                <th style="width:50px">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="gallery-tbody"></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="empty-state" id="empty-state" style="display:none">

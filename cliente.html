@@ -339,8 +339,22 @@
       aspect-ratio: 1.5;
     }
 
-    @media(max-width: 600px) {
+    @media(max-width: 800px) {
       #gallery {
+        --grid-cols: 6;
+        --span-v: 2;
+        --span-h: 3;
+        padding: 12px 10px;
+        gap: 8px;
+      }
+    }
+
+    @media(max-width: 480px) {
+      #gallery {
+        --grid-cols: 2;
+        --span-v: 1;
+        --span-h: 2;
+        padding: 8px 6px;
         gap: 6px;
       }
     }

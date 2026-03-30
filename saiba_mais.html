@@ -88,6 +88,7 @@
       font-weight: 800;
       background: linear-gradient(135deg, #0f172a, var(--primary));
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       letter-spacing: -.5px;
     }
@@ -133,6 +134,71 @@
       background: var(--primary-dk);
       transform: translateY(-1px);
       box-shadow: 0 4px 16px rgba(99, 102, 241, .4);
+    }
+
+    /* ── MOBILE SPECIFIC ── */
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 0 4vw;
+      }
+      .nav-links {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(24px);
+        flex-direction: column;
+        padding: 20px 5vw;
+        gap: 8px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transform: translateY(-120%);
+        transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 100;
+      }
+      .nav-links.open {
+        transform: translateY(0);
+      }
+      .nav-toggle {
+        display: block;
+      }
+      .nav-cta {
+        padding: 8px 16px;
+        font-size: .8rem;
+      }
+      .parallax-hero {
+        height: 80vh;
+      }
+      .hero-glass-card {
+        padding: 2rem 1.5rem;
+      }
+      .section {
+        padding: 60px 5vw;
+      }
+      .about-image {
+        max-width: 100%;
+      }
+      .social-card {
+        width: 100%;
+      }
+      footer {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+      }
+      footer span {
+        text-align: center;
+      }
     }
 
     /* ── PARALLAX HERO ── */
@@ -190,6 +256,7 @@
       margin-bottom: 20px;
       background: linear-gradient(135deg, #0f172a, #6366f1, #a78bfa);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -247,6 +314,7 @@
     .about-content h2 span {
       background: linear-gradient(135deg, var(--primary), #a78bfa);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -516,6 +584,7 @@
     .social-card.instagram .icon-wrapper i {
       background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       display: inline-block;
     }
@@ -560,14 +629,17 @@
 
   <!-- NAV -->
   <nav id="topnav">
-    <a href="https://red-llama-690371.hostingersite.com/" class="nav-logo">✦ CriaVibe</a>
+    <a href="/" class="nav-logo">✦ CriaVibe</a>
     <div class="nav-spacer"></div>
-    <div class="nav-links">
+    <div class="nav-links" id="navLinks">
       <a href="/saiba_mais.html" class="nav-link active">Sobre</a>
       <a href="/entrar.html" class="nav-link">Entrar</a>
     </div>
     <button class="nav-cta" onclick="location.href='/entrar.html#cadastro'">
-      Começar Grátis <i class="fa-solid fa-arrow-right"></i>
+      Começar
+    </button>
+    <button class="nav-toggle" id="menuToggle">
+      <i class="fa-solid fa-bars"></i>
     </button>
   </nav>
 
@@ -710,6 +782,19 @@
       } else {
         nav.style.background = 'rgba(255,255,255,0.9)';
         nav.style.boxShadow = 'none';
+      }
+    });
+
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+      const icon = menuToggle.querySelector('i');
+      if (navLinks.classList.contains('open')) {
+        icon.classList.replace('fa-bars', 'fa-xmark');
+      } else {
+        icon.classList.replace('fa-xmark', 'fa-bars');
       }
     });
 

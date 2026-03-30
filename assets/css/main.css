@@ -50,6 +50,7 @@ img{display:block;max-width:100%}
 .topnav-user strong{color:var(--text);font-weight:600}
 .topnav-logout{font-size:.8rem;color:var(--muted);padding:5px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;transition:var(--tr);background:none}
 .topnav-logout:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
+.topnav-toggle{display:none;background:none;border:none;font-size:1.25rem;color:var(--muted);cursor:pointer;padding:8px}
 
 /* ── Buttons ── */
 .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--radius-sm);font-size:.825rem;font-weight:600;border:none;transition:var(--tr);white-space:nowrap;cursor:pointer;font-family:inherit}
@@ -133,7 +134,8 @@ select.form-control{cursor:pointer}
 
 /* ── Galleries table ── */
 .galleries-table{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:visible}
-.galleries-table table{width:100%;border-collapse:collapse}
+.table-responsive{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.galleries-table table{width:100%;border-collapse:collapse;min-width:700px}
 .galleries-table thead th{padding:11px 16px;text-align:left;font-size:.72rem;font-weight:700;letter-spacing:.07em;color:var(--light);text-transform:uppercase;background:var(--surface-2);border-bottom:1px solid var(--border)}
 .galleries-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
 .galleries-table tbody tr:last-child{border-bottom:none}
@@ -163,6 +165,30 @@ select.form-control{cursor:pointer}
 
 /* ── Responsive ── */
 @media(max-width:768px){
-  .painel-sidebar{display:none}
-  .painel-main{margin-left:0;padding:16px}
+  .topnav-toggle{display:block}
+  .topnav-user span{display:none}
+  .topnav{padding:0 12px}
+  .painel-sidebar{
+    left:-220px;
+    transition:transform .3s ease;
+    box-shadow: 8px 0 32px rgba(0,0,0,0.1);
+    z-index: 400;
+  }
+  body.sidebar-open .painel-sidebar{
+    transform:translateX(220px);
+  }
+  .painel-main{margin-left:0;padding:20px 16px}
+  .painel-header h2{font-size:1.1rem}
+  .search-bar input{width:120px}
+  
+  /* Modal optimization */
+  .modal{width:100%;border-radius:var(--radius) var(--radius) 0 0;position:fixed;bottom:0;max-height:85vh}
+  @keyframes modalIn{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+  .modal-body{padding-bottom:40px}
+}
+
+@media(max-width:480px){
+  .btn span{display:none}
+  .btn i{font-size:1rem;margin:0}
+  .topnav-logo span{display:none}
 }

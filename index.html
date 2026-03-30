@@ -87,6 +87,7 @@
       font-weight: 800;
       background: linear-gradient(135deg, var(--text), var(--primary));
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       letter-spacing: -.5px;
       cursor: pointer;
@@ -197,6 +198,7 @@
     .hero-title span {
       background: linear-gradient(135deg, var(--primary), #a78bfa, #ec4899);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent
     }
 
@@ -480,6 +482,96 @@
       border: none;
       line-height: 1
     }
+
+    /* ── MOBILE SPECIFIC ── */
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+      z-index: 300;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 0 4vw;
+      }
+      .nav-links {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: var(--nav-bg);
+        backdrop-filter: blur(24px);
+        flex-direction: column;
+        padding: 20px 5vw;
+        gap: 8px;
+        border-bottom: 1px solid var(--border-glass);
+        transform: translateY(-120%);
+        transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 100;
+      }
+      .nav-links.open {
+        transform: translateY(0);
+      }
+      .nav-toggle {
+        display: block;
+      }
+      .nav-cta {
+        padding: 8px 16px;
+        font-size: .8rem;
+      }
+      .nav-logo {
+        font-size: 1.15rem;
+      }
+
+      .hero {
+        padding-top: 120px;
+        padding-bottom: 40px;
+      }
+      .hero-title {
+        font-size: clamp(2.2rem, 10vw, 3.2rem);
+      }
+      .hero-badge {
+        font-size: .75rem;
+        padding: 4px 12px;
+      }
+      .hero-actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto;
+      }
+      .btn-hero {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .section {
+        padding: 40px 5vw;
+      }
+      .section-title h2 {
+        font-size: 1.8rem;
+      }
+      .gals-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+      }
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+      }
+      footer span {
+        text-align: center;
+      }
+    }
   </style>
 </head>
 
@@ -489,12 +581,15 @@
   <nav id="topnav">
     <a href="#" class="nav-logo" id="logoToggle">✦ CriaVibe</a>
     <div class="nav-spacer"></div>
-    <div class="nav-links">
+    <div class="nav-links" id="navLinks">
       <a href="/saiba_mais.html" class="nav-link">Sobre</a>
       <a href="/entrar.html" class="nav-link">Entrar</a>
     </div>
     <button class="nav-cta" onclick="location.href='/entrar.html#cadastro'">
-      Começar Grátis <i class="fa-solid fa-arrow-right"></i>
+      Começar
+    </button>
+    <button class="nav-toggle" id="menuToggle">
+      <i class="fa-solid fa-bars"></i>
     </button>
   </nav>
 
@@ -641,6 +736,27 @@
     }
 
     window.addEventListener('scroll', updateNavBg);
+
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+      const icon = menuToggle.querySelector('i');
+      if (navLinks.classList.contains('open')) {
+        icon.classList.replace('fa-bars', 'fa-xmark');
+      } else {
+        icon.classList.replace('fa-xmark', 'fa-bars');
+      }
+    });
+
+    // Close menu on click
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        menuToggle.querySelector('i').classList.replace('fa-xmark', 'fa-bars');
+      });
+    });
 
 
     carregarGalerias();

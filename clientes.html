@@ -9,7 +9,10 @@
 </head>
 <body>
 <nav class="topnav">
-  <div class="topnav-logo"><i class="fa-solid fa-images"></i> CriaVibe</div>
+  <button class="topnav-toggle" onclick="document.body.classList.toggle('sidebar-open')">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+  <div class="topnav-logo"><i class="fa-solid fa-images"></i> <span>CriaVibe</span></div>
   <div class="topnav-spacer"></div>
   <div class="topnav-user">
     <i class="fa-solid fa-user-circle" style="font-size:1.2rem;color:var(--primary)"></i>
@@ -36,20 +39,22 @@
     </div>
 
     <div class="galleries-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>E-mail</th>
-            <th>Telefone</th>
-            <th>Senha de Acesso</th>
-            <th style="width:50px">Ações</th>
-          </tr>
-        </thead>
-        <tbody id="clientes-tbody">
-          <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted)"><i class="fa-solid fa-spinner fa-spin"></i></td></tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Telefone</th>
+              <th>Senha de Acesso</th>
+              <th style="width:50px">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="clientes-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted)"><i class="fa-solid fa-spinner fa-spin"></i></td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </main>
 </div>
