@@ -941,43 +941,65 @@
 
     @media (max-width: 800px) {
       #cover-screen {
-        flex-direction: column-reverse;
+        flex-direction: column; /* Texto em cima, Foto embaixo como no exemplo */
       }
 
       .cover-left {
         flex: none;
         height: auto;
-        padding: 60px 24px;
+        padding: 30px 20px 20px; /* Padding reduzido para economia de espaço */
         width: 100%;
         max-width: 100%;
         background: var(--bg);
-        box-shadow: 0 -30px 60px rgba(0, 0, 0, 0.8);
-        border-top: 1px solid var(--border);
+        box-shadow: none;
+        border-bottom: 1px solid var(--border);
         text-align: center;
         align-items: center;
+        z-index: 10;
       }
 
       .cover-logo {
-        margin-bottom: 30px;
+        margin-bottom: 15px; /* Mais compacto */
       }
 
       .cover-logo img {
-        width: 120px;
-        height: 120px;
+        width: 90px; /* Logo menor no mobile */
+        height: 90px;
+      }
+
+      .cover-welcome {
+        font-size: 1rem;
+        margin-bottom: 4px;
       }
 
       .cover-title {
-        font-size: 2.8rem;
-        margin-bottom: 20px;
+        font-size: 2.2rem;
+        margin-bottom: 8px;
+        line-height: 1.1;
       }
 
+      .cover-count {
+        font-size: 0.85rem;
+        margin-bottom: 25px;
+        letter-spacing: 1px;
+      }
+
+      .btn-cover-ver, .btn-cover-dl {
+        padding: 14px !important;
+        font-size: 1rem !important;
+        border-radius: 8px !important;
+      }
+
+      /* Container da Foto */
       .cover-right {
-        height: 55vh; /* Garante tamanho generoso na foto */
-        flex: none;
+        flex: 1; /* Ocupa todo o resto da tela disponível */
+        height: auto;
+        min-height: 300px;
       }
 
       .cover-gradient {
-        background: linear-gradient(to top, rgba(10, 10, 20, 1) 0%, rgba(10,10,20,0.4) 15%, transparent 40%);
+        /* Gradiente do topo escuro para a foto nítida */
+        background: linear-gradient(to bottom, rgba(10, 10, 20, 1) 0%, rgba(10,10,20,0.4) 15%, transparent 40%);
       }
     }
 
@@ -1022,16 +1044,25 @@
     }
 
     #btn-cover-dl {
-      border: 1px solid var(--border);
-      color: var(--text);
+      display: none;
+    }
+
+    .btn-cover-ver {
+      background: #fff !important;
+      color: #000 !important;
       border-radius: 10px;
       padding: 16px;
       font-size: 1.1rem;
-      transition: .2s;
+      border: none;
     }
 
-    #btn-cover-dl:hover {
-      background: var(--surface);
+    .btn-cover-dl {
+      background: #0f172a !important; /* Marinho muito escuro / Preto */
+      color: #fff !important;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 1.1rem;
+      border: 1px solid rgba(255,255,255,0.1);
     }
   </style>
 </head>
@@ -1066,12 +1097,11 @@
       <h1 id="cover-title" class="cover-title">Carregando...</h1>
       <p id="cover-count" class="cover-count">0 FOTOS</p>
 
-      <div style="display:flex;flex-direction:column;gap:16px;width:100%">
-        <button class="btn btn-primary" onclick="irParaGaleria()"
-          style="border-radius:10px;padding:16px;font-size:1.1rem;background:#fff;color:#000">
+      <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;margin:0 auto">
+        <button class="btn btn-cover-ver" onclick="irParaGaleria()">
           <i class="fa-solid fa-images"></i> VER FOTOS
         </button>
-        <button class="btn tbtn-outline" id="btn-cover-dl" onclick="baixarZipTodas()" style="display:none">
+        <button class="btn btn-cover-dl" id="btn-cover-dl" onclick="baixarZipTodas()" style="display:none">
           <i class="fa-solid fa-download"></i> DOWNLOAD
         </button>
       </div>
