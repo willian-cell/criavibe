@@ -941,65 +941,64 @@
 
     @media (max-width: 800px) {
       #cover-screen {
-        flex-direction: column; /* Texto em cima, Foto embaixo como no exemplo */
+        flex-direction: column;
       }
 
       .cover-left {
         flex: none;
         height: auto;
-        padding: 30px 20px 20px; /* Padding reduzido para economia de espaço */
+        padding: 20px 20px 15px; /* Compactação extrema */
         width: 100%;
         max-width: 100%;
         background: var(--bg);
         box-shadow: none;
-        border-bottom: 1px solid var(--border);
+        border-bottom: 2px solid var(--border);
         text-align: center;
         align-items: center;
         z-index: 10;
       }
 
       .cover-logo {
-        margin-bottom: 15px; /* Mais compacto */
+        margin-bottom: 10px;
       }
 
       .cover-logo img {
-        width: 90px; /* Logo menor no mobile */
-        height: 90px;
+        width: 70px; /* Logo muito pequeno para priorizar a foto */
+        height: 70px;
       }
 
       .cover-welcome {
-        font-size: 1rem;
-        margin-bottom: 4px;
+        font-size: 0.85rem;
+        margin-bottom: 2px;
       }
 
       .cover-title {
-        font-size: 2.2rem;
-        margin-bottom: 8px;
-        line-height: 1.1;
+        font-size: 1.8rem; /* Título mais discreto */
+        margin-bottom: 5px;
       }
 
       .cover-count {
-        font-size: 0.85rem;
-        margin-bottom: 25px;
+        font-size: 0.75rem;
+        margin-bottom: 15px;
         letter-spacing: 1px;
       }
 
       .btn-cover-ver, .btn-cover-dl {
-        padding: 14px !important;
-        font-size: 1rem !important;
+        padding: 12px 10px !important;
+        font-size: 0.9rem !important;
         border-radius: 8px !important;
       }
 
-      /* Container da Foto */
+      /* Container da Foto - Ultra espantoso */
       .cover-right {
-        flex: 1; /* Ocupa todo o resto da tela disponível */
+        flex: 1; 
         height: auto;
-        min-height: 300px;
+        border: none;
       }
 
       .cover-gradient {
-        /* Gradiente do topo escuro para a foto nítida */
-        background: linear-gradient(to bottom, rgba(10, 10, 20, 1) 0%, rgba(10,10,20,0.4) 15%, transparent 40%);
+        /* Removemos qualquer sombra ou gradiente por cima da imagem no mobile */
+        display: none !important;
       }
     }
 
