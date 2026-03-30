@@ -167,7 +167,8 @@ select.form-control{cursor:pointer}
 @media(max-width:768px){
   .topnav-toggle{display:block}
   .topnav-user span{display:none}
-  .topnav{height:80px;padding:15px 16px 0}
+  .topnav{height:80px;padding:15px 16px 0;z-index:500}
+  .topnav > * { position:relative; z-index:501; }
   .painel-layout{margin-top:80px;min-height:calc(100vh - 80px)}
   .painel-sidebar{
     top:80px;
