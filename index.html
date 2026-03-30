@@ -497,22 +497,24 @@
 
     @media (max-width: 768px) {
       nav {
-        padding: 0 4vw;
+        padding: 0 5vw;
+        height: 72px;
       }
       .nav-links {
         position: fixed;
-        top: 64px;
+        top: 72px;
         left: 0;
         right: 0;
         background: var(--nav-bg);
-        backdrop-filter: blur(24px);
+        backdrop-filter: blur(28px);
         flex-direction: column;
-        padding: 20px 5vw;
-        gap: 8px;
+        padding: 24px 7vw;
+        gap: 12px;
         border-bottom: 1px solid var(--border-glass);
-        transform: translateY(-120%);
-        transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(-130%);
+        transition: transform .35s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 100;
+        box-shadow: 0 16px 32px rgba(0,0,0,0.2);
       }
       .nav-links.open {
         transform: translateY(0);
@@ -521,16 +523,16 @@
         display: block;
       }
       .nav-cta {
-        padding: 8px 16px;
-        font-size: .8rem;
+        padding: 9px 18px;
+        font-size: .85rem;
       }
       .nav-logo {
-        font-size: 1.15rem;
+        font-size: 1.2rem;
       }
 
       .hero {
-        padding-top: 120px;
-        padding-bottom: 40px;
+        padding-top: 150px;
+        padding-bottom: 60px;
       }
       .hero-title {
         font-size: clamp(2.2rem, 10vw, 3.2rem);
