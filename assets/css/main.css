@@ -195,6 +195,7 @@ body.sidebar-open .sidebar-overlay {
 
 /* ── Responsive ── */
 @media(max-width:768px){
+  .badge{padding:2px 6px;font-size:.65rem;gap:3px;border-radius:15px}
   .topnav-toggle{display:block}
   .topnav-user span{display:none}
   .topnav{height:80px;padding:15px 16px 0;z-index:500}
