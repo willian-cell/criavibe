@@ -654,10 +654,10 @@
       if (btn) btn.innerHTML = textLabel;
       document.querySelectorAll('.filtro-dd.show').forEach(el => el.classList.remove('show'));
       renderFotos();
-    }
+    };
 
-      (async () => {
-        await requireAuth();
+    (async () => {
+      await requireAuth();
         if (!galeriaId) { location.href = '/painel.html'; return; }
         try {
           const d = await API.get(`/galerias/get.php?id=${galeriaId}`);
