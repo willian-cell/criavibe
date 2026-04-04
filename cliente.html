@@ -860,229 +860,139 @@
       opacity: 1
     }
 
-    /* ── COVER SCREEN ── */
-    #cover-screen {
-      flex-direction: row;
+    /* ── UNIFIED HERO ── */
+    #unified-layout {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
       background: var(--bg);
     }
 
-    .cover-left {
-      flex: 0 0 35%;
-      min-width: 320px;
-      max-width: 450px;
+    #hero-cover {
+      position: relative;
+      width: 100%;
+      height: 60vh;
+      min-height: 380px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      padding: 40px 8%;
+      justify-content: space-between;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 1;
+      filter: brightness(0.65);
+      transition: filter 0.5s ease;
+    }
+
+    .hero-gradient {
+      position: absolute;
+      inset: 0;
       z-index: 2;
-      background: var(--bg);
-      box-shadow: 20px 0 50px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(to bottom, rgba(10,10,20,0.5) 0%, transparent 40%, var(--bg) 100%);
     }
 
-    .cover-logo {
-      margin-bottom: 50px;
+    .hero-nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 5vw;
     }
-
-    .cover-logo img {
-      width: 150px;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 0;
-      border: 3px solid rgba(255,255,255,0.1);
-      filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
-    }
-
-    .cover-welcome {
-      font-size: 1.25rem;
-      font-weight: 400;
-      color: var(--muted);
-      margin-bottom: 8px;
-      letter-spacing: 0.5px;
-    }
-
-    .cover-title {
-      font-size: 4.5rem;
-      font-weight: 800;
-      margin-bottom: 12px;
-      line-height: 1.0;
+    
+    .hero-nav button {
+      background: transparent;
+      border: none;
       color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--tr);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .hero-nav button:hover { opacity: 0.8; transform: translateX(-3px); }
+
+    .hero-brand {
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      padding: 40px 5vw;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-family: inherit;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 5px;
+      text-shadow: 0 4px 15px rgba(0,0,0,0.6);
       text-transform: capitalize;
     }
 
-    .cover-count {
-      font-size: 1.1rem;
+    .hero-subtitle {
+      font-size: clamp(0.9rem, 2vw, 1.2rem);
+      font-weight: 500;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 4px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    /* ── ACTION BAR ── */
+    #action-bar {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .action-stats {
+      font-size: 0.95rem;
       color: var(--muted);
-      margin-bottom: 40px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .cover-right {
-      flex: 1;
-      position: relative;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: cover; /* Servirá apenas como container da imagem herdada */
-      overflow: hidden;
-      background-color: var(--bg);
-    }
-
-    /* Fundo desfocado (Blurred Backdrop) para preencher os espaços sem cortar a foto */
-    .cover-right::before {
-      content: '';
-      position: absolute;
-      inset: -20px;
-      background-image: inherit;
-      background-size: cover;
-      background-position: center;
-      filter: blur(40px) brightness(0.4);
-      z-index: 1;
-    }
-
-    /* A foto nítida e completa (Sharp Foreground) */
-    .cover-right::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: inherit;
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-      z-index: 2;
-    }
-
-    /* Gradiente de transição sobre as fotos */
-    .cover-gradient {
-      position: absolute;
-      inset: 0;
-      z-index: 3;
-      pointer-events: none;
-      background: linear-gradient(to right, rgba(10, 10, 20, 1) 0%, rgba(10,10,20,0.4) 15%, transparent 40%);
+    .action-btns {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     @media (max-width: 800px) {
-      #cover-screen {
-        flex-direction: column;
-      }
-
-      .cover-left {
-        flex: none;
-        height: auto;
-        padding: 20px 20px 15px; /* Compactação extrema */
-        width: 100%;
-        max-width: 100%;
-        background: var(--bg);
-        box-shadow: none;
-        border-bottom: 2px solid var(--border);
-        text-align: center;
-        align-items: center;
-        z-index: 10;
-      }
-
-      .cover-logo {
-        margin-bottom: 10px;
-      }
-
-      .cover-logo img {
-        width: 70px; /* Logo muito pequeno para priorizar a foto */
-        height: 70px;
-      }
-
-      .cover-welcome {
-        font-size: 0.85rem;
-        margin-bottom: 2px;
-      }
-
-      .cover-title {
-        font-size: 1.8rem; /* Título mais discreto */
-        margin-bottom: 5px;
-      }
-
-      .cover-count {
-        font-size: 0.75rem;
-        margin-bottom: 15px;
-        letter-spacing: 1px;
-      }
-
-      .btn-cover-ver, .btn-cover-dl {
-        padding: 12px 10px !important;
-        font-size: 0.9rem !important;
-        border-radius: 8px !important;
-      }
-
-      /* Container da Foto - Ultra espantoso */
-      .cover-right {
-        flex: 1; 
-        height: auto;
-        border: none;
-      }
-
-      .cover-gradient {
-        /* Removemos qualquer sombra ou gradiente por cima da imagem no mobile */
-        display: none !important;
-      }
-    }
-
-    @keyframes modalSlide {
-      from {
-        transform: scale(.85) translateY(20px);
-        opacity: 0;
-      }
-
-      to {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-      }
-    }
-
-    /* ── FLOATING SELECTION ── */
-    #floating-selection {
-      display: none;
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(30, 32, 40, 0.95);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      padding: 12px 24px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      align-items: center;
-      gap: 20px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-      z-index: 200;
-      color: #fff;
-      /* Texto sempre branco no fundo escuro */
-    }
-
-    #floating-count {
-      font-weight: 500;
-      font-size: 0.95rem;
-      white-space: nowrap;
-      color: #fff;
-    }
-
-    #btn-cover-dl {
-      display: none;
-    }
-
-    .btn-cover-ver {
-      background: #fff !important;
-      color: #000 !important;
-      border-radius: 10px;
-      padding: 16px;
-      font-size: 1.1rem;
-      border: none;
-    }
-
-    .btn-cover-dl {
-      background: #0f172a !important; /* Marinho muito escuro / Preto */
-      color: #fff !important;
-      border-radius: 10px;
-      padding: 16px;
-      font-size: 1.1rem;
-      border: 1px solid rgba(255,255,255,0.1);
+      #hero-cover { height: 50vh; min-height: 380px; }
+      .hero-nav { padding: 16px 5vw; }
+      #action-bar { justify-content: center; text-align: center; padding: 20px 5vw; flex-direction: column; }
+      .action-stats { width: 100%; justify-content: center; margin-bottom: 4px; font-size: 0.95rem; }
+      .action-btns { justify-content: center; width: 100%; gap: 8px; }
+      .action-btns .tbtn { flex: 1; min-width: 0; padding: 12px 6px; font-size: 0.8rem; display: flex; justify-content: center; align-items: center;}
     }
   </style>
 </head>
@@ -1108,83 +1018,47 @@
     </div>
   </div>
 
-  <!-- COVER SCREEN (CAPA) -->
-  <div id="cover-screen" style="display:none;position:fixed;inset:0;z-index:150;">
-    <!-- Left Content Panel -->
-    <div class="cover-left">
-      <div class="cover-logo"><img src="/logo/logo-criavibe-fotografia.jpeg" alt="Logo CriaVibe"></div>
-      <p class="cover-welcome">Bem-vindo(a)</p>
-      <h1 id="cover-title" class="cover-title">Carregando...</h1>
-      <p id="cover-count" class="cover-count">0 FOTOS</p>
+  <!-- UNIFIED LAYOUT -->
+  <div id="unified-layout" style="display:none; flex-direction:column; min-height:100vh;">
+    <!-- HERO HEADER -->
+    <header id="hero-cover">
+      <div id="hero-bg" class="hero-bg"></div>
+      <div class="hero-gradient"></div>
+      
+      <nav class="hero-nav">
+        <button onclick="location.reload()" title="Voltar/Sair"><i class="fa-solid fa-arrow-left"></i> Sair</button>
+        <div class="hero-brand" id="logoToggle"><i class="fa-solid fa-images"></i> CriaVibe</div>
+      </nav>
+      
+      <div class="hero-content">
+        <h1 id="hero-title" class="hero-title">Carregando...</h1>
+        <h2 id="hero-subtitle" class="hero-subtitle">PORTIFÓLIO</h2>
+      </div>
+    </header>
 
-      <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;margin:0 auto">
-        <button class="btn btn-cover-ver" onclick="irParaGaleria()">
-          <i class="fa-solid fa-images"></i> VER FOTOS
+    <!-- ACTION BAR -->
+    <div id="action-bar">
+      <div class="action-stats">
+        <span id="sel-counter" style="color:var(--text)">0 fotos selecionadas</span>
+        <span id="dl-counter" style="display:none;"></span>
+      </div>
+      <div class="action-btns">
+        <button class="tbtn tbtn-primary" id="btn-zip-sel" onclick="baixarZipSelecionadas()" style="display:none">
+          <i class="fa-solid fa-download"></i> Baixar Selecionadas
         </button>
-        <button class="btn btn-cover-dl" id="btn-cover-dl" onclick="baixarZipTodas()" style="display:none">
-          <i class="fa-solid fa-download"></i> DOWNLOAD
+        <button class="tbtn tbtn-outline" id="btn-zip-all" onclick="baixarZipTodas()" style="display:none">
+          <i class="fa-solid fa-file-zipper"></i> Baixar Tudo
+        </button>
+        <button class="tbtn tbtn-clear" id="btn-clear-sel" onclick="limparSelecao()" style="display:none">
+          <i class="fa-solid fa-eraser"></i> Desmarcar
         </button>
       </div>
     </div>
 
-    <!-- Right Photo Panel -->
-    <div id="cover-bg" class="cover-right">
-      <div class="cover-gradient"></div>
+    <!-- GALLERY -->
+    <div id="gallery" style="display:grid;">
+      <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Carregando fotos...</div>
     </div>
-  </div>
-
-  <!-- TOP NAV -->
-  <nav id="topnav" style="display:none; justify-content: space-between;">
-    <div style="display:flex; align-items:center;">
-      <button onclick="voltarParaCapa()"
-        style="background:transparent;border:none;color:var(--text);font-size:1.2rem;cursor:pointer;margin-right:16px;transition:0.2s"
-        title="Voltar" onmouseover="this.style.color='var(--primary)';this.style.transform='translateX(-3px)'"
-        onmouseout="this.style.color='var(--text)';this.style.transform=''">
-        <i class="fa-solid fa-arrow-left"></i>
-      </button>
-      <div class="logo" id="logoToggle">
-        <img src="/logo/logo-criavibe-fotografia.jpeg" alt="Logo"
-          style="height: 40px; width: 40px; object-fit: cover; border-radius: 0; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2);">
-      </div>
-      <div id="galeria-nome" style="margin-left:12px; font-weight:600; font-size:1rem;"></div>
-    </div>
-    <div style="display:flex; align-items:center; gap: 12px; font-size: 0.9rem; color: var(--muted);">
-      <span id="top-status-text">0 fotos selecionadas • Baixar tudo (ZIP)</span>
-      <div id="dl-counter" style="display:none; margin-left:10px;"></div>
-    </div>
-  </nav>
-
-  <!-- TOOLBAR -->
-  <div id="toolbar" style="display:none; justify-content: flex-end; padding-top: 15px; padding-bottom: 15px;">
-
-    <button class="tbtn tbtn-primary" id="btn-zip-sel" onclick="baixarZipSelecionadas()"
-      style="display:none; padding: 10px 20px; font-size: 0.95rem; border-radius: 8px;">
-      Baixar Selecionadas
-    </button>
-    <button class="tbtn tbtn-outline" id="btn-zip-all" onclick="baixarZipTodas()"
-      style="display:none; padding: 10px 20px; font-size: 0.95rem; border-radius: 8px; margin-left:12px;">
-      Baixar Tudo
-    </button>
-  </div>
-
-  <!-- FLOATING SELECTION BAR -->
-  <div id="floating-selection">
-    <span id="floating-count">0 fotos selecionadas</span>
-    <button class="btn btn-primary" onclick="baixarZipSelecionadas()"
-      style="width: auto; padding: 10px 24px; border-radius: 8px; font-size: 0.9rem; margin: 0; box-shadow: none;">
-      Baixar Selecionadas
-    </button>
-    <button onclick="limparSelecao()"
-      style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 9px 24px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; font-family: inherit; transition: 0.2s;"
-      onmouseover="this.style.background='rgba(255,255,255,0.15)'"
-      onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-      Desmarcar
-    </button>
-  </div>
-
-  <!-- GALLERY -->
-  <div id="gallery" style="display:none">
-    <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Carregando fotos...</div>
   </div>
 
   <!-- LIGHTBOX -->
@@ -1326,24 +1200,28 @@
 
     // ── INIT ──────────────────────────────────────────────────────
     async function prepararCapa() {
-      document.getElementById('cover-screen').style.display = 'flex';
-      document.getElementById('cover-title').textContent = GALERIA.nome;
+      document.getElementById('unified-layout').style.display = 'flex';
+      document.getElementById('hero-title').textContent = GALERIA.nome;
       document.title = GALERIA.nome + ' — CriaVibe';
-
-      // entrega_em_alta = permite baixar fotos (campo correto do banco)
-      if (GALERIA.entrega_em_alta == 1) {
-        document.getElementById('btn-cover-dl').style.display = 'flex';
+      
+      if(GALERIA.descricao) {
+        document.getElementById('hero-subtitle').textContent = GALERIA.descricao;
       }
 
-      // Carrega fotos silenciosamente para a grid e para preencher o fundo da capa
+      if (GALERIA.selecao_ativa == 1) {
+        isModoSelecao = true;
+      }
+      if (GALERIA.entrega_em_alta == 1) {
+        document.getElementById('btn-zip-all').style.display = '';
+      }
+
       await carregarFotos(true);
-
-      // Tocar música automaticamente na capa (se habilitada)
+      atualizarContador();
+      atualizarToolbar();
       carregarMusica();
-    }
 
-    function irParaGaleria() {
-      // Garantir a reprodução caso o navegador tenha bloqueado o autoplay inicial
+      if (typeof iniciarPolling === 'function') iniciarPolling();
+      
       if (GALERIA && GALERIA.musicas_ativas == 1) {
         const audio = document.getElementById('audio-player');
         if (audio && audio.src && audio.paused && document.getElementById('yt-player-container').style.display !== 'block') {
@@ -1353,43 +1231,6 @@
           try { if (ytPlayer.getPlayerState() !== 1) ytPlayer.playVideo(); } catch(err) {}
         }
       }
-
-      document.getElementById('cover-screen').style.display = 'none';
-      iniciarGaleriaNav();
-    }
-
-    function voltarParaCapa() {
-      document.getElementById('topnav').style.display = 'none';
-      document.getElementById('toolbar').style.display = 'none';
-      document.getElementById('gallery').style.display = 'none';
-      document.getElementById('cover-screen').style.display = 'flex';
-      atualizarToolbar();
-    }
-
-    function iniciarGaleriaNav() {
-      // Nav
-      document.getElementById('topnav').style.display = 'flex';
-      document.getElementById('toolbar').style.display = 'flex';
-      document.getElementById('gallery').style.display = 'grid'; // GARANTIDO como grid
-      document.getElementById('galeria-nome').textContent = GALERIA.nome;
-      atualizarContador();
-
-      // Botões (baseado nos módulos da galeria)
-      // Coerce para boolean (MySQL retorna '0'/'1' como string)
-      if (GALERIA.selecao_ativa == 1) {
-        isModoSelecao = true;
-      }
-
-      // entrega_em_alta == 1: permite baixar. Padronizado com nome do DB.
-      if (GALERIA.entrega_em_alta == 1) {
-        document.getElementById('btn-zip-all').style.display = '';
-      }
-
-      // Garante que a barra de seleção apareça se houver fotos já selecionadas
-      atualizarToolbar();
-
-      // Inicia polling automático de atualizações
-      iniciarPolling();
     }
 
     async function carregarFotos(isFromCover = false) {
@@ -1398,12 +1239,9 @@
         const r = await fetch(`/api/fotos/list.php?galeria_id=${GALERIA.id}`, { credentials: 'include' });
         const d = await r.json();
         const rawFotos = d.fotos || [];
-        document.getElementById('cover-count').textContent = rawFotos.length + ' FOTOS';
-
         if (rawFotos.length > 0) {
-          // Busca prioritária pela foto de capa (is_capa == 1)
           const fotoCapa = rawFotos.find(f => f.is_capa == 1) || rawFotos[0];
-          document.getElementById('cover-bg').style.backgroundImage = `url('/${fotoCapa.caminho_arquivo}')`;
+          document.getElementById('hero-bg').style.backgroundImage = `url('/${fotoCapa.caminho_arquivo}')`;
         }
 
         if (!rawFotos.length) {
@@ -1680,37 +1518,34 @@
     function atualizarToolbar() {
       const n = selecionadas.size;
       const maxSel = parseInt(GALERIA.max_selecao) || 0;
-      const isGalleryVisible = document.getElementById('gallery').style.display !== 'none';
 
-      // Gerencia o feedback visual de limite atingido na galeria
       const galleryEl = document.getElementById('gallery');
-      if (maxSel > 0 && n >= maxSel) {
-        galleryEl.classList.add('selection-limit-reached');
-      } else {
-        galleryEl.classList.remove('selection-limit-reached');
-      }
-
-      // Botão "Baixar Selecionadas" na toolbar superior
-      const btnZipSel = document.getElementById('btn-zip-sel');
-      if (btnZipSel) btnZipSel.style.display = (GALERIA.entrega_em_alta == 1 && n > 0 && isGalleryVisible) ? '' : 'none';
-
-      // Barra flutuante inferior de seleção
-      const floatingBar = document.getElementById('floating-selection');
-      if (floatingBar) {
-        if (n > 0) {
-          floatingBar.style.display = 'flex';
-          const maxSel = parseInt(GALERIA.max_selecao) || 0;
-          document.getElementById('floating-count').textContent =
-            `${n} foto${n > 1 ? 's' : ''} selecionada${n > 1 ? 's' : ''}${maxSel > 0 ? ` de ${maxSel}` : ''}`;
+      if (galleryEl) {
+        if (maxSel > 0 && n >= maxSel) {
+          galleryEl.classList.add('selection-limit-reached');
         } else {
-          floatingBar.style.display = 'none';
+          galleryEl.classList.remove('selection-limit-reached');
         }
       }
 
-      // Status no topo
-      const topStatus = document.getElementById('top-status-text');
-      if (topStatus) {
-        topStatus.textContent = `${n} foto${n !== 1 ? 's' : ''} selecionada${n !== 1 ? 's' : ''} • Baixar tudo (ZIP)`;
+      const selCounter = document.getElementById('sel-counter');
+      if (selCounter) {
+        selCounter.textContent = `${n} foto${n !== 1 ? 's' : ''} selecionada${n !== 1 ? 's' : ''}${maxSel > 0 ? ` de ${maxSel}` : ''}`;
+      }
+
+      const btnZipSel = document.getElementById('btn-zip-sel');
+      const btnClearSel = document.getElementById('btn-clear-sel');
+      
+      if (GALERIA && GALERIA.entrega_em_alta == 1 && n > 0) {
+        if(btnZipSel) btnZipSel.style.display = '';
+      } else {
+        if(btnZipSel) btnZipSel.style.display = 'none';
+      }
+
+      if (n > 0) {
+        if(btnClearSel) btnClearSel.style.display = '';
+      } else {
+        if(btnClearSel) btnClearSel.style.display = 'none';
       }
     }
 
