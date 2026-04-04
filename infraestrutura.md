@@ -174,3 +174,7 @@ FLASK_DEBUG=false
 
 > [!CAUTION]
 > Nunca faça commit do [.env](file:///c:/Users/willi/Documents/criavibe_site/.env) com credenciais reais. O [.gitignore](file:///c:/Users/willi/Documents/criavibe_site/.gitignore) já protege isso.
+
+
+testar loca:
+php -S localhost:8000

@@ -1,102 +1,43 @@
-# Criavibe Site
+# CriaVibe - Sistema de Galerias de Fotos
 
-Aplicação web Flask para gerenciamento de galerias de imagens.
+O **CriaVibe** é uma aplicação focada em fotógrafos para administração, entrega de fotos, e aprovação de galerias em ambiente web amigável com um dashboard limpo e ágil. 
 
-## Melhorias Implementadas
+O sistema backend é desenvolvido inteiramente de forma otimizada usando **PHP** estruturado nativo, servindo uma interface construída puramente em **HTML, CSS e JavaScript Vanilla**.
 
-### 🔒 Segurança
-- **Variáveis de ambiente**: Credenciais do banco e chave secreta agora usam variáveis de ambiente
-- **Validação de entrada**: Validação robusta de dados de entrada
-- **Sanitização de arquivos**: Verificação de extensões e nomes de arquivo seguros
-- **Tratamento de erros**: Logging adequado e tratamento de exceções
+## Estrutura de Diretórios
 
-### 🛠️ Funcionalidades
-- **Logging**: Sistema de logs para monitoramento
-- **Tipagem**: Adicionadas anotações de tipo para melhor manutenção
-- **Validação**: Validação de dados de registro e login
-- **Tratamento de erros**: Melhor tratamento de falhas de conexão com banco
+- `/assets`: Contém todo o styling (`/css`), imagens auxiliares (`/images`), e lógicas em JavaScript (`/js`). Funções vitais de fetch chamando a API encontram-se em `assets/js/api.js` e `auth.js`.
+- `/api`: Núcleo de comunicação que processa e persiste transações.
+- `/uploads`: Diretório dinâmico onde todas as fotos originais e comprimidas da aplicação são salvas em tempo real.
+- Raiz (`.html`): View e front-facing do sistema (e.g., `painel.html`, `clientes.html`, `entrar.html`, `saiba_mais.html`).
 
-### 📁 Estrutura
-- **Configuração centralizada**: Arquivo `config.py` melhorado
-- **Separação de responsabilidades**: Lógica de banco separada em `db.py`
-- **Documentação**: README e requirements.txt
+## Funcionalidades e Rotas (Backend API)
 
-## Instalação
+Os controladores do sistema são separados por domínio lógico em `/api`, suportando JSON purista. 
 
-1. **Clone o repositório**
-```bash
-git clone <url-do-repositorio>
-cd criavibe_site
-```
+**Rotas principais e domínios**:
+- **Auth (`api/auth`)**: Sistema de sessão mantido pelo `config.php`, contendo checagem de usuário ativo, logout, e validação de permissões rígidas via token/session.
+- **Clientes (`api/clientes`)**: Criação segura gerando link e senha únicos auto-distribuíveis para os clientes sem requerer envio em texto puro nas galerias.
+- **Fotos (`api/fotos`)**:
+  - Central upload multi-partes escalável em `upload.php`.
+  - Processo de download flexível unificado ou empacotado sob demanda e em tempo real em `download_zip.php` validando o `$dl_count`.
+  - Lógica de limitação inteligente de seleções (curadoria) controlados pelos endpoints `toggle_selecao.php` (individual) e `client_selecao.php` (em bloco para limpar e selecionar todos sob limites predefinidos).
+- **Galerias (`api/galerias`)**:
+  - Geração de álbuns ativando restrições de *max_downloads* e *max_selecao*. O endpoint `verify_access.php` faz fallback caso sessões PHP venham a cair ou fechar. 
+  - Consultas protegidas para donos limitarem quem está explorando álbuns por senha.
+- **Músicas (`api/musicas`)**: Upload de background tracks para playlists executadas automaticamente na capa frontal da galera do cliente.
+- **Migrações (`api/db_migrations.php`)**: Utilitário engatilhado manual e seguramente para atualizar o banco e sanar estruturas `Lazy` com DDL sem impactar ou destruir os nós das listagens sob estresse simultâneo.
 
-2. **Instale as dependências**
-```bash
-pip install -r requirements.txt
-```
+## Instalação e Configuração
 
-3. **Configure as variáveis de ambiente**
-```bash
-# Copie o arquivo de exemplo
-cp env_example.txt .env
+O sistema já pode existir em qualquer provedor otimizado com suporte a PHP 7.4+ nativo.
 
-# Edite o arquivo .env com suas configurações
-```
+1. **Baixe ou clone via repositório.**
+2. Copie o escopo das credenciais (`env_example.txt` como inspiração) configurando obrigatoriamente dentro de `api/config.php` nos campos de `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`.
+3. Inicie a configuração da pasta `/uploads`. Certifique-se de aplicar `CHMOD 775` (ou similar) em sistemas baseados em Unix nas varas `uploads/` para que o PHP grave as imagens do client.
+4. Rode **somente uma vez** o sistema de auto-restauração acessando sua URL direta `/api/db_migrations.php` estando autenticado, para garantir que novas colunas do banco estejam devidamente instanciadas e prontas no schema.
 
-4. **Configure o banco de dados**
+Dúvidas gerais, analise os arquivos de roteamento na ramificação de `api/` para verificação dos cabeçalhos aceitos (CORS já vêm habilitado para `HTTP_ORIGIN` no `config.php`).
 
 
-5. **Execute a aplicação**
-```bash
-python app.py
-```
-
-## Variáveis de Ambiente
-
-Copie o arquivo `env_example.txt` para `.env` e configure:
-
-- `DB_USER`: Usuário do banco de dados
-- `DB_PASSWORD`: Senha do banco de dados  
-- `DB_HOST`: Host do banco de dados
-- `DB_NAME`: Nome do banco de dados
-- `SECRET_KEY`: Chave secreta para sessões Flask
-
-## Estrutura do Projeto
-
-```
-criavibe_site/
-├── app.py              # Aplicação principal Flask
-├── config.py           # Configurações
-├── db.py              # Operações de banco de dados
-├── requirements.txt    # Dependências Python
-├── env_example.txt    # Exemplo de variáveis de ambiente
-├── static/            # Arquivos estáticos
-│   └── uploads/       # Imagens enviadas
-└── templates/         # Templates HTML
-```
-
-## Funcionalidades
-
-- ✅ Registro e login de usuários
-- ✅ Upload de imagens
-- ✅ Criação de galerias
-- ✅ Sistema de sessões
-- ✅ Validação de dados
-- ✅ Logging de atividades
-- ✅ Tratamento de erros
-
-## Segurança
-
-- Senhas são hasheadas com Werkzeug
-- Validação de tipos de arquivo
-- Sanitização de nomes de arquivo
-- Variáveis de ambiente para credenciais
-- Logging de tentativas de login
-
-## Próximas Melhorias Sugeridas
-
-1. **Autenticação JWT**: Implementar tokens JWT
-2. **Rate Limiting**: Limitar tentativas de login
-3. **Compressão de imagens**: Reduzir tamanho de uploads
-4. **Cache**: Implementar cache para melhor performance
-5. **Testes**: Adicionar testes unitários
-6. **Docker**: Containerização da aplicação 
+testar local: php -S localhost:8000
