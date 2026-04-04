@@ -130,6 +130,11 @@
     <button class="btn btn-sm" onclick="copiarLink()" style="background:var(--surface-2);border:1.5px solid var(--border)">
       <i class="fa-solid fa-link"></i> Copiar Link
     </button>
+    <select id="filtro-tipo" class="btn btn-sm" onchange="renderFotos()" style="background:var(--surface-2);border:1.5px solid var(--border);color:var(--text);font-weight:600;cursor:pointer;appearance:none;padding:5px 12px;text-align:center">
+      <option value="todas">◨ Tipo Foto</option>
+      <option value="vertical">📱 Apenas Verticais</option>
+      <option value="horizontal">🖥️ Apenas Horizontais</option>
+    </select>
   </div>
 
   <div class="tabs">
@@ -254,9 +259,10 @@
 <script src="/assets/js/auth.js"></script>
 <script>
 let galeriaId = new URLSearchParams(location.search).get('id');
-let galeria   = null;
-let fotos     = [];
-let lbIdx     = 0;
+let galeria       = null;
+let fotos         = [];
+let fotosVisiveis = [];
+let lbIdx         = 0;
 
 (async () => {
   await requireAuth();
@@ -325,13 +331,20 @@ async function carregarFotos() {
 
 function renderFotos() {
   const grid = document.getElementById('photos-grid');
-  if (!fotos.length) { grid.innerHTML='<div class="empty-state"><div class="icon"><i class="fa-solid fa-images"></i></div><p>Nenhuma foto enviada ainda.</p></div>'; return; }
+  const filtro = document.getElementById('filtro-tipo') ? document.getElementById('filtro-tipo').value : 'todas';
+  
+  fotosVisiveis = fotos.filter(f => filtro === 'todas' || f.orientacao === filtro);
+
+  if (!fotosVisiveis.length) { 
+    grid.innerHTML='<div class="empty-state"><div class="icon"><i class="fa-solid fa-images"></i></div><p>Nenhuma foto encontrada neste filtro.</p></div>'; 
+    return; 
+  }
   
   grid.style.setProperty('--grid-cols', 15);
   grid.style.setProperty('--span-v', 3);
   grid.style.setProperty('--span-h', 5);
 
-  grid.innerHTML = fotos.map((f,i) => `
+  grid.innerHTML = fotosVisiveis.map((f,i) => `
     <div class="photo-card ${f.selecionada?'sel':''} ${f.is_capa == 1 ? 'is-capa' : ''} ${f.orientacao}" id="pc-${f.id}">
       ${f.selecionada ? `
       <div class="photo-sel-badge">
@@ -388,13 +401,13 @@ async function excluirFoto(id) {
 // ── Lightbox ─────────────────────────────────────────────
 function abrirLightbox(i) {
   lbIdx = i;
-  document.getElementById('lb-img').src = '/'+fotos[i].caminho_arquivo;
+  document.getElementById('lb-img').src = '/'+fotosVisiveis[i].caminho_arquivo;
   document.getElementById('lightbox').classList.add('open');
 }
 function fecharLightbox() { document.getElementById('lightbox').classList.remove('open'); }
 function navLightbox(d) {
-  lbIdx = (lbIdx+d+fotos.length)%fotos.length;
-  document.getElementById('lb-img').src = '/'+fotos[lbIdx].caminho_arquivo;
+  lbIdx = (lbIdx+d+fotosVisiveis.length)%fotosVisiveis.length;
+  document.getElementById('lb-img').src = '/'+fotosVisiveis[lbIdx].caminho_arquivo;
 }
 document.addEventListener('keydown', e => {
   if (!document.getElementById('lightbox').classList.contains('open')) return;
