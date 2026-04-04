@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel — CriaVibe</title>
-  <link rel="stylesheet" href="/assets/css/main.css?v=2">
+  <link rel="stylesheet" href="/assets/css/main.css?v=4">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     .sel-alert {
@@ -71,11 +71,30 @@
     }
 
     .thumb-wrap:hover .zoom-preview,
-    .thumb-wrap:focus-within .zoom-preview {
+    .thumb-wrap:focus-within .zoom-preview,
+    .thumb-wrap:active .zoom-preview {
       visibility: visible;
       opacity: 1;
       transform: translateY(-50%) scale(1);
       transition: opacity .22s ease, transform .22s ease, visibility 0s linear 0s;
+    }
+
+    @media (max-width: 768px) {
+      .thumb-wrap .zoom-preview {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(.88);
+        width: 85vw;
+        max-width: 400px;
+        z-index: 10000;
+        box-shadow: 0 0 0 100vmax rgba(0,0,0,0.85), 0 16px 48px rgba(0,0,0,.7);
+      }
+      .thumb-wrap:hover .zoom-preview,
+      .thumb-wrap:focus-within .zoom-preview,
+      .thumb-wrap:active .zoom-preview {
+        transform: translate(-50%, -50%) scale(1);
+      }
     }
 
     /* Realce de linha ao salvar */

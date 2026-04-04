@@ -1336,6 +1336,17 @@
     }
 
     function irParaGaleria() {
+      // Garantir a reprodução caso o navegador tenha bloqueado o autoplay inicial
+      if (GALERIA && GALERIA.musicas_ativas == 1) {
+        const audio = document.getElementById('audio-player');
+        if (audio && audio.src && audio.paused && document.getElementById('yt-player-container').style.display !== 'block') {
+          audio.play().catch(() => {});
+        }
+        if (typeof ytPlayer !== 'undefined' && ytPlayer && typeof ytPlayer.playVideo === 'function') {
+          try { if (ytPlayer.getPlayerState() !== 1) ytPlayer.playVideo(); } catch(err) {}
+        }
+      }
+
       document.getElementById('cover-screen').style.display = 'none';
       iniciarGaleriaNav();
     }

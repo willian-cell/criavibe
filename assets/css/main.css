@@ -156,7 +156,7 @@ body.sidebar-open .sidebar-overlay {
 .galleries-table tbody tr:last-child{border-bottom:none}
 .galleries-table tbody tr:hover{background:var(--surface-2)}
 .galleries-table td{padding:12px 16px;vertical-align:middle;font-size:.85rem}
-.gallery-thumb{width:52px;height:36px;object-fit:cover;border-radius:5px}
+.gallery-thumb{width:52px;height:36px;object-fit:contain;background:#0f172a;border-radius:5px}
 .gallery-thumb-empty{width:52px;height:36px;border-radius:5px;background:var(--primary-lt);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:.75rem}
 .gallery-name{font-weight:600;color:var(--text);display:block;margin-bottom:2px;}
 .gallery-name:hover{color:var(--primary)}
@@ -204,81 +204,60 @@ body.sidebar-open .sidebar-overlay {
   @keyframes modalIn{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
   .modal-body{padding-bottom:40px}
 
-  /* ── Mobile Galleries Cards ── */
-  .table-responsive {
-    overflow: visible;
-  }
-  .galleries-table {
-    border: none;
-    box-shadow: none;
-    background: transparent;
-  }
-  .galleries-table table,
-  .galleries-table tbody,
-  .galleries-table tr,
-  .galleries-table td {
-    display: block;
-    width: 100%;
-  }
-  .galleries-table thead {
-    display: none;
-  }
+  /* ── Mobile Galleries Cards Premium ── */
+  .table-responsive { overflow: visible; padding-bottom: 0; }
+  .galleries-table { border: none; box-shadow: none; background: transparent; }
+  .galleries-table table, .galleries-table tbody, .galleries-table tr, .galleries-table td { display: block; width: 100%; }
+  .galleries-table thead { display: none; }
+  
   .galleries-table tr {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 16px;
-    padding: 16px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
+    position: relative; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 16px; padding: 16px;
     box-shadow: var(--shadow);
+    display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: flex-start;
   }
-  .galleries-table td {
-    padding: 0;
-    border: none;
-  }
-  /* TD1: Capa */
-  .galleries-table td:nth-child(1) {
-    width: 52px;
-    flex-shrink: 0;
-  }
-  /* TD2: Galeria Nome */
+  .galleries-table td { padding: 0; border: none; }
+  
+  /* Top section: Capa */
+  .galleries-table td:nth-child(1) { width: 55px; margin-right: 14px; }
+  .gallery-thumb, .gallery-thumb-empty { width: 55px; height: 55px; border-radius: 8px; object-fit: contain; background: #0f172a; }
+  
+  /* Galeria Nome/Badge */
   .galleries-table td:nth-child(2) {
-    flex: 1;
-    min-width: 0;
+    flex: 1; min-width: 0; padding-right: 30px; /* actions room */
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 55px;
   }
-  /* TD3 - TD6: Infos com flex basis 50% */
-  .galleries-table td:nth-child(3),
+  
+  /* Playlist */
+  .galleries-table td:nth-child(3) {
+    width: 100%; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border);
+    font-size: 0.85rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .galleries-table td:nth-child(3):has(span:only-child) { display: none; } /* Esconde música vazia se houver :has suporte */
+
+  /* STATS BOXES */
   .galleries-table td:nth-child(4),
   .galleries-table td:nth-child(5),
   .galleries-table td:nth-child(6) {
-    width: 48%;
-    font-size: .82rem;
-    display: flex;
-    align-items: center;
-    margin-top: 4px;
-    color: var(--text);
+    width: calc(33.333% - 6px);
+    margin-top: 12px; margin-right: 6px;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 10px 4px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; font-size: 0.8rem;
   }
-  /* Adding labels */
-  .galleries-table td:nth-child(4)::before { content: "Fotos: "; font-weight: 600; color: var(--muted); margin-right: 6px; }
-  .galleries-table td:nth-child(5)::before { content: "Seleç.: "; font-weight: 600; color: var(--muted); margin-right: 6px; }
-  .galleries-table td:nth-child(6)::before { content: "Down.: "; font-weight: 600; color: var(--muted); margin-right: 6px; }
-
-  /* TD7: Actions */
-  .galleries-table td:nth-child(7) {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    width: auto;
-  }
+  .galleries-table td:nth-child(6) { margin-right: 0; }
   
+  .galleries-table td:nth-child(4)::before { content: "FOTOS"; display: block; font-size: 0.62rem; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+  .galleries-table td:nth-child(5)::before { content: "SELEÇÃO"; display: block; font-size: 0.62rem; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+  .galleries-table td:nth-child(6)::before { content: "DOWNLOAD"; display: block; font-size: 0.62rem; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+
+  /* Actions */
+  .galleries-table td:nth-child(7) {
+    position: absolute; top: 16px; right: 12px; width: auto; z-index: 10;
+  }
   .actions-dropdown {
-    right: 0;
-    top: calc(100% + 5px);
-    z-index: 9999;
+    right: 0; top: calc(100% + 5px); z-index: 9999;
   }
 }
 
