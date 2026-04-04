@@ -2,11 +2,9 @@
 
 Options -Indexes
 
-# ── PHP Settings ──────────────────────────────────────────────
-php_value upload_max_filesize 50M
-php_value post_max_size 52M
-php_value memory_limit 128M
-php_value max_execution_time 120
+# As configurações de PHP foram removidas daqui porque
+# a Hostinger bloqueia a diretiva php_value no .htaccess e retorna Erro 500!
+# Você deve alterar os limites de Upload direto no Painel da Hostinger (Configurações do PHP).
 
 # ── Protect sensitive files ────────────────────────────────────
 <Files ".env">
