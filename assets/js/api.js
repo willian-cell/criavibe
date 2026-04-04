@@ -13,7 +13,7 @@ const API = {
       ...options,
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok && data.status === 'erro') throw new Error(data.mensagem || 'Erro desconhecido.');
+    if ((!res.ok) || (data.status === 'erro')) throw new Error(data.mensagem || 'Erro desconhecido.');
     return data;
   },
 

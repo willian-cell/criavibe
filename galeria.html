@@ -1,351 +1,751 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galeria — CriaVibe</title>
-  <link rel="stylesheet" href="/assets/css/main.css?v=2">
+  <link rel="stylesheet" href="/assets/css/main.css?v=13">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    .manager-topbar{
-      min-height:50px; height:auto; padding:12px 24px; background:var(--surface); border-bottom:1px solid var(--border);
-      display:flex; align-items:center; gap:8px; flex-wrap:wrap; position:sticky; top:0; z-index:50;
+    .manager-topbar {
+      min-height: 50px;
+      height: auto;
+      padding: 12px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
-    .manager-tab{font-size:.9rem;font-weight:700;color:var(--text)}
-    .manager-spacer{flex:1}
+
+    .manager-tab {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .manager-spacer {
+      flex: 1
+    }
+
     @media(max-width: 768px) {
-      .manager-topbar { padding: 16px; gap: 12px; }
-      .manager-tab { width: 100%; font-size: 1.1rem; }
-      .manager-spacer { display: none; }
+      .manager-topbar {
+        padding: 16px;
+        gap: 12px;
+        justify-content: center;
+      }
+
+      .manager-tab {
+        width: 100%;
+        font-size: 1.15rem;
+        text-align: center;
+        margin-bottom: 2px;
+      }
+
+      .manager-spacer {
+        display: none;
+      }
+
+      .manager-actions {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      .manager-actions .btn {
+        flex: 1;
+        padding: 6px 2px;
+        font-size: 0.72rem;
+        min-width: 0;
+        white-space: nowrap;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+      }
+
+      .manager-actions select.btn {
+        padding: 4px 0 !important;
+        font-size: 0.7rem;
+      }
     }
-    .photos-grid{display:grid;grid-template-columns:repeat(var(--grid-cols, 10), 1fr);gap:10px;padding:24px}
-    .photo-card{position:relative;border-radius:0;overflow:hidden;background:#0f172a;border:2px solid transparent;transition:var(--tr);}
-    .photo-card.vertical { grid-column: span var(--span-v, 2); aspect-ratio: 2/3; }
-    .photo-card.horizontal { grid-column: span var(--span-h, 5); aspect-ratio: 3/2; }
-    .photo-card img{width:100%;height:100%;object-fit:contain}
-    .photo-card.sel{
+
+    .photos-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-cols, 10), 1fr);
+      gap: 10px;
+      padding: 24px
+    }
+
+    .photos-grid .empty-state {
+      grid-column: 1 / -1;
+      padding: 60px 20px;
+    }
+
+    .photo-card {
+      position: relative;
+      border-radius: 0;
+      overflow: hidden;
+      background: #0f172a;
+      border: 2px solid transparent;
+      transition: var(--tr);
+    }
+
+    .photo-card.vertical {
+      grid-column: span var(--span-v, 2);
+      aspect-ratio: 2/3;
+    }
+
+    .photo-card.horizontal {
+      grid-column: span var(--span-h, 5);
+      aspect-ratio: 3/2;
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain
+    }
+
+    .photo-card.sel {
       border-color: var(--primary);
-      box-shadow: 0 0 0 1px var(--primary), 0 0 16px rgba(99,102,241,.3);
+      box-shadow: 0 0 0 1px var(--primary), 0 0 16px rgba(99, 102, 241, .3);
     }
-    .photo-sel-badge{
-      position:absolute;top:7px;left:7px;
-      background:var(--primary);color:#fff;
-      font-size:.68rem;font-weight:700;
-      padding:3px 8px;border-radius:20px;
-      display:flex;align-items:center;gap:4px;
-      box-shadow:0 2px 8px rgba(0,0,0,.3);
-      pointer-events:none;z-index:3;
+
+    .photo-sel-badge {
+      position: absolute;
+      top: 7px;
+      left: 7px;
+      background: var(--primary);
+      color: #fff;
+      font-size: .68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+      pointer-events: none;
+      z-index: 3;
       animation: badgePop .3s ease;
     }
+
     @keyframes badgePop {
-      from { transform: scale(0.7); opacity:0; }
-      to   { transform: scale(1);   opacity:1; }
+      from {
+        transform: scale(0.7);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
+
     .photo-card.is-capa {
       border-color: #ffd700;
       box-shadow: 0 0 0 1px #ffd700, 0 0 16px rgba(255, 215, 0, 0.4);
     }
+
     .photo-capa-badge {
-      position:absolute;top:7px;right:7px;
-      background:linear-gradient(135deg, #ffd700, #b8860b);
-      color:#000;
-      font-size:.62rem;font-weight:800;
-      padding:3px 8px;border-radius:20px;
-      display:flex;align-items:center;gap:4px;
-      box-shadow:0 2px 8px rgba(0,0,0,.3);
-      pointer-events:none;z-index:3;
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      background: linear-gradient(135deg, #ffd700, #b8860b);
+      color: #000;
+      font-size: .62rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+      pointer-events: none;
+      z-index: 3;
     }
-    .photo-overlay{position:absolute;bottom:0;left:0;right:0;padding:6px;background:linear-gradient(to top,rgba(0,0,0,.72)0%,transparent 100%);display:flex;gap:4px;justify-content:flex-end;opacity:0;transition:opacity .2s}
-    .photo-card:hover .photo-overlay{opacity:1}
-    .photo-btn{width:28px;height:28px;border-radius:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:.8rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--tr);backdrop-filter:blur(4px)}
-    .photo-btn:hover{background:rgba(255,255,255,.3)}
-    .photo-btn.danger:hover{background:var(--danger);border-color:var(--danger)}
-    .upload-zone{border:2px dashed var(--border-2);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:var(--tr);margin:24px}
-    .upload-zone:hover,.upload-zone.drag{border-color:var(--primary);background:var(--primary-lt)}
-    .upload-zone i{font-size:2rem;color:var(--muted);margin-bottom:10px}
-    .upload-zone p{color:var(--muted);font-size:.875rem}
-    .progress-bar-bg{height:6px;background:var(--bg);border-radius:10px;margin-top:12px}
-    .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),#818cf8);border-radius:10px;width:0%;transition:width .2s}
+
+    .photo-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 6px;
+      background: linear-gradient(to top, rgba(0, 0, 0, .72)0%, transparent 100%);
+      display: flex;
+      gap: 4px;
+      justify-content: flex-end;
+      opacity: 0;
+      transition: opacity .2s
+    }
+
+    .photo-card:hover .photo-overlay {
+      opacity: 1
+    }
+
+    .photo-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .3);
+      color: #fff;
+      font-size: .8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--tr);
+      backdrop-filter: blur(4px)
+    }
+
+    .photo-btn:hover {
+      background: rgba(255, 255, 255, .3)
+    }
+
+    .photo-btn.danger:hover {
+      background: var(--danger);
+      border-color: var(--danger)
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--border-2);
+      border-radius: var(--radius);
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--tr);
+      margin: 24px
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag {
+      border-color: var(--primary);
+      background: var(--primary-lt)
+    }
+
+    .upload-zone i {
+      font-size: 2rem;
+      color: var(--muted);
+      margin-bottom: 10px
+    }
+
+    .upload-zone p {
+      color: var(--muted);
+      font-size: .875rem
+    }
+
+    .progress-bar-bg {
+      height: 6px;
+      background: var(--bg);
+      border-radius: 10px;
+      margin-top: 12px
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #818cf8);
+      border-radius: 10px;
+      width: 0%;
+      transition: width .2s
+    }
+
     /* Tabs */
-    .tabs{display:flex;border-bottom:2px solid var(--border);margin:0 24px}
-    .tab-btn{padding:10px 18px;font-size:.875rem;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:var(--tr);font-family:inherit}
-    .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
-    .tab-panel{display:none;padding:0}
-    .tab-panel.active{display:block}
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin: 0 24px
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--muted);
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: var(--tr);
+      font-family: inherit
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary)
+    }
+
+    .tab-panel {
+      display: none;
+      padding: 0
+    }
+
+    .tab-panel.active {
+      display: block
+    }
+
     /* Config */
-    .config-section{padding:24px}
-    .config-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
-    .config-card h3{font-size:1rem;font-weight:700;margin-bottom:16px}
-    .config-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);gap:16px}
-    .config-row:last-child{border-bottom:none;padding-bottom:0}
-    .config-row-label{font-size:.875rem;font-weight:600;margin-bottom:4px}
-    .config-row-desc{font-size:.78rem;color:var(--muted)}
+    .config-section {
+      padding: 24px
+    }
+
+    .config-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 16px
+    }
+
+    .config-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 16px
+    }
+
+    .config-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 16px
+    }
+
+    .config-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0
+    }
+
+    .config-row-label {
+      font-size: .875rem;
+      font-weight: 600;
+      margin-bottom: 4px
+    }
+
+    .config-row-desc {
+      font-size: .78rem;
+      color: var(--muted)
+    }
+
     /* Lightbox */
-    .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;align-items:center;justify-content:center}
-    .lightbox.open{display:flex}
-    .lightbox img{max-width:92vw;max-height:90vh;border-radius:0;object-fit:contain}
-    .lightbox-close{position:absolute;top:16px;right:20px;color:#fff;font-size:1.8rem;cursor:pointer;background:none;border:none}
-    .lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);color:#fff;font-size:2rem;cursor:pointer;background:rgba(255,255,255,.1);border:none;padding:8px 14px;border-radius:8px}
-    .lightbox-nav.prev{left:12px}
-    .lightbox-nav.next{right:12px}
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .92);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center
+    }
+
+    .lightbox.open {
+      display: flex
+    }
+
+    .lightbox img {
+      max-width: 92vw;
+      max-height: 90vh;
+      border-radius: 0;
+      object-fit: contain
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      color: #fff;
+      font-size: 1.8rem;
+      cursor: pointer;
+      background: none;
+      border: none
+    }
+
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+      background: rgba(255, 255, 255, .1);
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px
+    }
+
+    .lightbox-nav.prev {
+      left: 12px
+    }
+
+    .lightbox-nav.next {
+      right: 12px
+    }
+
+    /* Dropdown Actions Menu */
+    .actions-menu {
+      position: relative;
+    }
+
+    .actions-dropdown {
+      display: none;
+      position: absolute;
+      background: var(--surface, #1e293b);
+      border: 1px solid var(--border, #334155);
+      border-radius: var(--radius, 8px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
+      z-index: 100;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .actions-dropdown.show {
+      display: flex;
+    }
+
+    .dd-item {
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      color: var(--text, #f8fafc);
+      font-size: .85rem;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      transition: var(--tr, all .2s);
+      font-family: inherit;
+      width: 100%;
+      white-space: nowrap;
+    }
+
+    .dd-item:hover {
+      background: var(--surface-2, #334155);
+      color: var(--primary, #6366f1);
+    }
   </style>
 </head>
+
 <body>
 
-<nav class="topnav">
-  <button class="topnav-toggle" onclick="document.body.classList.toggle('sidebar-open')">
-    <i class="fa-solid fa-bars"></i>
-  </button>
-  <div class="topnav-logo"><i class="fa-solid fa-images"></i> <span>CriaVibe</span></div>
-  <div class="topnav-spacer"></div>
-  <div class="topnav-user">
-    <a href="/painel.html" style="color:var(--muted);font-size:.825rem">← Painel</a>
-    <button class="topnav-logout" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
-  </div>
-</nav>
-
-<div class="painel-layout">
-  <!-- SIDEBAR OVERLAY -->
-  <div class="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open')"></div>
-
-  <!-- SIDEBAR -->
-  <aside class="painel-sidebar">
-    <h3>Menu</h3>
-    <a href="/painel.html" class="sidebar-link active"><i class="fa-solid fa-images"></i> Galerias</a>
-    <a href="/clientes.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Clientes</a>
-    <h3 style="margin-top:20px">Conta</h3>
-    <a href="/configuracoes.html" class="sidebar-link"><i class="fa-solid fa-gear"></i> Configurações</a>
-    <a href="/saiba_mais.html" class="sidebar-link"><i class="fa-solid fa-circle-info"></i> Sobre</a>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="painel-main" style="padding: 0; max-width: 100%;">
-    <div>
-  <div class="manager-topbar">
-    <span class="manager-tab" id="top-nome">Carregando...</span>
-    <div class="manager-spacer"></div>
-    <a id="btn-ver" href="#" target="_blank" class="btn btn-secondary btn-sm">
-      <i class="fa-solid fa-eye"></i> Ver Galeria
-    </a>
-    <button class="btn btn-sm" onclick="copiarLink()" style="background:var(--surface-2);border:1.5px solid var(--border)">
-      <i class="fa-solid fa-link"></i> Copiar Link
+  <nav class="topnav">
+    <button class="topnav-toggle" onclick="document.body.classList.toggle('sidebar-open')">
+      <i class="fa-solid fa-bars"></i>
     </button>
-    <select id="filtro-tipo" class="btn btn-sm" onchange="renderFotos()" style="background:var(--surface-2);border:1.5px solid var(--border);color:var(--text);font-weight:600;cursor:pointer;appearance:none;padding:5px 12px;text-align:center">
-      <option value="todas">◨ Tipo Foto</option>
-      <option value="vertical">📱 Apenas Verticais</option>
-      <option value="horizontal">🖥️ Apenas Horizontais</option>
-    </select>
-  </div>
-
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('fotos')"><i class="fa-solid fa-images"></i> Fotos</button>
-    <button class="tab-btn" onclick="switchTab('config')"><i class="fa-solid fa-gear"></i> Configurações</button>
-    <button class="tab-btn" onclick="switchTab('musicas')"><i class="fa-solid fa-music"></i> Músicas</button>
-  </div>
-
-  <!-- FOTOS -->
-  <div id="tab-fotos" class="tab-panel active">
-    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
-         ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFiles(event)">
-      <i class="fa-solid fa-cloud-arrow-up"></i>
-      <p><strong>Clique ou arraste</strong> as fotos aqui</p>
-      <p>JPG, PNG, WEBP · Múltiplos arquivos aceitos</p>
-      <div class="progress-bar-bg" id="prog-bg" style="display:none">
-        <div class="progress-bar-fill" id="prog-fill"></div>
-      </div>
-      <p id="prog-txt" style="font-size:.75rem;margin-top:6px;color:var(--primary)"></p>
+    <div class="topnav-logo"><i class="fa-solid fa-images"></i> <span>CriaVibe</span></div>
+    <div class="topnav-spacer"></div>
+    <div class="topnav-user">
+      <a href="/painel.html" style="color:var(--muted);font-size:.825rem">← Painel</a>
+      <button class="topnav-logout" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+        Sair</button>
     </div>
-    <input id="file-input" type="file" accept="image/*" multiple style="display:none" onchange="uploadFotos(this.files)">
-    <div class="photos-grid" id="photos-grid"></div>
-  </div>
+  </nav>
 
-  <!-- CONFIGURAÇÕES -->
-  <div id="tab-config" class="tab-panel">
-    <div class="config-section">
-      <div class="config-card">
-        <h3>Informações</h3>
-        <div class="form-group">
-          <label>Nome da Galeria</label>
-          <input id="cfg-nome" class="form-control" type="text">
-        </div>
-        <div class="form-group">
-          <label>Descrição</label>
-          <textarea id="cfg-descricao" class="form-control" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-          <label>Privacidade</label>
-          <select id="cfg-privacidade" class="form-control" onchange="toggleSenhaCfg()">
-            <option value="privada">Privada (com senha)</option>
-            <option value="publica">Pública</option>
-          </select>
-        </div>
-        <div class="form-group" id="cfg-senha-g">
-          <label>Nova Senha <small style="color:var(--muted)">(vazio = manter atual)</small></label>
-          <input id="cfg-senha" class="form-control" type="password" placeholder="Nova senha">
-        </div>
-        <button class="btn btn-primary" onclick="salvarConfig()">
-          <i class="fa-solid fa-floppy-disk"></i> Salvar
-        </button>
-      </div>
-      <div class="config-card">
-        <h3>Módulos</h3>
-        <div class="config-row">
-          <div><div class="config-row-label">Permitir Downloads</div><div class="config-row-desc">Cliente pode baixar as fotos entregues</div></div>
-          <label class="toggle-switch"><input id="tog-alta" type="checkbox"><span class="toggle-slider"></span></label>
-        </div>
-        <div class="config-row">
-          <div><div class="config-row-label">Seleção de Fotos</div><div class="config-row-desc">Cliente pode marcar as fotos favoritas</div></div>
-          <label class="toggle-switch"><input id="tog-sel" type="checkbox"><span class="toggle-slider"></span></label>
-        </div>
-        <div class="config-row">
-          <div><div class="config-row-label">Player de Música</div><div class="config-row-desc">Trilha sonora na galeria do cliente</div></div>
-          <label class="toggle-switch"><input id="tog-mus" type="checkbox"><span class="toggle-slider"></span></label>
-        </div>
-        <button class="btn btn-primary" style="margin-top:16px" onclick="salvarModulos()">
-          <i class="fa-solid fa-floppy-disk"></i> Salvar Módulos
-        </button>
-      </div>
-    </div>
-  </div>
+  <div class="painel-layout">
+    <!-- SIDEBAR OVERLAY -->
+    <div class="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open')"></div>
 
-  <!-- MÚSICAS -->
-  <div id="tab-musicas" class="tab-panel">
-    <div class="config-section">
-      <div class="config-card">
-        <h3>Adicionar Música</h3>
-        <div class="tabs" style="margin:0 0 16px">
-          <button class="tab-btn active" onclick="switchMusTab('mp3')" id="mbt-mp3">Upload MP3</button>
-          <button class="tab-btn" onclick="switchMusTab('yt')" id="mbt-yt">YouTube</button>
-        </div>
-        <div id="mus-mp3">
-          <input type="file" id="mus-file" accept="audio/*" class="form-control">
-          <button class="btn btn-primary" style="margin-top:10px" onclick="uploadMusica()">
-            <i class="fa-solid fa-upload"></i> Enviar MP3
-          </button>
-        </div>
-        <div id="mus-yt" style="display:none">
-          <div class="form-group">
-            <label>URL do YouTube</label>
-            <input id="yt-url" class="form-control" type="url" placeholder="https://youtube.com/watch?v=...">
+    <!-- SIDEBAR -->
+    <aside class="painel-sidebar">
+      <h3>Menu</h3>
+      <a href="/painel.html" class="sidebar-link active"><i class="fa-solid fa-images"></i> Galerias</a>
+      <a href="/clientes.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Clientes</a>
+      <h3 style="margin-top:20px">Conta</h3>
+      <a href="/configuracoes.html" class="sidebar-link"><i class="fa-solid fa-gear"></i> Configurações</a>
+      <a href="/saiba_mais.html" class="sidebar-link"><i class="fa-solid fa-circle-info"></i> Sobre</a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="painel-main" style="padding: 0; max-width: 100%;">
+      <div>
+        <div class="manager-topbar">
+          <span class="manager-tab" id="top-nome">Carregando...</span>
+          <div class="manager-spacer"></div>
+          <div class="manager-actions">
+            <a id="btn-ver" href="#" target="_blank" class="btn btn-secondary btn-sm">
+              <i class="fa-solid fa-eye"></i> Ver Galeria
+            </a>
+            <button class="btn btn-secondary btn-sm" onclick="copiarLink()">
+              <i class="fa-solid fa-link"></i> Copiar Link
+            </button>
+            <div class="actions-menu" style="flex:1;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-filtro-text"
+                onclick="toggleFiltro(event, this)" style="width:100%; justify-content:center; text-align:center;">
+                &#9688; Tipo Foto
+              </button>
+              <div class="actions-dropdown filtro-dd" id="filtro-dropdown"
+                style="top:calc(100% + 5px); right:0; min-width:160px; text-align:left;">
+                <button type="button" class="dd-item" onclick="setFiltro('todas', '&#9688; Tipo Foto')">&#9688; Todas as
+                  Fotos</button>
+                <button type="button" class="dd-item" onclick="setFiltro('vertical', 'Verticais')">Apenas
+                  Verticais</button>
+                <button type="button" class="dd-item" onclick="setFiltro('horizontal', 'Horizontais')">Apenas
+                  Horizontais</button>
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Nome de exibição</label>
-            <input id="yt-nome" class="form-control" type="text" placeholder="Nome da faixa">
+        </div>
+
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab('fotos')"><i class="fa-solid fa-images"></i> Fotos</button>
+          <button class="tab-btn" onclick="switchTab('config')"><i class="fa-solid fa-gear"></i> Configurações</button>
+          <button class="tab-btn" onclick="switchTab('musicas')"><i class="fa-solid fa-music"></i> Músicas</button>
+        </div>
+
+        <!-- FOTOS -->
+        <div id="tab-fotos" class="tab-panel active">
+          <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
+            ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFiles(event)">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p><strong>Clique ou arraste</strong> as fotos aqui</p>
+            <p>JPG, PNG, WEBP · Múltiplos arquivos aceitos</p>
+            <div class="progress-bar-bg" id="prog-bg" style="display:none">
+              <div class="progress-bar-fill" id="prog-fill"></div>
+            </div>
+            <p id="prog-txt" style="font-size:.75rem;margin-top:6px;color:var(--primary)"></p>
           </div>
-          <button class="btn btn-primary" onclick="addYoutube()">
-            <i class="fa-brands fa-youtube"></i> Adicionar
-          </button>
+          <input id="file-input" type="file" accept="image/*" multiple style="display:none"
+            onchange="uploadFotos(this.files)">
+          <div class="photos-grid" id="photos-grid"></div>
+        </div>
+
+        <!-- CONFIGURAÇÕES -->
+        <div id="tab-config" class="tab-panel">
+          <div class="config-section">
+            <div class="config-card">
+              <h3>Informações</h3>
+              <div class="form-group">
+                <label>Nome da Galeria</label>
+                <input id="cfg-nome" class="form-control" type="text">
+              </div>
+              <div class="form-group">
+                <label>Descrição</label>
+                <textarea id="cfg-descricao" class="form-control" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Privacidade</label>
+                <select id="cfg-privacidade" class="form-control" onchange="toggleSenhaCfg()">
+                  <option value="privada">Privada (com senha)</option>
+                  <option value="publica">Pública</option>
+                </select>
+              </div>
+              <div class="form-group" id="cfg-senha-g">
+                <label>Nova Senha <small style="color:var(--muted)">(vazio = manter atual)</small></label>
+                <input id="cfg-senha" class="form-control" type="password" placeholder="Nova senha">
+              </div>
+              <button class="btn btn-primary" onclick="salvarConfig()">
+                <i class="fa-solid fa-floppy-disk"></i> Salvar
+              </button>
+            </div>
+            <div class="config-card">
+              <h3>Módulos</h3>
+              <div class="config-row">
+                <div>
+                  <div class="config-row-label">Permitir Downloads</div>
+                  <div class="config-row-desc">Cliente pode baixar as fotos entregues</div>
+                </div>
+                <label class="toggle-switch"><input id="tog-alta" type="checkbox"><span
+                    class="toggle-slider"></span></label>
+              </div>
+              <div class="config-row">
+                <div>
+                  <div class="config-row-label">Seleção de Fotos</div>
+                  <div class="config-row-desc">Cliente pode marcar as fotos favoritas</div>
+                </div>
+                <label class="toggle-switch"><input id="tog-sel" type="checkbox"><span
+                    class="toggle-slider"></span></label>
+              </div>
+              <div class="config-row">
+                <div>
+                  <div class="config-row-label">Player de Música</div>
+                  <div class="config-row-desc">Trilha sonora na galeria do cliente</div>
+                </div>
+                <label class="toggle-switch"><input id="tog-mus" type="checkbox"><span
+                    class="toggle-slider"></span></label>
+              </div>
+              <button class="btn btn-primary" style="margin-top:16px" onclick="salvarModulos()">
+                <i class="fa-solid fa-floppy-disk"></i> Salvar Módulos
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÚSICAS -->
+        <div id="tab-musicas" class="tab-panel">
+          <div class="config-section">
+            <div class="config-card">
+              <h3>Adicionar Música</h3>
+              <div class="tabs" style="margin:0 0 16px">
+                <button class="tab-btn active" onclick="switchMusTab('mp3')" id="mbt-mp3">Upload MP3</button>
+                <button class="tab-btn" onclick="switchMusTab('yt')" id="mbt-yt">YouTube</button>
+              </div>
+              <div id="mus-mp3">
+                <input type="file" id="mus-file" accept="audio/*" class="form-control">
+                <button class="btn btn-primary" style="margin-top:10px" onclick="uploadMusica()">
+                  <i class="fa-solid fa-upload"></i> Enviar MP3
+                </button>
+              </div>
+              <div id="mus-yt" style="display:none">
+                <div class="form-group">
+                  <label>URL do YouTube</label>
+                  <input id="yt-url" class="form-control" type="url" placeholder="https://youtube.com/watch?v=...">
+                </div>
+                <div class="form-group">
+                  <label>Nome de exibição</label>
+                  <input id="yt-nome" class="form-control" type="text" placeholder="Nome da faixa">
+                </div>
+                <button class="btn btn-primary" onclick="addYoutube()">
+                  <i class="fa-brands fa-youtube"></i> Adicionar
+                </button>
+              </div>
+            </div>
+            <div class="config-card">
+              <h3>Playlist</h3>
+              <div id="music-list" style="display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="config-card">
-        <h3>Playlist</h3>
-        <div id="music-list" style="display:flex;flex-direction:column;gap:8px"></div>
-      </div>
-    </div>
+    </main>
   </div>
-    </div>
-  </main>
-</div>
 
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="if(event.target===this)fecharLightbox()">
-  <button class="lightbox-close" onclick="fecharLightbox()">&times;</button>
-  <button class="lightbox-nav prev" onclick="navLightbox(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-  <img id="lb-img" src="" alt="">
-  <button class="lightbox-nav next" onclick="navLightbox(1)"><i class="fa-solid fa-chevron-right"></i></button>
-</div>
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" onclick="if(event.target===this)fecharLightbox()">
+    <button class="lightbox-close" onclick="fecharLightbox()">&times;</button>
+    <button class="lightbox-nav prev" onclick="navLightbox(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+    <img id="lb-img" src="" alt="">
+    <button class="lightbox-nav next" onclick="navLightbox(1)"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
 
-<script src="/assets/js/api.js"></script>
-<script src="/assets/js/auth.js"></script>
-<script>
-let galeriaId = new URLSearchParams(location.search).get('id');
-let galeria       = null;
-let fotos         = [];
-let fotosVisiveis = [];
-let lbIdx         = 0;
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script>
+    let galeriaId = new URLSearchParams(location.search).get('id');
+    let galeria = null;
+    let fotos = [];
+    let fotosVisiveis = [];
+    let lbIdx = 0;
+    let filtroAtual = 'todas';
 
-(async () => {
-  await requireAuth();
-  if (!galeriaId) { location.href='/painel.html'; return; }
-  const d = await API.get(`/galerias/get.php?id=${galeriaId}`);
-  galeria = d.galeria;
-  document.title = galeria.nome + ' — CriaVibe';
-  document.getElementById('top-nome').textContent = galeria.nome;
-  document.getElementById('btn-ver').href = `/cliente.html?token=${galeria.link_token}`;
-  preencherConfig();
-  await carregarFotos();
-  await carregarMusicas();
+    function toggleFiltro(e, btn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const dd = document.getElementById('filtro-dropdown');
+      const isShow = dd.classList.contains('show');
+      document.querySelectorAll('.filtro-dd.show').forEach(el => el.classList.remove('show'));
+      if (!isShow) dd.classList.add('show');
+    }
 
-  // Auto-polling: atualiza seleções do cliente a cada 30 segundos
-  setInterval(async () => {
-    if (!galeriaId) return;
-    try {
-      const r = await API.get(`/fotos/list.php?galeria_id=${galeriaId}`);
-      const novasfotos = r.fotos || [];
-      let mudou = false;
-      novasfotos.forEach(f => {
-        const idx = fotos.findIndex(x => x.id === f.id);
-        if (idx !== -1 && (fotos[idx].selecionada !== f.selecionada || fotos[idx].is_capa !== f.is_capa)) {
-          fotos[idx].selecionada = f.selecionada;
-          fotos[idx].is_capa = f.is_capa;
-          mudou = true;
-        }
-      });
-      if (mudou) renderFotos();
-    } catch {}
-  }, 30000);
-})();
-
-// ── Tabs ──────────────────────────────────────────────────
-function switchTab(name) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', ['fotos','config','musicas'][i]===name));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-}
-function switchMusTab(t) {
-  document.getElementById('mus-mp3').style.display = t==='mp3'?'':'none';
-  document.getElementById('mus-yt').style.display  = t==='yt' ?'':'none';
-  document.querySelectorAll('#tab-musicas .tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='mp3')||(i===1&&t==='yt')));
-}
-
-// ── Fotos ─────────────────────────────────────────────────
-async function carregarFotos() {
-  const d = await API.get(`/fotos/list.php?galeria_id=${galeriaId}`);
-  const rawFotos = d.fotos || [];
-  
-  // Detect orientaton to calculate spans properly
-  fotos = await Promise.all(rawFotos.map(f => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        f.orientacao = img.naturalWidth > img.naturalHeight ? 'horizontal' : 'vertical';
-        resolve(f);
-      };
-      img.onerror = () => { f.orientacao = 'horizontal'; resolve(f); };
-      img.src = '/' + f.caminho_arquivo;
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.actions-menu')) {
+        document.querySelectorAll('.filtro-dd.show').forEach(el => el.classList.remove('show'));
+      }
     });
-  }));
-  
-  renderFotos();
-}
 
-function renderFotos() {
-  const grid = document.getElementById('photos-grid');
-  const filtro = document.getElementById('filtro-tipo') ? document.getElementById('filtro-tipo').value : 'todas';
-  
-  fotosVisiveis = fotos.filter(f => filtro === 'todas' || f.orientacao === filtro);
+    window.setFiltro = function (val, textLabel) {
+      filtroAtual = val;
+      const btn = document.getElementById('btn-filtro-text');
+      if (btn) btn.innerHTML = textLabel;
+      document.querySelectorAll('.filtro-dd.show').forEach(el => el.classList.remove('show'));
+      renderFotos();
+    }
 
-  if (!fotosVisiveis.length) { 
-    grid.innerHTML='<div class="empty-state"><div class="icon"><i class="fa-solid fa-images"></i></div><p>Nenhuma foto encontrada neste filtro.</p></div>'; 
-    return; 
-  }
-  
-  grid.style.setProperty('--grid-cols', 15);
-  grid.style.setProperty('--span-v', 3);
-  grid.style.setProperty('--span-h', 5);
+      (async () => {
+        await requireAuth();
+        if (!galeriaId) { location.href = '/painel.html'; return; }
+        try {
+          const d = await API.get(`/galerias/get.php?id=${galeriaId}`);
+          if (!d || !d.galeria) throw new Error('Galeria não encontrada.');
+          galeria = d.galeria;
+          document.title = galeria.nome + ' — CriaVibe';
+          document.getElementById('top-nome').textContent = galeria.nome;
+          if (galeria.link_token) {
+            document.getElementById('btn-ver').href = `/cliente.html?token=${galeria.link_token}`;
+          }
+          preencherConfig();
+          await carregarFotos();
+          await carregarMusicas();
+        } catch (e) {
+          showToast(e.message, 'error');
+          document.getElementById('top-nome').textContent = "Erro ao carregar";
+        }
 
-  grid.innerHTML = fotosVisiveis.map((f,i) => `
-    <div class="photo-card ${f.selecionada?'sel':''} ${f.is_capa == 1 ? 'is-capa' : ''} ${f.orientacao}" id="pc-${f.id}">
+        // Auto-polling: atualiza seleções do cliente a cada 30 segundos
+        setInterval(async () => {
+          if (!galeria || !galeriaId) return;
+          try {
+            const r = await API.get(`/fotos/list.php?galeria_id=${galeriaId}`);
+            const novasfotos = r.fotos || [];
+            let mudou = false;
+            novasfotos.forEach(f => {
+              const idx = fotos.findIndex(x => x.id === f.id);
+              if (idx !== -1 && (fotos[idx].selecionada !== f.selecionada || fotos[idx].is_capa !== f.is_capa)) {
+                fotos[idx].selecionada = f.selecionada;
+                fotos[idx].is_capa = f.is_capa;
+                mudou = true;
+              }
+            });
+            if (mudou) renderFotos();
+          } catch { }
+        }, 30000);
+      })();
+
+    // ── Tabs ──────────────────────────────────────────────────
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', ['fotos', 'config', 'musicas'][i] === name));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+    function switchMusTab(t) {
+      document.getElementById('mus-mp3').style.display = t === 'mp3' ? '' : 'none';
+      document.getElementById('mus-yt').style.display = t === 'yt' ? '' : 'none';
+      document.querySelectorAll('#tab-musicas .tab-btn').forEach((b, i) => b.classList.toggle('active', (i === 0 && t === 'mp3') || (i === 1 && t === 'yt')));
+    }
+
+    // ── Fotos ─────────────────────────────────────────────────
+    async function carregarFotos() {
+      const d = await API.get(`/fotos/list.php?galeria_id=${galeriaId}`);
+      const rawFotos = d.fotos || [];
+
+      // Detect orientaton to calculate spans properly
+      fotos = await Promise.all(rawFotos.map(f => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            f.orientacao = img.naturalWidth > img.naturalHeight ? 'horizontal' : 'vertical';
+            resolve(f);
+          };
+          img.onerror = () => { f.orientacao = 'horizontal'; resolve(f); };
+          img.src = '/' + f.caminho_arquivo;
+        });
+      }));
+
+      renderFotos();
+    }
+
+    function renderFotos() {
+      const grid = document.getElementById('photos-grid');
+      const filtro = filtroAtual;
+
+      fotosVisiveis = fotos.filter(f => filtro === 'todas' || f.orientacao === filtro);
+
+      if (!fotosVisiveis.length) {
+        grid.innerHTML = '<div class="empty-state"><div class="icon"><i class="fa-solid fa-images"></i></div><p>Nenhuma foto encontrada neste filtro.</p></div>';
+        return;
+      }
+
+      grid.style.setProperty('--grid-cols', 15);
+      grid.style.setProperty('--span-v', 3);
+      grid.style.setProperty('--span-h', 5);
+
+      grid.innerHTML = fotosVisiveis.map((f, i) => `
+    <div class="photo-card ${f.selecionada ? 'sel' : ''} ${f.is_capa == 1 ? 'is-capa' : ''} ${f.orientacao}" id="pc-${f.id}">
       ${f.selecionada ? `
       <div class="photo-sel-badge">
         <i class="fa-solid fa-star"></i> Selecionada
@@ -362,144 +762,145 @@ function renderFotos() {
       </div>
     </div>
   `).join('');
-}
+    }
 
-// ── Upload de Fotos ───────────────────────────────────────
-function dragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag'); }
-function dragLeave()  { document.getElementById('drop-zone').classList.remove('drag'); }
-function dropFiles(e) { e.preventDefault(); dragLeave(); uploadFotos(e.dataTransfer.files); }
+    // ── Upload de Fotos ───────────────────────────────────────
+    function dragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag'); }
+    function dragLeave() { document.getElementById('drop-zone').classList.remove('drag'); }
+    function dropFiles(e) { e.preventDefault(); dragLeave(); uploadFotos(e.dataTransfer.files); }
 
-async function uploadFotos(files) {
-  if (!files || !files.length) return;
-  const prog = document.getElementById('prog-fill');
-  const txt  = document.getElementById('prog-txt');
-  document.getElementById('prog-bg').style.display = '';
-  let done = 0;
-  for (const file of files) {
-    const fd = new FormData();
-    fd.append('galeria_id', galeriaId);
-    fd.append('fotos[]', file);
-    await API.upload('/fotos/upload.php', fd);
-    done++;
-    prog.style.width = `${(done/files.length)*100}%`;
-    txt.textContent  = `${done}/${files.length} enviadas`;
-  }
-  showToast(`${done} foto(s) enviada(s)!`);
-  document.getElementById('prog-bg').style.display='none';
-  txt.textContent='';
-  prog.style.width='0%';
-  await carregarFotos();
-}
+    async function uploadFotos(files) {
+      if (!files || !files.length) return;
+      const prog = document.getElementById('prog-fill');
+      const txt = document.getElementById('prog-txt');
+      document.getElementById('prog-bg').style.display = '';
+      let done = 0;
+      for (const file of files) {
+        const fd = new FormData();
+        fd.append('galeria_id', galeriaId);
+        fd.append('fotos[]', file);
+        await API.upload('/fotos/upload.php', fd);
+        done++;
+        prog.style.width = `${(done / files.length) * 100}%`;
+        txt.textContent = `${done}/${files.length} enviadas`;
+      }
+      showToast(`${done} foto(s) enviada(s)!`);
+      document.getElementById('prog-bg').style.display = 'none';
+      txt.textContent = '';
+      prog.style.width = '0%';
+      await carregarFotos();
+    }
 
-async function excluirFoto(id) {
-  if (!confirm('Excluir esta foto?')) return;
-  await API.post('/fotos/delete.php', { id });
-  showToast('Foto excluída.');
-  await carregarFotos();
-}
+    async function excluirFoto(id) {
+      if (!confirm('Excluir esta foto?')) return;
+      await API.post('/fotos/delete.php', { id });
+      showToast('Foto excluída.');
+      await carregarFotos();
+    }
 
-// ── Lightbox ─────────────────────────────────────────────
-function abrirLightbox(i) {
-  lbIdx = i;
-  document.getElementById('lb-img').src = '/'+fotosVisiveis[i].caminho_arquivo;
-  document.getElementById('lightbox').classList.add('open');
-}
-function fecharLightbox() { document.getElementById('lightbox').classList.remove('open'); }
-function navLightbox(d) {
-  lbIdx = (lbIdx+d+fotosVisiveis.length)%fotosVisiveis.length;
-  document.getElementById('lb-img').src = '/'+fotosVisiveis[lbIdx].caminho_arquivo;
-}
-document.addEventListener('keydown', e => {
-  if (!document.getElementById('lightbox').classList.contains('open')) return;
-  if (e.key==='ArrowRight') navLightbox(1);
-  if (e.key==='ArrowLeft')  navLightbox(-1);
-  if (e.key==='Escape')     fecharLightbox();
-});
+    // ── Lightbox ─────────────────────────────────────────────
+    function abrirLightbox(i) {
+      lbIdx = i;
+      document.getElementById('lb-img').src = '/' + fotosVisiveis[i].caminho_arquivo;
+      document.getElementById('lightbox').classList.add('open');
+    }
+    function fecharLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+    function navLightbox(d) {
+      lbIdx = (lbIdx + d + fotosVisiveis.length) % fotosVisiveis.length;
+      document.getElementById('lb-img').src = '/' + fotosVisiveis[lbIdx].caminho_arquivo;
+    }
+    document.addEventListener('keydown', e => {
+      if (!document.getElementById('lightbox').classList.contains('open')) return;
+      if (e.key === 'ArrowRight') navLightbox(1);
+      if (e.key === 'ArrowLeft') navLightbox(-1);
+      if (e.key === 'Escape') fecharLightbox();
+    });
 
-// ── Config ────────────────────────────────────────────────
-function preencherConfig() {
-  document.getElementById('cfg-nome').value      = galeria.nome;
-  document.getElementById('cfg-descricao').value = galeria.descricao || '';
-  document.getElementById('cfg-privacidade').value = galeria.privacidade;
-  toggleSenhaCfg();
-  document.getElementById('tog-alta').checked = !!galeria.entrega_em_alta;
-  document.getElementById('tog-sel').checked  = !!galeria.selecao_ativa;
-  document.getElementById('tog-mus').checked  = !!galeria.musicas_ativas;
-}
-function toggleSenhaCfg() {
-  const p = document.getElementById('cfg-privacidade').value;
-  document.getElementById('cfg-senha-g').style.display = p==='privada'?'':'none';
-}
-async function salvarConfig() {
-  const d = await API.post('/galerias/update.php', {
-    id: parseInt(galeriaId),
-    nome: document.getElementById('cfg-nome').value.trim(),
-    descricao: document.getElementById('cfg-descricao').value.trim(),
-    privacidade: document.getElementById('cfg-privacidade').value,
-    senha: document.getElementById('cfg-senha').value || null,
-  });
-  if (d.status==='ok') { showToast('Configurações salvas!'); galeria.nome = document.getElementById('cfg-nome').value.trim(); document.getElementById('top-nome').textContent = galeria.nome; }
-  else showToast(d.mensagem,'error');
-}
-async function salvarModulos() {
-  const d = await API.post('/galerias/update_modulos.php', {
-    id: parseInt(galeriaId),
-    entrega_em_alta: document.getElementById('tog-alta').checked,
-    selecao_ativa:   document.getElementById('tog-sel').checked,
-    musicas_ativas:  document.getElementById('tog-mus').checked,
-  });
-  if (d.status === 'ok') {
-    showToast('Módulos salvos com sucesso!');
-    // Atualiza objeto local para refletir mudanças imediatamente
-    galeria.entrega_em_alta = document.getElementById('tog-alta').checked ? 1 : 0;
-    galeria.selecao_ativa   = document.getElementById('tog-sel').checked  ? 1 : 0;
-    galeria.musicas_ativas  = document.getElementById('tog-mus').checked  ? 1 : 0;
-  } else {
-    showToast(d.mensagem || 'Erro ao salvar módulos.', 'error');
-  }
-}
+    // ── Config ────────────────────────────────────────────────
+    function preencherConfig() {
+      document.getElementById('cfg-nome').value = galeria.nome;
+      document.getElementById('cfg-descricao').value = galeria.descricao || '';
+      document.getElementById('cfg-privacidade').value = galeria.privacidade;
+      toggleSenhaCfg();
+      document.getElementById('tog-alta').checked = !!galeria.entrega_em_alta;
+      document.getElementById('tog-sel').checked = !!galeria.selecao_ativa;
+      document.getElementById('tog-mus').checked = !!galeria.musicas_ativas;
+    }
+    function toggleSenhaCfg() {
+      const p = document.getElementById('cfg-privacidade').value;
+      document.getElementById('cfg-senha-g').style.display = p === 'privada' ? '' : 'none';
+    }
+    async function salvarConfig() {
+      const d = await API.post('/galerias/update.php', {
+        id: parseInt(galeriaId),
+        nome: document.getElementById('cfg-nome').value.trim(),
+        descricao: document.getElementById('cfg-descricao').value.trim(),
+        privacidade: document.getElementById('cfg-privacidade').value,
+        senha: document.getElementById('cfg-senha').value || null,
+      });
+      if (d.status === 'ok') { showToast('Configurações salvas!'); galeria.nome = document.getElementById('cfg-nome').value.trim(); document.getElementById('top-nome').textContent = galeria.nome; }
+      else showToast(d.mensagem, 'error');
+    }
+    async function salvarModulos() {
+      const d = await API.post('/galerias/update_modulos.php', {
+        id: parseInt(galeriaId),
+        entrega_em_alta: document.getElementById('tog-alta').checked,
+        selecao_ativa: document.getElementById('tog-sel').checked,
+        musicas_ativas: document.getElementById('tog-mus').checked,
+      });
+      if (d.status === 'ok') {
+        showToast('Módulos salvos com sucesso!');
+        // Atualiza objeto local para refletir mudanças imediatamente
+        galeria.entrega_em_alta = document.getElementById('tog-alta').checked ? 1 : 0;
+        galeria.selecao_ativa = document.getElementById('tog-sel').checked ? 1 : 0;
+        galeria.musicas_ativas = document.getElementById('tog-mus').checked ? 1 : 0;
+      } else {
+        showToast(d.mensagem || 'Erro ao salvar módulos.', 'error');
+      }
+    }
 
-// ── Músicas ───────────────────────────────────────────────
-async function carregarMusicas() {
-  const d = await API.get(`/musicas/list.php?galeria_id=${galeriaId}`);
-  const list = document.getElementById('music-list');
-  const musicas = d.musicas || [];
-  if (!musicas.length) { list.innerHTML='<p style="color:var(--muted);font-size:.85rem">Nenhuma música adicionada.</p>'; return; }
-  list.innerHTML = musicas.map(m => `
+    // ── Músicas ───────────────────────────────────────────────
+    async function carregarMusicas() {
+      const d = await API.get(`/musicas/list.php?galeria_id=${galeriaId}`);
+      const list = document.getElementById('music-list');
+      const musicas = d.musicas || [];
+      if (!musicas.length) { list.innerHTML = '<p style="color:var(--muted);font-size:.85rem">Nenhuma música adicionada.</p>'; return; }
+      list.innerHTML = musicas.map(m => `
     <div style="display:flex;align-items:center;gap:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px">
-      <i class="fa-solid ${m.caminho_arquivo.includes('youtube')?'fa-brands fa-youtube':'fa-music'}" style="color:var(--primary)"></i>
-      <span style="flex:1;font-size:.85rem;font-weight:600">${m.nome_exibicao||m.nome_arquivo}</span>
+      <i class="fa-solid ${m.caminho_arquivo.includes('youtube') ? 'fa-brands fa-youtube' : 'fa-music'}" style="color:var(--primary)"></i>
+      <span style="flex:1;font-size:.85rem;font-weight:600">${m.nome_exibicao || m.nome_arquivo}</span>
       <button class="btn btn-danger btn-sm" onclick="excluirMusica(${m.id})"><i class="fa-solid fa-trash"></i></button>
     </div>
   `).join('');
-}
-async function uploadMusica() {
-  const file = document.getElementById('mus-file').files[0];
-  if (!file) return;
-  const fd = new FormData(); fd.append('galeria_id',galeriaId); fd.append('musica',file);
-  const d = await API.upload('/musicas/add.php', fd);
-  if (d.status==='ok') { showToast('Música adicionada!'); await carregarMusicas(); }
-  else showToast(d.mensagem,'error');
-}
-async function addYoutube() {
-  const url = document.getElementById('yt-url').value.trim();
-  const nome = document.getElementById('yt-nome').value.trim() || 'YouTube';
-  const fd = new FormData(); fd.append('galeria_id',galeriaId); fd.append('yt_url',url); fd.append('yt_nome',nome);
-  const d = await API.upload('/musicas/add.php', fd);
-  if (d.status==='ok') { showToast('YouTube adicionado!'); await carregarMusicas(); }
-  else showToast(d.mensagem,'error');
-}
-async function excluirMusica(id) {
-  if (!confirm('Remover esta música?')) return;
-  await API.post('/musicas/delete.php', {id});
-  showToast('Música removida.'); await carregarMusicas();
-}
+    }
+    async function uploadMusica() {
+      const file = document.getElementById('mus-file').files[0];
+      if (!file) return;
+      const fd = new FormData(); fd.append('galeria_id', galeriaId); fd.append('musica', file);
+      const d = await API.upload('/musicas/add.php', fd);
+      if (d.status === 'ok') { showToast('Música adicionada!'); await carregarMusicas(); }
+      else showToast(d.mensagem, 'error');
+    }
+    async function addYoutube() {
+      const url = document.getElementById('yt-url').value.trim();
+      const nome = document.getElementById('yt-nome').value.trim() || 'YouTube';
+      const fd = new FormData(); fd.append('galeria_id', galeriaId); fd.append('yt_url', url); fd.append('yt_nome', nome);
+      const d = await API.upload('/musicas/add.php', fd);
+      if (d.status === 'ok') { showToast('YouTube adicionado!'); await carregarMusicas(); }
+      else showToast(d.mensagem, 'error');
+    }
+    async function excluirMusica(id) {
+      if (!confirm('Remover esta música?')) return;
+      await API.post('/musicas/delete.php', { id });
+      showToast('Música removida.'); await carregarMusicas();
+    }
 
-function copiarLink() {
-  if (!galeria?.link_token) return;
-  navigator.clipboard.writeText(`${location.origin}/cliente.html?token=${galeria.link_token}`)
-    .then(()=>showToast('Link copiado!'));
-}
-</script>
+    function copiarLink() {
+      if (!galeria?.link_token) return;
+      navigator.clipboard.writeText(`${location.origin}/cliente.html?token=${galeria.link_token}`)
+        .then(() => showToast('Link copiado!'));
+    }
+  </script>
 </body>
+
 </html>

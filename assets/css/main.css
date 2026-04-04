@@ -44,6 +44,18 @@ img{display:block;max-width:100%}
   display:flex;align-items:center;padding:0 24px;gap:16px;
   box-shadow:var(--shadow);
 }
+.manager-topbar{background:var(--surface);padding:16px 24px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);margin-bottom:24px}
+.manager-tab{font-size:1.25rem;font-weight:700;color:var(--text)}
+.manager-spacer{flex:1}
+.manager-actions{display:flex;align-items:center;gap:8px}
+
+@media (max-width: 768px) {
+  .manager-topbar{flex-wrap:wrap;padding:16px;gap:12px}
+  .manager-tab{width:100%;text-align:center;font-size:1.15rem}
+  .manager-spacer{display:none}
+  .manager-actions{width:100%;justify-content:center;gap:6px}
+  .manager-actions .btn{flex:1;min-width:0;padding-left:4px!important;padding-right:4px!important;font-size:0.7rem;white-space:nowrap;justify-content:center;display:flex;align-items:center}
+}
 .topnav-logo{font-size:1.15rem;font-weight:800;color:var(--primary);letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
 .topnav-spacer{flex:1}
 .topnav-user{display:flex;align-items:center;gap:10px;font-size:.825rem;color:var(--muted)}
@@ -178,6 +190,9 @@ body.sidebar-open .sidebar-overlay {
 .copy-btn{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 10px;font-size:.72rem;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);display:inline-flex;align-items:center;gap:5px}
 .copy-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-lt)}
 
+/* ── Short text utilities ── */
+.show-on-mobile { display: none; }
+
 /* ── Responsive ── */
 @media(max-width:768px){
   .topnav-toggle{display:block}
@@ -262,7 +277,10 @@ body.sidebar-open .sidebar-overlay {
   .galleries-table td:nth-child(4) > span { display: none !important; }
   .galleries-table td:nth-child(4) strong { font-size: 0.95rem; color: var(--text); line-height: 1; }
   .galleries-table td:nth-child(5) > span,
-  .galleries-table td:nth-child(6) > span { font-size: 0.85rem; line-height: 1.2; }
+  .galleries-table td:nth-child(6) > span { 
+      font-size: 0.68rem; line-height: 1.2; padding: 3px 8px;
+      max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
 
   /* Actions */
   .galleries-table td:nth-child(7) {
@@ -271,6 +289,10 @@ body.sidebar-open .sidebar-overlay {
   .actions-dropdown {
     right: 0; top: calc(100% + 5px); z-index: 9999;
   }
+  
+  /* Short texts for smaller footprint */
+  .hide-on-mobile { display: none !important; }
+  .show-on-mobile { display: inline !important; }
 }
 
 @media(max-width:480px){

@@ -388,11 +388,11 @@
       <td><strong>${g.total_fotos || 0}</strong> <span style="color:var(--muted);font-size:.8rem">fotos</span></td>
       <td>
         ${(g.total_selecionadas > 0)
-          ? `<span class="sel-alert"><i class="fa-solid fa-star"></i> ${g.total_selecionadas} selecionada${g.total_selecionadas > 1 ? 's' : ''}</span>`
+          ? `<span class="sel-alert"><i class="fa-solid fa-star"></i> <span class="hide-on-mobile">${g.total_selecionadas} selecionada${g.total_selecionadas > 1 ? 's' : ''}</span><span class="show-on-mobile">${g.total_selecionadas} sel.</span></span>`
           : `<span style="color:var(--muted);font-size:.8rem">—</span>`
         }
       </td>
-      <td><span class="badge badge-${g.entrega_em_alta ? 'ativo' : 'inativo'}">${g.entrega_em_alta ? '<i class="fa-solid fa-circle-check"></i> Ativo' : 'Inativo'}</span></td>
+      <td><span class="badge badge-${g.entrega_em_alta ? 'ativo' : 'inativo'}">${g.entrega_em_alta ? '<i class="fa-solid fa-circle-check"></i> <span class="hide-on-mobile">Ativo</span><span class="show-on-mobile">On</span>' : '<span class="hide-on-mobile">Inativo</span><span class="show-on-mobile">Off</span>'}</span></td>
       <td>
         <div class="actions-menu">
           <button class="actions-btn" onclick="toggleMenu(this)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
