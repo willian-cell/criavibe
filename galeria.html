@@ -327,8 +327,8 @@ function renderFotos() {
   const grid = document.getElementById('photos-grid');
   if (!fotos.length) { grid.innerHTML='<div class="empty-state"><div class="icon"><i class="fa-solid fa-images"></i></div><p>Nenhuma foto enviada ainda.</p></div>'; return; }
   
-  grid.style.setProperty('--grid-cols', 10);
-  grid.style.setProperty('--span-v', 2);
+  grid.style.setProperty('--grid-cols', 15);
+  grid.style.setProperty('--span-v', 3);
   grid.style.setProperty('--span-h', 5);
 
   grid.innerHTML = fotos.map((f,i) => `
