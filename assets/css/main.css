@@ -118,6 +118,21 @@ select.form-control{cursor:pointer}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 /* ── Layout painel ── */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 7, 17, 0.6);
+  backdrop-filter: blur(3px);
+  z-index: 399; /* Just below the sidebar */
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--tr);
+}
+body.sidebar-open .sidebar-overlay {
+  opacity: 1;
+  visibility: visible;
+}
+
 .painel-layout{display:flex;margin-top:56px;min-height:calc(100vh - 56px)}
 .painel-sidebar{width:220px;position:fixed;top:56px;bottom:0;left:0;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;overflow-y:auto;z-index:100}
 .painel-sidebar h3{font-size:.68rem;font-weight:700;letter-spacing:.1em;color:var(--light);text-transform:uppercase;padding:0 20px 10px}
@@ -188,6 +203,83 @@ select.form-control{cursor:pointer}
   .modal{width:100%;border-radius:var(--radius) var(--radius) 0 0;position:fixed;bottom:0;max-height:85vh}
   @keyframes modalIn{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
   .modal-body{padding-bottom:40px}
+
+  /* ── Mobile Galleries Cards ── */
+  .table-responsive {
+    overflow: visible;
+  }
+  .galleries-table {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+  .galleries-table table,
+  .galleries-table tbody,
+  .galleries-table tr,
+  .galleries-table td {
+    display: block;
+    width: 100%;
+  }
+  .galleries-table thead {
+    display: none;
+  }
+  .galleries-table tr {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    padding: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+  }
+  .galleries-table td {
+    padding: 0;
+    border: none;
+  }
+  /* TD1: Capa */
+  .galleries-table td:nth-child(1) {
+    width: 52px;
+    flex-shrink: 0;
+  }
+  /* TD2: Galeria Nome */
+  .galleries-table td:nth-child(2) {
+    flex: 1;
+    min-width: 0;
+  }
+  /* TD3 - TD6: Infos com flex basis 50% */
+  .galleries-table td:nth-child(3),
+  .galleries-table td:nth-child(4),
+  .galleries-table td:nth-child(5),
+  .galleries-table td:nth-child(6) {
+    width: 48%;
+    font-size: .82rem;
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+    color: var(--text);
+  }
+  /* Adding labels */
+  .galleries-table td:nth-child(4)::before { content: "Fotos: "; font-weight: 600; color: var(--muted); margin-right: 6px; }
+  .galleries-table td:nth-child(5)::before { content: "Seleç.: "; font-weight: 600; color: var(--muted); margin-right: 6px; }
+  .galleries-table td:nth-child(6)::before { content: "Down.: "; font-weight: 600; color: var(--muted); margin-right: 6px; }
+
+  /* TD7: Actions */
+  .galleries-table td:nth-child(7) {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: auto;
+  }
+  
+  .actions-dropdown {
+    right: 0;
+    top: calc(100% + 5px);
+    z-index: 9999;
+  }
 }
 
 @media(max-width:480px){
