@@ -149,7 +149,7 @@ body.sidebar-open .sidebar-overlay {
 
 /* ── Galleries table ── */
 .galleries-table{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:visible}
-.table-responsive{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;min-height:220px;padding-bottom:10px}
+.table-responsive{width:100%;overflow:visible;padding-bottom:20px}
 .galleries-table table{width:100%;border-collapse:collapse;min-width:700px}
 .galleries-table thead th{padding:11px 16px;text-align:left;font-size:.72rem;font-weight:700;letter-spacing:.07em;color:var(--light);text-transform:uppercase;background:var(--surface-2);border-bottom:1px solid var(--border)}
 .galleries-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
@@ -207,7 +207,7 @@ body.sidebar-open .sidebar-overlay {
   /* ── Mobile Galleries Cards Premium ── */
   .table-responsive { overflow: visible; padding-bottom: 0; }
   .galleries-table { border: none; box-shadow: none; background: transparent; }
-  .galleries-table table, .galleries-table tbody, .galleries-table tr, .galleries-table td { display: block; width: 100%; }
+  .galleries-table table, .galleries-table tbody, .galleries-table tr, .galleries-table td { display: block; width: 100%; min-width: 0; }
   .galleries-table thead { display: none; }
   
   .galleries-table tr {
