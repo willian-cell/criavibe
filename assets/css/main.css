@@ -224,33 +224,43 @@ body.sidebar-open .sidebar-overlay {
   
   /* Galeria Nome/Badge */
   .galleries-table td:nth-child(2) {
-    flex: 1; min-width: 0; padding-right: 30px; /* actions room */
+    flex: 0 0 calc(100% - 69px); min-width: 0; padding-right: 30px; /* forces break */
     display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 55px;
   }
   
-  /* Playlist */
-  .galleries-table td:nth-child(3) {
-    width: 100%; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border);
-    font-size: 0.85rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  }
-  .galleries-table td:nth-child(3):has(span:only-child) { display: none; } /* Esconde música vazia se houver :has suporte */
-
-  /* STATS BOXES */
+  /* BOTTOM ROW: Playlist (3), Fotos (4), Seleção (5), Download (6) */
+  .galleries-table td:nth-child(3),
   .galleries-table td:nth-child(4),
   .galleries-table td:nth-child(5),
   .galleries-table td:nth-child(6) {
-    width: calc(33.333% - 6px);
-    margin-top: 12px; margin-right: 6px;
-    background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    padding: 10px 4px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; font-size: 0.8rem;
+    margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border);
+    font-size: 0.72rem; display: flex; align-items: center; white-space: nowrap;
+    background: transparent; border-radius: 0; border-left: none; border-right: none; border-bottom: none;
   }
-  .galleries-table td:nth-child(6) { margin-right: 0; }
+
+  /* Playlist */
+  .galleries-table td:nth-child(3) {
+    flex: 1; min-width: 0; justify-content: flex-start;
+  }
+  .galleries-table td:nth-child(3):has(span:only-child) { display: none; } 
   
-  .galleries-table td:nth-child(4)::before { content: "FOTOS"; display: block; font-size: 0.62rem; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
-  .galleries-table td:nth-child(5)::before { content: "SELEÇÃO"; display: block; font-size: 0.62rem; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
-  .galleries-table td:nth-child(6)::before { content: "DOWNLOAD"; display: block; font-size: 0.62rem; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+  /* O TD4 puxa todo o traço se a música não existir */
+  .galleries-table tr:has(td:nth-child(3):empty) td:nth-child(4),
+  .galleries-table tr:has(td:nth-child(3) span:only-child) td:nth-child(4) {
+    flex: 1; justify-content: flex-start; padding-left: 0;
+  }
+
+  /* Stats Inlines */
+  .galleries-table td:nth-child(4) { flex: 0 0 auto; justify-content: flex-end; padding-left: 0; }
+  .galleries-table td:nth-child(5) { flex: 0 0 auto; justify-content: flex-end; padding-left: 14px; }
+  .galleries-table td:nth-child(6) { flex: 0 0 auto; justify-content: flex-end; padding-left: 14px; }
+  
+  /* Adjust labels */
+  .galleries-table td:nth-child(4)::before { content: none; }
+  .galleries-table td:nth-child(4) span { text-transform: uppercase; font-size: 0.65rem !important; font-weight: 700; margin-left: 4px; }
+  
+  .galleries-table td:nth-child(5)::before { content: "SELEÇÃO"; display: block; font-size: 0.62rem; font-weight: 700; color: var(--muted); margin-right: 6px; }
+  .galleries-table td:nth-child(6)::before { content: "DOWNLOAD"; display: block; font-size: 0.62rem; font-weight: 700; color: var(--muted); margin-right: 6px; }
 
   /* Actions */
   .galleries-table td:nth-child(7) {
