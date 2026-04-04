@@ -7,9 +7,17 @@
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    .manager-topbar{height:50px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:8px;position:sticky;top:56px;z-index:50}
+    .manager-topbar{
+      min-height:50px; height:auto; padding:12px 24px; background:var(--surface); border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap; position:sticky; top:0; z-index:50;
+    }
     .manager-tab{font-size:.9rem;font-weight:700;color:var(--text)}
     .manager-spacer{flex:1}
+    @media(max-width: 768px) {
+      .manager-topbar { padding: 16px; gap: 12px; }
+      .manager-tab { width: 100%; font-size: 1.1rem; }
+      .manager-spacer { display: none; }
+    }
     .photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:24px}
     .photo-card{position:relative;border-radius:var(--radius-sm);overflow:hidden;background:var(--surface-2);border:2px solid transparent;transition:var(--tr);aspect-ratio:4/3}
     .photo-card img{width:100%;height:100%;object-fit:cover}
@@ -83,7 +91,10 @@
 <body>
 
 <nav class="topnav">
-  <div class="topnav-logo"><i class="fa-solid fa-images"></i> CriaVibe</div>
+  <button class="topnav-toggle" onclick="document.body.classList.toggle('sidebar-open')">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+  <div class="topnav-logo"><i class="fa-solid fa-images"></i> <span>CriaVibe</span></div>
   <div class="topnav-spacer"></div>
   <div class="topnav-user">
     <a href="/painel.html" style="color:var(--muted);font-size:.825rem">← Painel</a>
@@ -91,7 +102,23 @@
   </div>
 </nav>
 
-<div style="margin-top:56px">
+<div class="painel-layout">
+  <!-- SIDEBAR OVERLAY -->
+  <div class="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open')"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="painel-sidebar">
+    <h3>Menu</h3>
+    <a href="/painel.html" class="sidebar-link active"><i class="fa-solid fa-images"></i> Galerias</a>
+    <a href="/clientes.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Clientes</a>
+    <h3 style="margin-top:20px">Conta</h3>
+    <a href="/configuracoes.html" class="sidebar-link"><i class="fa-solid fa-gear"></i> Configurações</a>
+    <a href="/saiba_mais.html" class="sidebar-link"><i class="fa-solid fa-circle-info"></i> Sobre</a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="painel-main" style="padding: 0; max-width: 100%;">
+    <div>
   <div class="manager-topbar">
     <span class="manager-tab" id="top-nome">Carregando...</span>
     <div class="manager-spacer"></div>
@@ -209,6 +236,8 @@
       </div>
     </div>
   </div>
+    </div>
+  </main>
 </div>
 
 <!-- LIGHTBOX -->
