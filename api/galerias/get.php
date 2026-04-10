@@ -10,6 +10,7 @@ try {
     db()->exec("ALTER TABLE galerias ADD COLUMN max_downloads INT DEFAULT 0");
     db()->exec("ALTER TABLE galerias ADD COLUMN max_selecao INT DEFAULT 0");
     db()->exec("ALTER TABLE galerias ADD COLUMN dl_count INT DEFAULT 0");
+    db()->exec("ALTER TABLE galerias ADD COLUMN capa_apresentacao VARCHAR(255) DEFAULT NULL");
 } catch (Exception $e) {}
 
 if ($id) {

@@ -17,6 +17,7 @@ try {
     $db->exec("ALTER TABLE galerias ADD COLUMN IF NOT EXISTS max_downloads INT DEFAULT 0");
     $db->exec("ALTER TABLE galerias ADD COLUMN IF NOT EXISTS max_selecao INT DEFAULT 0");
     $db->exec("ALTER TABLE galerias ADD COLUMN IF NOT EXISTS dl_count INT DEFAULT 0");
+    $db->exec("ALTER TABLE galerias ADD COLUMN IF NOT EXISTS capa_apresentacao VARCHAR(255) DEFAULT NULL");
 
     // Migrações em Imagens
     $db->exec("ALTER TABLE imagens ADD COLUMN IF NOT EXISTS is_capa TINYINT(1) DEFAULT 0");

@@ -1267,6 +1267,10 @@
         document.getElementById('hero-subtitle').textContent = GALERIA.descricao;
       }
 
+      if (GALERIA.capa_apresentacao) {
+        document.getElementById('hero-bg').style.backgroundImage = `url('/${GALERIA.capa_apresentacao}')`;
+      }
+
       if (GALERIA.selecao_ativa == 1) {
         isModoSelecao = true;
       }
@@ -1298,7 +1302,7 @@
         const r = await fetch(`/api/fotos/list.php?galeria_id=${GALERIA.id}`, { credentials: 'include' });
         const d = await r.json();
         const rawFotos = d.fotos || [];
-        if (rawFotos.length > 0) {
+        if (rawFotos.length > 0 && !GALERIA.capa_apresentacao) {
           const fotoCapa = rawFotos.find(f => f.is_capa == 1) || rawFotos[0];
           document.getElementById('hero-bg').style.backgroundImage = `url('/${fotoCapa.caminho_arquivo}')`;
         }

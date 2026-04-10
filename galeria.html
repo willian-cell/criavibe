@@ -500,18 +500,29 @@
 
         <!-- FOTOS -->
         <div id="tab-fotos" class="tab-panel active">
-          <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
-            ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFiles(event)">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <p><strong>Clique ou arraste</strong> as fotos aqui</p>
-            <p>JPG, PNG, WEBP · Múltiplos arquivos aceitos</p>
-            <div class="progress-bar-bg" id="prog-bg" style="display:none">
-              <div class="progress-bar-fill" id="prog-fill"></div>
+          <div class="upload-zones-container" style="display: flex; gap: 24px; margin: 24px; flex-wrap: wrap;">
+            <div class="upload-zone" id="drop-zone" style="margin: 0; flex: 2; min-width: 300px;" onclick="document.getElementById('file-input').click()"
+              ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFiles(event)">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <p><strong>Clique ou arraste</strong> as fotos aqui</p>
+              <p>JPG, PNG, WEBP · Múltiplos arquivos aceitos</p>
+              <div class="progress-bar-bg" id="prog-bg" style="display:none">
+                <div class="progress-bar-fill" id="prog-fill"></div>
+              </div>
+              <p id="prog-txt" style="font-size:.75rem;margin-top:6px;color:var(--primary)"></p>
             </div>
-            <p id="prog-txt" style="font-size:.75rem;margin-top:6px;color:var(--primary)"></p>
+            
+            <div class="upload-zone" id="drop-capa-zone" style="margin: 0; flex: 1; min-width: 250px; background: rgba(255, 215, 0, 0.03); border-color: #ffd700;" onclick="document.getElementById('file-capa-input').click()">
+              <i class="fa-solid fa-image" style="color: #b8860b"></i>
+              <p><strong style="color: #b8860b">Capa de Apresentação</strong></p>
+              <p>Exibida no topo p/ o cliente</p>
+              <p id="prog-txt-capa" style="font-size:.75rem;margin-top:6px;color:#b8860b"></p>
+              <img id="preview-capa" style="display:none; width:100%; height:100px; object-fit:cover; border-radius: 8px; margin-top: 10px;" />
+            </div>
           </div>
           <input id="file-input" type="file" accept="image/*" multiple style="display:none"
             onchange="uploadFotos(this.files)">
+          <input id="file-capa-input" type="file" accept="image/*" style="display:none" onchange="uploadCapaApresentacao(this.files)">
           <div class="photos-grid" id="photos-grid"></div>
         </div>
 
@@ -668,6 +679,13 @@
           if (galeria.link_token) {
             document.getElementById('btn-ver').href = `/cliente.html?token=${galeria.link_token}`;
           }
+          if (galeria.capa_apresentacao) {
+            const preview = document.getElementById('preview-capa');
+            if (preview) {
+              preview.src = '/' + galeria.capa_apresentacao;
+              preview.style.display = 'block';
+            }
+          }
           preencherConfig();
           await carregarFotos();
           await carregarMusicas();
@@ -796,6 +814,35 @@
       await API.post('/fotos/delete.php', { id });
       showToast('Foto excluída.');
       await carregarFotos();
+    }
+
+    async function uploadCapaApresentacao(files) {
+      if (!files || !files.length) return;
+      const file = files[0];
+      const fd = new FormData();
+      fd.append('galeria_id', galeriaId);
+      fd.append('capa', file);
+      
+      const txt = document.getElementById('prog-txt-capa');
+      txt.textContent = 'Enviando...';
+      try {
+        const res = await API.upload('/galerias/upload_capa.php', fd);
+        if (res.status === 'ok') {
+          showToast('Capa de apresentação enviada com sucesso!');
+          galeria.capa_apresentacao = res.caminho;
+          const preview = document.getElementById('preview-capa');
+          if (preview) {
+            preview.src = '/' + res.caminho;
+            preview.style.display = 'block';
+          }
+        } else {
+          showToast(res.mensagem || 'Erro ao fazer upload da capa.', 'error');
+        }
+      } catch (e) {
+        showToast('Erro: ' + e.message, 'error');
+      } finally {
+        txt.textContent = '';
+      }
     }
 
     // ── Lightbox ─────────────────────────────────────────────
