@@ -10,9 +10,27 @@ $chk = db()->prepare("SELECT id FROM galerias WHERE id=? AND usuario_email=? LIM
 $chk->execute([$galeria_id, $u['email']]);
 if (!$chk->fetch()) json_out(['status'=>'erro','mensagem'=>'Galeria não encontrada.'], 404);
 
+// Suporte a definir capa puxando foto já existente da galeria
+if (isset($_POST['foto_id'])) {
+    $fid = (int)$_POST['foto_id'];
+    $stmtF = db()->prepare("SELECT caminho_arquivo FROM imagens WHERE id=? AND galeria_id=?");
+    $stmtF->execute([$fid, $galeria_id]);
+    $foto = $stmtF->fetch();
+    
+    if ($foto) {
+        $caminho = $foto['caminho_arquivo'];
+        $stmt = db()->prepare("UPDATE galerias SET capa_apresentacao = ? WHERE id = ?");
+        $stmt->execute([$caminho, $galeria_id]);
+        json_out(['status'=>'ok', 'caminho' => $caminho, 'mensagem'=>'Capa puxada da galeria com sucesso!']);
+    } else {
+        json_out(['status'=>'erro','mensagem'=>'Foto não encontrada ou não pertence a esta galeria.'], 404);
+    }
+}
+
 $file = $_FILES['capa'] ?? null;
 if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
-    json_out(['status'=>'erro','mensagem'=>'Erro no upload do arquivo (tente uma imagem menor).'], 400);
+    // Se nenhum $_FILES e também nenhum foto_id, dispara erro
+    json_out(['status'=>'erro','mensagem'=>'Nenhum arquivo ou foto enviado (tente uma imagem menor).'], 400);
 }
 
 $uploadDir = __DIR__.'/../../uploads/capas/';

@@ -512,7 +512,8 @@
               <p id="prog-txt" style="font-size:.75rem;margin-top:6px;color:var(--primary)"></p>
             </div>
             
-            <div class="upload-zone" id="drop-capa-zone" style="margin: 0; flex: 1; min-width: 250px; background: rgba(255, 215, 0, 0.03); border-color: #ffd700;" onclick="document.getElementById('file-capa-input').click()">
+            <div class="upload-zone" id="drop-capa-zone" style="margin: 0; flex: 1; min-width: 250px; background: rgba(255, 215, 0, 0.03); border-color: #ffd700;" onclick="document.getElementById('file-capa-input').click()"
+                 ondragover="dragOverCapa(event)" ondragleave="dragLeaveCapa()" ondrop="dropCapa(event)">
               <i class="fa-solid fa-image" style="color: #b8860b"></i>
               <p><strong style="color: #b8860b">Capa de Apresentação</strong></p>
               <p>Exibida no topo p/ o cliente</p>
@@ -763,7 +764,7 @@
       grid.style.setProperty('--span-h', 5);
 
       grid.innerHTML = fotosVisiveis.map((f, i) => `
-    <div class="photo-card ${f.selecionada ? 'sel' : ''} ${f.is_capa == 1 ? 'is-capa' : ''} ${f.orientacao}" id="pc-${f.id}">
+    <div class="photo-card ${f.selecionada ? 'sel' : ''} ${f.is_capa == 1 ? 'is-capa' : ''} ${f.orientacao}" id="pc-${f.id}" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', 'foto_' + ${f.id})">
       ${f.selecionada ? `
       <div class="photo-sel-badge">
         <i class="fa-solid fa-star"></i> Selecionada
@@ -786,6 +787,21 @@
     function dragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag'); }
     function dragLeave() { document.getElementById('drop-zone').classList.remove('drag'); }
     function dropFiles(e) { e.preventDefault(); dragLeave(); uploadFotos(e.dataTransfer.files); }
+
+    function dragOverCapa(e) { e.preventDefault(); document.getElementById('drop-capa-zone').classList.add('drag'); }
+    function dragLeaveCapa() { document.getElementById('drop-capa-zone').classList.remove('drag'); }
+    function dropCapa(e) {
+      e.preventDefault();
+      dragLeaveCapa();
+      e.stopPropagation();
+      const txtData = e.dataTransfer.getData('text/plain');
+      if (txtData && txtData.startsWith('foto_')) {
+        const fotoId = txtData.split('_')[1];
+        definirCapaDaGrade(fotoId);
+      } else if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        uploadCapaApresentacao(e.dataTransfer.files);
+      }
+    }
 
     async function uploadFotos(files) {
       if (!files || !files.length) return;
@@ -837,6 +853,33 @@
           }
         } else {
           showToast(res.mensagem || 'Erro ao fazer upload da capa.', 'error');
+        }
+      } catch (e) {
+        showToast('Erro: ' + e.message, 'error');
+      } finally {
+        txt.textContent = '';
+      }
+    }
+
+    async function definirCapaDaGrade(fotoId) {
+      const fd = new FormData();
+      fd.append('galeria_id', galeriaId);
+      fd.append('foto_id', fotoId);
+      
+      const txt = document.getElementById('prog-txt-capa');
+      txt.textContent = 'Aplicando foto da grade...';
+      try {
+        const res = await API.upload('/galerias/upload_capa.php', fd);
+        if (res.status === 'ok') {
+          showToast(res.mensagem);
+          galeria.capa_apresentacao = res.caminho;
+          const preview = document.getElementById('preview-capa');
+          if (preview) {
+            preview.src = '/' + res.caminho;
+            preview.style.display = 'block';
+          }
+        } else {
+          showToast(res.mensagem || 'Erro ao definir a capa.', 'error');
         }
       } catch (e) {
         showToast('Erro: ' + e.message, 'error');

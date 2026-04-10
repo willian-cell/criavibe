@@ -5,13 +5,9 @@ $id    = (int)($_GET['id'] ?? 0);
 $token = $_GET['token'] ?? '';
 
 // Tenta adicionar a coluna is_capa, max_downloads, max_selecao e dl_count caso ainda não existam (Lazy migration)
-try {
-    db()->exec("ALTER TABLE imagens ADD COLUMN is_capa TINYINT(1) DEFAULT 0");
-    db()->exec("ALTER TABLE galerias ADD COLUMN max_downloads INT DEFAULT 0");
-    db()->exec("ALTER TABLE galerias ADD COLUMN max_selecao INT DEFAULT 0");
-    db()->exec("ALTER TABLE galerias ADD COLUMN dl_count INT DEFAULT 0");
-    db()->exec("ALTER TABLE galerias ADD COLUMN capa_apresentacao VARCHAR(255) DEFAULT NULL");
-} catch (Exception $e) {}
+try { db()->exec("ALTER TABLE galerias ADD COLUMN max_selecao INT DEFAULT 0"); } catch (Exception $e) {}
+try { db()->exec("ALTER TABLE galerias ADD COLUMN dl_count INT DEFAULT 0"); } catch (Exception $e) {}
+try { db()->exec("ALTER TABLE galerias ADD COLUMN capa_apresentacao VARCHAR(255) DEFAULT NULL"); } catch (Exception $e) {}
 
 if ($id) {
     $stmt = db()->prepare("SELECT * FROM galerias WHERE id = ? LIMIT 1");
