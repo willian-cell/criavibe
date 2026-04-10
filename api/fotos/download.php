@@ -55,5 +55,9 @@ header('Content-Disposition: attachment; filename="'.$nome.'"');
 header('Content-Length: '.filesize($path));
 header('X-Downloads-Used: '.($dl_count + 1));
 header('X-Downloads-Max: '.$max);
+
+if (ob_get_length()) ob_clean();
+flush();
+
 readfile($path);
 exit;

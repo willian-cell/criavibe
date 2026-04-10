@@ -52,11 +52,17 @@ if ($max > 0 && ($dl_count + count($fotos) > $max)) {
 $qtd_fotos = count($fotos);
 db()->prepare("UPDATE galerias SET dl_count = dl_count + ? WHERE id = ?")->execute([$qtd_fotos, $galeria_id]);
 
-// Cria ZIP temporário
-$tmpZip = tempnam(sys_get_temp_dir(), 'criavibe_') . '.zip';
+// Cria ZIP temporário no uploads/tmp (para evitar restrições de shared hosting)
+$tmpDir = __DIR__.'/../../uploads/tmp/';
+if (!is_dir($tmpDir)) mkdir($tmpDir, 0775, true);
+
+$tmpZip = tempnam($tmpDir, 'criavibe_') . '_fotos.zip';
+
+if (!class_exists('ZipArchive')) json_out(['status'=>'erro','mensagem'=>'A extensão ZipArchive não está ativa na Hostinger.'], 500);
+
 $zip = new ZipArchive();
-if ($zip->open($tmpZip, ZipArchive::CREATE) !== true)
-    json_out(['status'=>'erro','mensagem'=>'Erro ao criar ZIP.'], 500);
+if ($zip->open($tmpZip, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true)
+    json_out(['status'=>'erro','mensagem'=>'Erro ao criar arquivo ZIP.'], 500);
 
 foreach ($fotos as $f) {
     $path = __DIR__.'/../../'.$f['caminho_arquivo'];
@@ -72,6 +78,11 @@ header('Content-Disposition: attachment; filename="'.$nome_galeria.'_fotos.zip"'
 header('Content-Length: '.filesize($tmpZip));
 header('X-Downloads-Used: '.($dl_count + 1));
 header('X-Downloads-Max: '.$max);
+
+// Remove qualquer erro PHP da resposta para não corromper o arquivo zip
+if (ob_get_length()) ob_clean();
+flush();
+
 readfile($tmpZip);
 unlink($tmpZip);
 exit;
