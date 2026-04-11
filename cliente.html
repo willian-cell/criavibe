@@ -261,37 +261,57 @@
     }
 
     .tbtn {
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: .83rem;
+      height: 46px;
+      padding: 0 20px;
+      border-radius: 10px;
+      font-size: .88rem;
       font-weight: 600;
-      border: none;
+      border: 1px solid transparent;
       cursor: pointer;
       font-family: inherit;
-      transition: .2s;
-      display: flex;
+      transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
       align-items: center;
-      gap: 6px
+      justify-content: center;
+      gap: 10px;
+      white-space: nowrap;
     }
 
+    .tbtn:active { transform: scale(0.96); }
+
     .tbtn-outline {
-      background: transparent;
+      background: rgba(255, 255, 255, 0.04);
       color: var(--text);
-      border: 1px solid var(--border)
+      border-color: rgba(255, 255, 255, 0.12);
     }
 
     .tbtn-outline:hover {
-      border-color: rgba(255, 255, 255, .3);
-      background: rgba(255, 255, 255, .06)
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-1px);
     }
 
     .tbtn-primary {
       background: var(--primary);
-      color: #fff
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
     }
 
     .tbtn-primary:hover {
-      background: var(--primary-dk)
+      background: var(--primary-dk);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.45);
+    }
+    
+    .tbtn-clear {
+      background: #f1f5f9;
+      color: #0f172a;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .tbtn-clear:hover {
+      background: #e2e8f0;
+      transform: translateY(-1px);
     }
 
     .tbtn-green {
@@ -1034,9 +1054,9 @@
       #hero-cover { height: 50vh; min-height: 380px; }
       .hero-nav { padding: 16px 5vw; }
       #action-bar { justify-content: center; text-align: center; padding: 20px 5vw; flex-direction: column; }
-      .action-stats { width: 100%; justify-content: center; margin-bottom: 4px; font-size: 0.95rem; }
-      .action-btns { justify-content: center; width: 100%; gap: 8px; }
-      .action-btns .tbtn { flex: 1; min-width: 0; padding: 12px 6px; font-size: 0.8rem; display: flex; justify-content: center; align-items: center;}
+      .action-stats { width: 100%; justify-content: center; margin-bottom: 8px; font-size: 0.95rem; }
+      .action-btns { justify-content: center; width: 100%; gap: 10px; flex-wrap: wrap; }
+      .action-btns .tbtn { flex: 1; min-width: max-content; padding: 0 16px; height: 44px; font-size: 0.85rem; }
     }
   </style>
 </head>
