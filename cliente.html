@@ -277,7 +277,9 @@
       white-space: nowrap;
     }
 
-    .tbtn:active { transform: scale(0.96); }
+    .tbtn:active {
+      transform: scale(0.96);
+    }
 
     .tbtn-outline {
       background: rgba(255, 255, 255, 0.04);
@@ -302,13 +304,13 @@
       transform: translateY(-1px);
       box-shadow: 0 6px 16px rgba(59, 130, 246, 0.45);
     }
-    
+
     .tbtn-clear {
       background: #f1f5f9;
       color: #0f172a;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
-    
+
     .tbtn-clear:hover {
       background: #e2e8f0;
       transform: translateY(-1px);
@@ -625,14 +627,17 @@
       position: fixed;
       inset: 0;
       background: #000;
-      z-index: 900; /* Prioridade máxima */
+      z-index: 900;
+      /* Prioridade máxima */
       flex-direction: column;
       align-items: stretch;
       justify-content: flex-start;
       overflow: hidden;
     }
 
-    #lightbox.open { display: flex; }
+    #lightbox.open {
+      display: flex;
+    }
 
     #lb-topbar {
       flex: 0 0 70px;
@@ -658,12 +663,15 @@
       flex: 0 0 auto;
       text-align: right;
       font-size: 0.75rem;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255, 255, 255, 0.6);
       margin-right: 20px;
       line-height: 1.4;
     }
 
-    .lb-meta b { color: #fff; font-weight: 500; }
+    .lb-meta b {
+      color: #fff;
+      font-weight: 500;
+    }
 
     .lb-main-content {
       flex: 1;
@@ -688,7 +696,9 @@
     }
 
     /* Buttons */
-    #lb-capa, #lb-select-btn, #lb-dl-btn {
+    #lb-capa,
+    #lb-select-btn,
+    #lb-dl-btn {
       background: transparent !important;
       border: none !important;
       height: 100% !important;
@@ -701,19 +711,36 @@
       gap: 10px;
       color: #fff;
       transition: 0.2s;
-      border-right: 1px solid rgba(255,255,255,0.08) !important;
-      position: static !important; /* Force static */
+      border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+      position: static !important;
+      /* Force static */
       transform: none !important;
     }
 
-    #lb-capa { color: #ccac5d !important; }
-    #lb-capa:hover { background: rgba(204,172,93,0.1) !important; }
+    #lb-capa {
+      color: #ccac5d !important;
+    }
 
-    #lb-dl-btn { color: #d1d1d1 !important; }
-    #lb-dl-btn:hover { background: rgba(255,255,255,0.05) !important; }
+    #lb-capa:hover {
+      background: rgba(204, 172, 93, 0.1) !important;
+    }
 
-    #lb-select-btn { border-right: 1px solid rgba(255,255,255,0.1) !important; color: #d1d1d1; }
-    #lb-select-btn.selected { color: #8ab4f8 !important; }
+    #lb-dl-btn {
+      color: #d1d1d1 !important;
+    }
+
+    #lb-dl-btn:hover {
+      background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    #lb-select-btn {
+      border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: #d1d1d1;
+    }
+
+    #lb-select-btn.selected {
+      color: #8ab4f8 !important;
+    }
 
     #lb-close {
       background: transparent;
@@ -729,7 +756,10 @@
       transition: 0.2s;
     }
 
-    #lb-close:hover { color: #fff; transform: scale(1.1); }
+    #lb-close:hover {
+      color: #fff;
+      transform: scale(1.1);
+    }
 
     /* Ocultar o antigo lb-dl da parte inferior */
     #lb-dl {
@@ -749,7 +779,7 @@
       max-height: 100%;
       object-fit: contain;
       border-radius: 0;
-      box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8);
     }
 
     .lb-btn {
@@ -775,8 +805,13 @@
       background: rgba(255, 255, 255, .15)
     }
 
-    #lb-prev { left: 20px }
-    #lb-next { right: 20px }
+    #lb-prev {
+      left: 20px
+    }
+
+    #lb-next {
+      right: 20px
+    }
 
     /* ── MOBILE LIGHTBOX ── */
     @media (max-width: 800px) {
@@ -791,10 +826,12 @@
         width: 100%;
         height: 50px;
         order: 2;
-        border-top: 1px solid rgba(255,255,255,0.05);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
       }
 
-      #lb-capa, #lb-select-btn, #lb-dl-btn {
+      #lb-capa,
+      #lb-select-btn,
+      #lb-dl-btn {
         padding: 0 10px !important;
         font-size: 0.7rem;
         flex: 1;
@@ -818,9 +855,17 @@
         font-size: 1.2rem;
       }
 
-      .lb-main-content { padding: 10px; }
-      #lb-prev { left: 5px; }
-      #lb-next { right: 5px; }
+      .lb-main-content {
+        padding: 10px;
+      }
+
+      #lb-prev {
+        left: 5px;
+      }
+
+      #lb-next {
+        right: 5px;
+      }
     }
 
     #lb-dl {
@@ -915,7 +960,7 @@
       position: absolute;
       inset: 0;
       z-index: 2;
-      background: linear-gradient(to bottom, rgba(10,10,20,0.5) 0%, transparent 40%, var(--bg) 100%);
+      background: linear-gradient(to bottom, rgba(10, 10, 20, 0.5) 0%, transparent 40%, var(--bg) 100%);
     }
 
     .hero-nav {
@@ -926,7 +971,7 @@
       align-items: center;
       padding: 24px 5vw;
     }
-    
+
     .hero-nav button {
       background: transparent;
       border: none;
@@ -938,9 +983,13 @@
       align-items: center;
       gap: 8px;
       transition: var(--tr);
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
-    .hero-nav button:hover { opacity: 0.8; transform: translateX(-3px); }
+
+    .hero-nav button:hover {
+      opacity: 0.8;
+      transform: translateX(-3px);
+    }
 
     .hero-brand {
       cursor: pointer;
@@ -949,7 +998,8 @@
       justify-content: center;
       border-radius: 50%;
       position: relative;
-      z-index: 50; /* Garante clique */
+      z-index: 50;
+      /* Garante clique */
     }
 
     .hero-logo-img {
@@ -965,32 +1015,45 @@
 
     .hero-logo-img:hover {
       transform: scale(1.1);
-      border-color: rgba(255,255,255,0.9);
+      border-color: rgba(255, 255, 255, 0.9);
     }
 
     @keyframes pulseLogo {
-      0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
-      70% { box-shadow: 0 0 0 14px rgba(255, 255, 255, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 14px rgba(255, 255, 255, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+      }
     }
 
     /* ── LIGHT MODE VISUAL REFINEMENTS ── */
     body.light-mode .hero-gradient {
-      background: linear-gradient(to bottom, rgba(10,10,20,0.5) 0%, transparent 40%, var(--bg) 100%);
+      background: linear-gradient(to bottom, rgba(10, 10, 20, 0.5) 0%, transparent 40%, var(--bg) 100%);
     }
+
     body.light-mode #action-bar {
       background: rgba(255, 255, 255, 0.85);
       border-bottom: 1px solid var(--border);
     }
+
     body.light-mode .action-stats {
       color: var(--text);
     }
+
     body.light-mode .foto-item {
       background: var(--surface);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
+
     body.light-mode .hero-title {
-      color: #fff; /* Mantém branco para constraste com a imagem */
+      color: #fff;
+      /* Mantém branco para constraste com a imagem */
     }
 
     .hero-content {
@@ -1006,16 +1069,16 @@
       font-weight: 800;
       color: #fff;
       margin-bottom: 5px;
-      text-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
       text-transform: capitalize;
     }
 
     .hero-subtitle {
       font-size: clamp(0.9rem, 2vw, 1.2rem);
       font-weight: 500;
-      color: rgba(255,255,255,0.85);
+      color: rgba(255, 255, 255, 0.85);
       letter-spacing: 4px;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     }
 
     /* ── ACTION BAR ── */
@@ -1051,12 +1114,43 @@
     }
 
     @media (max-width: 800px) {
-      #hero-cover { height: 50vh; min-height: 380px; }
-      .hero-nav { padding: 16px 5vw; }
-      #action-bar { justify-content: center; text-align: center; padding: 20px 5vw; flex-direction: column; }
-      .action-stats { width: 100%; justify-content: center; margin-bottom: 8px; font-size: 0.95rem; }
-      .action-btns { justify-content: center; width: 100%; gap: 10px; flex-wrap: wrap; }
-      .action-btns .tbtn { flex: 1; min-width: max-content; padding: 0 16px; height: 44px; font-size: 0.85rem; }
+      #hero-cover {
+        height: 50vh;
+        min-height: 380px;
+      }
+
+      .hero-nav {
+        padding: 16px 5vw;
+      }
+
+      #action-bar {
+        justify-content: center;
+        text-align: center;
+        padding: 20px 5vw;
+        flex-direction: column;
+      }
+
+      .action-stats {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+      }
+
+      .action-btns {
+        justify-content: center;
+        width: 100%;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .action-btns .tbtn {
+        flex: 1;
+        min-width: max-content;
+        padding: 0 16px;
+        height: 44px;
+        font-size: 0.85rem;
+      }
     }
   </style>
 </head>
@@ -1088,14 +1182,14 @@
     <header id="hero-cover">
       <div id="hero-bg" class="hero-bg"></div>
       <div class="hero-gradient"></div>
-      
+
       <nav class="hero-nav">
         <button onclick="location.reload()" title="Voltar/Sair"><i class="fa-solid fa-arrow-left"></i> Sair</button>
         <div class="hero-brand" id="logoToggle" title="Alternar Modo Escuro/Claro">
           <img src="/logo/logo-criavibe-fotografia.jpeg" alt="CriaVibe" class="hero-logo-img">
         </div>
       </nav>
-      
+
       <div class="hero-content">
         <h1 id="hero-title" class="hero-title">Carregando...</h1>
         <h2 id="hero-subtitle" class="hero-subtitle">PORTIFÓLIO</h2>
@@ -1112,7 +1206,7 @@
         <button class="tbtn tbtn-primary" id="btn-zip-sel" onclick="baixarZipSelecionadas()" style="display:none">
           <i class="fa-solid fa-download"></i> Baixar Selecionadas
         </button>
-        <button class="tbtn tbtn-outline" id="btn-zip-all" onclick="baixarZipTodas()" style="display:none">
+        <button class="tbtn tbtn-clear" id="btn-zip-all" onclick="baixarZipTodas()" style="display:none">
           <i class="fa-solid fa-file-zipper"></i> Baixar Tudo
         </button>
         <button class="tbtn tbtn-clear" id="btn-clear-sel" onclick="limparSelecao()" style="display:none">
@@ -1192,7 +1286,8 @@
     animation: modalSlide .35s cubic-bezier(.34,1.56,.64,1);
   ">
       <div id="limite-icon" style="font-size:3rem;margin-bottom:16px;">⚠️</div>
-      <h2 id="limite-titulo" style="font-size:1.3rem;font-weight:800;color:#fca5a5;margin-bottom:12px;">Limite Atingido</h2>
+      <h2 id="limite-titulo" style="font-size:1.3rem;font-weight:800;color:#fca5a5;margin-bottom:12px;">Limite Atingido
+      </h2>
       <p id="limite-msg" style="color:rgba(255,255,255,0.75);font-size:.95rem;line-height:1.6;margin-bottom:28px;"></p>
       <div id="limite-box"
         style="background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.2);border-radius:12px;padding:14px;margin-bottom:28px;">
@@ -1284,8 +1379,8 @@
       document.getElementById('unified-layout').style.display = 'flex';
       document.getElementById('hero-title').textContent = GALERIA.nome;
       document.title = GALERIA.nome + ' — CriaVibe';
-      
-      if(GALERIA.descricao) {
+
+      if (GALERIA.descricao) {
         document.getElementById('hero-subtitle').textContent = GALERIA.descricao;
       }
 
@@ -1306,14 +1401,14 @@
       carregarMusica();
 
       if (typeof iniciarPolling === 'function') iniciarPolling();
-      
+
       if (GALERIA && GALERIA.musicas_ativas == 1) {
         const audio = document.getElementById('audio-player');
         if (audio && audio.src && audio.paused && document.getElementById('yt-player-container').style.display !== 'block') {
-          audio.play().catch(() => {});
+          audio.play().catch(() => { });
         }
         if (typeof ytPlayer !== 'undefined' && ytPlayer && typeof ytPlayer.playVideo === 'function') {
-          try { if (ytPlayer.getPlayerState() !== 1) ytPlayer.playVideo(); } catch(err) {}
+          try { if (ytPlayer.getPlayerState() !== 1) ytPlayer.playVideo(); } catch (err) { }
         }
       }
     }
@@ -1620,17 +1715,17 @@
 
       const btnZipSel = document.getElementById('btn-zip-sel');
       const btnClearSel = document.getElementById('btn-clear-sel');
-      
+
       if (GALERIA && GALERIA.entrega_em_alta == 1 && n > 0) {
-        if(btnZipSel) btnZipSel.style.display = '';
+        if (btnZipSel) btnZipSel.style.display = '';
       } else {
-        if(btnZipSel) btnZipSel.style.display = 'none';
+        if (btnZipSel) btnZipSel.style.display = 'none';
       }
 
       if (n > 0) {
-        if(btnClearSel) btnClearSel.style.display = '';
+        if (btnClearSel) btnClearSel.style.display = '';
       } else {
-        if(btnClearSel) btnClearSel.style.display = 'none';
+        if (btnClearSel) btnClearSel.style.display = 'none';
       }
     }
 
@@ -1955,7 +2050,7 @@
           const g = d.galeria;
           document.getElementById('galeria-title-lock').textContent = g.nome;
           if (g.privacidade === 'publica' && !g.cliente_id) {
-            GALERIA = g; 
+            GALERIA = g;
             dlCount = parseInt(g.dl_count) || 0;
             dlMax = parseInt(g.max_downloads) || 0;
             document.getElementById('lock-screen').style.display = 'none';
