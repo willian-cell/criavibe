@@ -457,7 +457,7 @@
       <a href="/painel.html" class="sidebar-link active"><i class="fa-solid fa-images"></i> Galerias</a>
       <a href="/clientes.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Clientes</a>
       <h3 style="margin-top:20px">Conta</h3>
-      <a href="/configuracoes.html" class="sidebar-link"><i class="fa-solid fa-gear"></i> Configurações</a>
+      <a href="/configuracoes.html" class="sidebar-link"><i class="fa-solid fa-gear"></i> Configurações de Conta</a>
       <a href="/saiba_mais.html" class="sidebar-link"><i class="fa-solid fa-circle-info"></i> Sobre</a>
     </aside>
 
@@ -501,8 +501,9 @@
         <!-- FOTOS -->
         <div id="tab-fotos" class="tab-panel active">
           <div class="upload-zones-container" style="display: flex; gap: 24px; margin: 24px; flex-wrap: wrap;">
-            <div class="upload-zone" id="drop-zone" style="margin: 0; flex: 2; min-width: 300px;" onclick="document.getElementById('file-input').click()"
-              ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFiles(event)">
+            <div class="upload-zone" id="drop-zone" style="margin: 0; flex: 2; min-width: 300px;"
+              onclick="document.getElementById('file-input').click()" ondragover="dragOver(event)"
+              ondragleave="dragLeave(event)" ondrop="dropFiles(event)">
               <i class="fa-solid fa-cloud-arrow-up"></i>
               <p><strong>Clique ou arraste</strong> as fotos aqui</p>
               <p>JPG, PNG, WEBP · Múltiplos arquivos aceitos</p>
@@ -511,19 +512,23 @@
               </div>
               <p id="prog-txt" style="font-size:.75rem;margin-top:6px;color:var(--primary)"></p>
             </div>
-            
-            <div class="upload-zone" id="drop-capa-zone" style="margin: 0; flex: 1; min-width: 250px; background: rgba(255, 215, 0, 0.03); border-color: #ffd700;" onclick="document.getElementById('file-capa-input').click()"
-                 ondragover="dragOverCapa(event)" ondragleave="dragLeaveCapa()" ondrop="dropCapa(event)">
+
+            <div class="upload-zone" id="drop-capa-zone"
+              style="margin: 0; flex: 1; min-width: 250px; background: rgba(255, 215, 0, 0.03); border-color: #ffd700;"
+              onclick="document.getElementById('file-capa-input').click()" ondragover="dragOverCapa(event)"
+              ondragleave="dragLeaveCapa()" ondrop="dropCapa(event)">
               <i class="fa-solid fa-image" style="color: #b8860b"></i>
               <p><strong style="color: #b8860b">Capa de Apresentação</strong></p>
               <p>Exibida no topo p/ o cliente</p>
               <p id="prog-txt-capa" style="font-size:.75rem;margin-top:6px;color:#b8860b"></p>
-              <img id="preview-capa" style="display:none; width:100%; height:100px; object-fit:cover; border-radius: 8px; margin-top: 10px;" />
+              <img id="preview-capa"
+                style="display:none; width:100%; height:100px; object-fit:cover; border-radius: 8px; margin-top: 10px;" />
             </div>
           </div>
           <input id="file-input" type="file" accept="image/*" multiple style="display:none"
             onchange="uploadFotos(this.files)">
-          <input id="file-capa-input" type="file" accept="image/*" style="display:none" onchange="uploadCapaApresentacao(this.files)">
+          <input id="file-capa-input" type="file" accept="image/*" style="display:none"
+            onchange="uploadCapaApresentacao(this.files)">
           <div class="photos-grid" id="photos-grid"></div>
         </div>
 
@@ -670,50 +675,50 @@
 
     (async () => {
       await requireAuth();
-        if (!galeriaId) { location.href = '/painel.html'; return; }
-        try {
-          const d = await API.get(`/galerias/get.php?id=${galeriaId}`);
-          if (!d || !d.galeria) throw new Error('Galeria não encontrada.');
-          galeria = d.galeria;
-          document.title = galeria.nome + ' — CriaVibe';
-          document.getElementById('top-nome').textContent = galeria.nome;
-          if (galeria.link_token) {
-            document.getElementById('btn-ver').href = `/cliente.html?token=${galeria.link_token}`;
-          }
-          if (galeria.capa_apresentacao) {
-            const preview = document.getElementById('preview-capa');
-            if (preview) {
-              preview.src = '/' + galeria.capa_apresentacao;
-              preview.style.display = 'block';
-            }
-          }
-          preencherConfig();
-          await carregarFotos();
-          await carregarMusicas();
-        } catch (e) {
-          showToast(e.message, 'error');
-          document.getElementById('top-nome').textContent = "Erro ao carregar";
+      if (!galeriaId) { location.href = '/painel.html'; return; }
+      try {
+        const d = await API.get(`/galerias/get.php?id=${galeriaId}`);
+        if (!d || !d.galeria) throw new Error('Galeria não encontrada.');
+        galeria = d.galeria;
+        document.title = galeria.nome + ' — CriaVibe';
+        document.getElementById('top-nome').textContent = galeria.nome;
+        if (galeria.link_token) {
+          document.getElementById('btn-ver').href = `/cliente.html?token=${galeria.link_token}`;
         }
+        if (galeria.capa_apresentacao) {
+          const preview = document.getElementById('preview-capa');
+          if (preview) {
+            preview.src = '/' + galeria.capa_apresentacao;
+            preview.style.display = 'block';
+          }
+        }
+        preencherConfig();
+        await carregarFotos();
+        await carregarMusicas();
+      } catch (e) {
+        showToast(e.message, 'error');
+        document.getElementById('top-nome').textContent = "Erro ao carregar";
+      }
 
-        // Auto-polling: atualiza seleções do cliente a cada 30 segundos
-        setInterval(async () => {
-          if (!galeria || !galeriaId) return;
-          try {
-            const r = await API.get(`/fotos/list.php?galeria_id=${galeriaId}`);
-            const novasfotos = r.fotos || [];
-            let mudou = false;
-            novasfotos.forEach(f => {
-              const idx = fotos.findIndex(x => x.id === f.id);
-              if (idx !== -1 && (fotos[idx].selecionada !== f.selecionada || fotos[idx].is_capa !== f.is_capa)) {
-                fotos[idx].selecionada = f.selecionada;
-                fotos[idx].is_capa = f.is_capa;
-                mudou = true;
-              }
-            });
-            if (mudou) renderFotos();
-          } catch { }
-        }, 30000);
-      })();
+      // Auto-polling: atualiza seleções do cliente a cada 30 segundos
+      setInterval(async () => {
+        if (!galeria || !galeriaId) return;
+        try {
+          const r = await API.get(`/fotos/list.php?galeria_id=${galeriaId}`);
+          const novasfotos = r.fotos || [];
+          let mudou = false;
+          novasfotos.forEach(f => {
+            const idx = fotos.findIndex(x => x.id === f.id);
+            if (idx !== -1 && (fotos[idx].selecionada !== f.selecionada || fotos[idx].is_capa !== f.is_capa)) {
+              fotos[idx].selecionada = f.selecionada;
+              fotos[idx].is_capa = f.is_capa;
+              mudou = true;
+            }
+          });
+          if (mudou) renderFotos();
+        } catch { }
+      }, 30000);
+    })();
 
     // ── Tabs ──────────────────────────────────────────────────
     function switchTab(name) {
@@ -838,7 +843,7 @@
       const fd = new FormData();
       fd.append('galeria_id', galeriaId);
       fd.append('capa', file);
-      
+
       const txt = document.getElementById('prog-txt-capa');
       txt.textContent = 'Enviando...';
       try {
@@ -865,7 +870,7 @@
       const fd = new FormData();
       fd.append('galeria_id', galeriaId);
       fd.append('foto_id', fotoId);
-      
+
       const txt = document.getElementById('prog-txt-capa');
       txt.textContent = 'Aplicando foto da grade...';
       try {
