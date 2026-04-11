@@ -1266,17 +1266,23 @@
 
     // ── INIT ──────────────────────────────────────────────────────
     async function prepararCapa() {
-      // Setup Theme Toggle Listener e Restaurar estado
+      // Setup Theme Toggle Listener e Restaurar estado do Tema da Galeria
+      const themeKey = 'cv-theme-' + GALERIA.id;
       const logoBtn = document.getElementById('logoToggle');
       if (logoBtn && !logoBtn.dataset.listener) {
         logoBtn.dataset.listener = "true";
         logoBtn.addEventListener('click', () => {
           document.body.classList.toggle('light-mode');
-          localStorage.setItem('cv-theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+          localStorage.setItem(themeKey, document.body.classList.contains('light-mode') ? 'light' : 'dark');
         });
-        if (localStorage.getItem('cv-theme') === 'light') {
-          document.body.classList.add('light-mode');
-        }
+      }
+
+      const cachedTheme = localStorage.getItem(themeKey);
+      const isClaro = cachedTheme === 'light' || (!cachedTheme && GALERIA.tema === 'claro');
+      if (isClaro) {
+        document.body.classList.add('light-mode');
+      } else {
+        document.body.classList.remove('light-mode');
       }
 
       document.getElementById('unified-layout').style.display = 'flex';
