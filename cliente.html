@@ -1267,19 +1267,15 @@
     // ── INIT ──────────────────────────────────────────────────────
     async function prepararCapa() {
       // Setup Theme Toggle Listener e Restaurar estado do Tema da Galeria
-      const themeKey = 'cv-theme-' + GALERIA.id;
       const logoBtn = document.getElementById('logoToggle');
       if (logoBtn && !logoBtn.dataset.listener) {
         logoBtn.dataset.listener = "true";
         logoBtn.addEventListener('click', () => {
           document.body.classList.toggle('light-mode');
-          localStorage.setItem(themeKey, document.body.classList.contains('light-mode') ? 'light' : 'dark');
         });
       }
 
-      const cachedTheme = localStorage.getItem(themeKey);
-      const isClaro = cachedTheme === 'light' || (!cachedTheme && GALERIA.tema === 'claro');
-      if (isClaro) {
+      if (GALERIA.tema === 'claro') {
         document.body.classList.add('light-mode');
       } else {
         document.body.classList.remove('light-mode');
