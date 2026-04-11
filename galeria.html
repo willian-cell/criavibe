@@ -172,7 +172,9 @@
     }
 
     .theme-card {
-      flex: 1; min-width: 200px; max-width: 400px;
+      flex: 1;
+      min-width: 200px;
+      max-width: 400px;
       border: 2px solid var(--border);
       border-radius: 10px;
       cursor: pointer;
@@ -180,10 +182,43 @@
       overflow: hidden;
       background: var(--surface);
     }
-    .theme-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.3); }
-    .theme-card.active { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary), 0 10px 20px rgba(59,130,246,0.3); }
-    .theme-card.active .theme-preview::after { content: '\f058'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: var(--primary); font-size: 1.8rem; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: var(--surface); border-radius: 50%; width: 34px; height: 34px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 5;}
-    .theme-preview { position: relative; border-bottom: 1px solid var(--border); }
+
+    .theme-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .theme-card.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary), 0 10px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .theme-card.active .theme-preview::after {
+      content: '\f058';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      color: var(--primary);
+      font-size: 1.8rem;
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      z-index: 5;
+    }
+
+    .theme-preview {
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
 
     .photo-overlay {
       position: absolute;
@@ -274,7 +309,13 @@
     .tabs {
       display: flex;
       border-bottom: 2px solid var(--border);
-      margin: 0 24px
+      margin: 0 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    
+    .tabs::-webkit-scrollbar {
+      display: none;
     }
 
     .tab-btn {
@@ -288,7 +329,9 @@
       border-bottom: 2px solid transparent;
       margin-bottom: -2px;
       transition: var(--tr);
-      font-family: inherit
+      font-family: inherit;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .tab-btn.active {
@@ -491,11 +534,12 @@
             <div class="actions-menu" style="flex:1;">
               <button type="button" class="btn btn-secondary btn-sm" id="btn-filtro-text"
                 onclick="toggleFiltro(event, this)" style="width:100%; justify-content:center; text-align:center;">
-                &#9688; Tipo Foto
+                &#9688; Formato da Foto
               </button>
               <div class="actions-dropdown filtro-dd" id="filtro-dropdown"
                 style="top:calc(100% + 5px); right:0; min-width:160px; text-align:left;">
-                <button type="button" class="dd-item" onclick="setFiltro('todas', '&#9688; Tipo Foto')">&#9688; Todas as
+                <button type="button" class="dd-item" onclick="setFiltro('todas', '&#9688; Formato da Foto')">&#9688;
+                  Todas as
                   Fotos</button>
                 <button type="button" class="dd-item" onclick="setFiltro('vertical', 'Verticais')">Apenas
                   Verticais</button>
@@ -510,7 +554,8 @@
           <button class="tab-btn active" onclick="switchTab('fotos')"><i class="fa-solid fa-images"></i> Fotos</button>
           <button class="tab-btn" onclick="switchTab('config')"><i class="fa-solid fa-gear"></i> Configurações</button>
           <button class="tab-btn" onclick="switchTab('musicas')"><i class="fa-solid fa-music"></i> Músicas</button>
-          <button class="tab-btn" onclick="switchTab('preview')"><i class="fa-solid fa-eye"></i> Pré Visualização</button>
+          <button class="tab-btn" onclick="switchTab('preview')"><i class="fa-solid fa-eye"></i> Pré
+            Visualização</button>
         </div>
 
         <!-- FOTOS -->
@@ -649,12 +694,15 @@
           <div class="config-section">
             <div class="config-card" style="text-align: center;">
               <h3>Tema da Galeria</h3>
-              <p style="color:var(--muted); font-size: 0.9rem; margin-bottom: 24px;">Defina a aparência padrão da galeria enviada ao cliente.</p>
-              
+              <p style="color:var(--muted); font-size: 0.9rem; margin-bottom: 24px;">Defina a aparência padrão da
+                galeria enviada ao cliente.</p>
+
               <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
                 <div class="theme-card" id="theme-card-escuro" onclick="salvarTema('escuro')">
-                  <div class="theme-preview" style="background:#0a0a14; color:#fff; border-radius: 8px 8px 0 0; padding: 20px; height: 180px; display: flex; flex-direction:column; align-items:center; justify-content:center; position: relative;">
-                    <i class="fa-solid fa-moon" style="font-size: 2rem; margin-bottom: 12px; color: var(--primary);"></i>
+                  <div class="theme-preview"
+                    style="background:#0a0a14; color:#fff; border-radius: 8px 8px 0 0; padding: 20px; height: 180px; display: flex; flex-direction:column; align-items:center; justify-content:center; position: relative;">
+                    <i class="fa-solid fa-moon"
+                      style="font-size: 2rem; margin-bottom: 12px; color: var(--primary);"></i>
                     <h4 style="margin:0; font-size: 1.2rem;">Tema Escuro</h4>
                   </div>
                   <div style="padding: 15px; font-weight: 600; text-align: center; border-radius: 0 0 8px 8px;">
@@ -663,7 +711,8 @@
                 </div>
 
                 <div class="theme-card" id="theme-card-claro" onclick="salvarTema('claro')">
-                  <div class="theme-preview" style="background:#f1f5f9; color:#0f172a; border-radius: 8px 8px 0 0; padding: 20px; height: 180px; display: flex; flex-direction:column; align-items:center; justify-content:center; position: relative;">
+                  <div class="theme-preview"
+                    style="background:#f1f5f9; color:#0f172a; border-radius: 8px 8px 0 0; padding: 20px; height: 180px; display: flex; flex-direction:column; align-items:center; justify-content:center; position: relative;">
                     <i class="fa-solid fa-sun" style="font-size: 2rem; margin-bottom: 12px; color: #eab308;"></i>
                     <h4 style="margin:0; font-size: 1.2rem;">Tema Claro</h4>
                   </div>
@@ -1005,7 +1054,7 @@
         showToast(d.mensagem, 'error');
       }
     }
-    
+
     async function salvarTema(novoTema) {
       document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
       document.getElementById('theme-card-' + novoTema)?.classList.add('active');
