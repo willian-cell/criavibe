@@ -1857,19 +1857,24 @@
       const foto = FOTOS[lbIndex];
       const btn = document.getElementById('lb-capa');
 
-      FOTOS.forEach(f => f.is_capa = 0);
-      foto.is_capa = 1;
+      const isRemovendo = (foto.is_capa == 1);
 
+      FOTOS.forEach(f => f.is_capa = 0);
       document.querySelectorAll('.foto-item').forEach(el => el.classList.remove('is-capa'));
-      document.getElementById(`foto-${foto.id}`)?.classList.add('is-capa');
+
+      if (!isRemovendo) {
+        foto.is_capa = 1;
+        document.getElementById(`foto-${foto.id}`)?.classList.add('is-capa');
+      }
+
       atualizarControlesLightbox();
 
       try {
         await fetch('/api/fotos/set_capa.php', {
           method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: foto.id, galeria_id: GALERIA.id, token: TOKEN })
+          body: JSON.stringify({ id: foto.id, galeria_id: GALERIA.id, token: TOKEN, remover: isRemovendo })
         });
-        toast('Foto de capa definida!');
+        toast(isRemovendo ? 'Capa removida!' : 'Foto de capa definida!');
       } catch (err) { }
     }
 

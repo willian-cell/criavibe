@@ -5,6 +5,7 @@ $body = body();
 $foto_id = (int)($body['id'] ?? 0);
 $galeria_id = (int)($body['galeria_id'] ?? 0);
 $token = $body['token'] ?? '';
+$remover = (bool)($body['remover'] ?? false);
 
 // Verifica acesso: via sessão OU via token
 $acesso_ok = false;
@@ -42,8 +43,11 @@ try {
 $stmt = db()->prepare("UPDATE imagens SET is_capa = 0 WHERE galeria_id = ?");
 $stmt->execute([$galeria_id]);
 
-// Define a nova foto de capa
-$stmt = db()->prepare("UPDATE imagens SET is_capa = 1 WHERE id = ? AND galeria_id = ?");
-$stmt->execute([$foto_id, $galeria_id]);
-
-json_out(['status'=>'ok', 'mensagem'=>'Capa atualizada com sucesso.']);
+if (!$remover) {
+    // Define a nova foto de capa
+    $stmt = db()->prepare("UPDATE imagens SET is_capa = 1 WHERE id = ? AND galeria_id = ?");
+    $stmt->execute([$foto_id, $galeria_id]);
+    json_out(['status'=>'ok', 'mensagem'=>'Capa atualizada com sucesso.']);
+} else {
+    json_out(['status'=>'ok', 'mensagem'=>'Capa removida com sucesso.']);
+}
