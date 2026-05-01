@@ -386,40 +386,35 @@
       direction: ltr;
     }
 
-    /* Phone Mockup Frame */
+    /* Floating "Loose" Image Styles with Smooth Movement */
     .showroom-img-wrapper {
       position: relative;
-      border-radius: 36px; /* Mais arredondado como iPhone */
-      overflow: hidden;
-      box-shadow: 0 40px 100px rgba(0,0,0,0.6);
-      border: 8px solid #1a1a1a; /* Bezel do celular */
-      background: #000;
-      max-width: 320px; /* Largura mobile padrão */
+      max-width: 300px; 
       margin: 0 auto;
-      transition: transform .6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .showroom-img-wrapper::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 28px;
-      box-shadow: inset 0 0 20px rgba(255,255,255,0.1);
-      pointer-events: none;
+      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1); /* Transição mais lenta e suave */
+      display: flex;
+      justify-content: center;
     }
 
     .showroom-img-wrapper:hover {
-      transform: translateY(-15px) rotateY(-5deg) rotateX(5deg);
+      transform: translateY(-20px) scale(1.03);
     }
 
     .showroom-img-wrapper img {
       width: 100%;
-      display: block;
-      border-radius: 28px;
+      height: 550px;
+      object-fit: contain;
+      border-radius: 20px;
+      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.4));
+      animation: float 6s ease-in-out infinite; /* Movimento constante e leve */
     }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+
 
     .showroom-info h3 {
       font-size: 2.5rem;
