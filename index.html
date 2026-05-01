@@ -389,9 +389,9 @@
     /* Floating "Loose" Image Styles with Smooth Movement */
     .showroom-img-wrapper {
       position: relative;
-      max-width: 300px; 
+      max-width: 420px; /* Aumentado de 300px */
       margin: 0 auto;
-      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1); /* Transição mais lenta e suave */
+      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       justify-content: center;
     }
@@ -402,11 +402,11 @@
 
     .showroom-img-wrapper img {
       width: 100%;
-      height: 550px;
+      height: 650px; /* Aumentado de 550px */
       object-fit: contain;
       border-radius: 20px;
       filter: drop-shadow(0 20px 30px rgba(0,0,0,0.4));
-      animation: float 6s ease-in-out infinite; /* Movimento constante e leve */
+      animation: float 6s ease-in-out infinite;
     }
 
     @keyframes float {
@@ -414,13 +414,14 @@
       50% { transform: translateY(-15px); }
     }
 
-    /* Destaque para a primeira imagem do Showroom */
+    /* Destaque para a primeira imagem do Showroom (Ainda maior) */
     .showroom-item:first-child .showroom-img-wrapper {
-      max-width: 450px; /* Aumentado para preencher mais espaço */
+      max-width: 550px; /* Aumentado de 450px */
     }
     .showroom-item:first-child img {
-      height: 680px; /* Altura maior para destaque */
+      height: 750px; /* Aumentado de 680px */
     }
+
 
 
 
