@@ -1,4 +1,18 @@
 <?php
+require_once __DIR__ . '/config.php';
+
+function mask($str) {
+    if (!$str) return "Vazio ❌";
+    return substr($str, 0, 4) . "..." . substr($str, -4) . " (OK ✅)";
+}
+
+echo "<h1>Diagnóstico de Ambiente</h1>";
+echo "<ul>";
+echo "<li><b>R2_ACCOUNT_ID:</b> " . mask(getenv('R2_ACCOUNT_ID') ?: ($_ENV['R2_ACCOUNT_ID'] ?? ($_SERVER['R2_ACCOUNT_ID'] ?? ''))) . "</li>";
+echo "<li><b>R2_BUCKET_NAME:</b> " . mask(getenv('R2_BUCKET_NAME') ?: ($_ENV['R2_BUCKET_NAME'] ?? ($_SERVER['R2_BUCKET_NAME'] ?? ''))) . "</li>";
+echo "<li><b>R2_ACCESS_KEY_ID:</b> " . mask(getenv('R2_ACCESS_KEY_ID') ?: ($_ENV['R2_ACCESS_KEY_ID'] ?? ($_SERVER['R2_ACCESS_KEY_ID'] ?? ''))) . "</li>";
+echo "</ul>";
+
 $logFile = __DIR__ . '/error.log';
 
 echo "<h1>Logs de Erro do Sistema</h1>";
