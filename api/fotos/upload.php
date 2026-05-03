@@ -34,7 +34,7 @@ if (!defined('R2_ACCESS_KEY')) define('R2_ACCESS_KEY', get_env_var('R2_ACCESS_KE
 if (!defined('R2_SECRET_KEY')) define('R2_SECRET_KEY', get_env_var('R2_SECRET_KEY'));
 if (!defined('R2_BUCKET'))     define('R2_BUCKET',     get_env_var('R2_BUCKET_NAME'));
 if (!defined('R2_ENDPOINT')) {
-    $accId = get_env_var('R2_ACCOUNT_ID');
+    $accId = get_env_var('R2_ACCOUNT_ID') ?: 'a0ffb4ddf665d57e3a7295a45a99cd61';
     define('R2_ENDPOINT', "https://{$accId}.r2.cloudflarestorage.com/" . R2_BUCKET);
 }
 
