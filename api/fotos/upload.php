@@ -24,12 +24,18 @@ if (!$files) json_out(['status'=>'erro','mensagem'=>'Nenhum arquivo enviado.'], 
 
 require_once __DIR__.'/../lib/R2Storage.php';
 
+// Função auxiliar para capturar variáveis de ambiente de forma robusta
+function get_env_var($key) {
+    return getenv($key) ?: ($_ENV[$key] ?? ($_SERVER[$key] ?? ''));
+}
+
 // Garantir que as constantes existam (Caso o config.php do servidor seja antigo)
-if (!defined('R2_ACCESS_KEY')) define('R2_ACCESS_KEY', getenv('R2_ACCESS_KEY_ID'));
-if (!defined('R2_SECRET_KEY')) define('R2_SECRET_KEY', getenv('R2_SECRET_KEY'));
-if (!defined('R2_BUCKET'))     define('R2_BUCKET',     getenv('R2_BUCKET_NAME'));
+if (!defined('R2_ACCESS_KEY')) define('R2_ACCESS_KEY', get_env_var('R2_ACCESS_KEY_ID'));
+if (!defined('R2_SECRET_KEY')) define('R2_SECRET_KEY', get_env_var('R2_SECRET_KEY'));
+if (!defined('R2_BUCKET'))     define('R2_BUCKET',     get_env_var('R2_BUCKET_NAME'));
 if (!defined('R2_ENDPOINT')) {
-    define('R2_ENDPOINT', "https://" . getenv('R2_ACCOUNT_ID') . ".r2.cloudflarestorage.com/" . R2_BUCKET);
+    $accId = get_env_var('R2_ACCOUNT_ID');
+    define('R2_ENDPOINT', "https://{$accId}.r2.cloudflarestorage.com/" . R2_BUCKET);
 }
 
 // Instanciar R2
