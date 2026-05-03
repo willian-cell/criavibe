@@ -24,6 +24,14 @@ if (!$files) json_out(['status'=>'erro','mensagem'=>'Nenhum arquivo enviado.'], 
 
 require_once __DIR__.'/../lib/R2Storage.php';
 
+// Garantir que as constantes existam (Caso o config.php do servidor seja antigo)
+if (!defined('R2_ACCESS_KEY')) define('R2_ACCESS_KEY', getenv('R2_ACCESS_KEY_ID'));
+if (!defined('R2_SECRET_KEY')) define('R2_SECRET_KEY', getenv('R2_SECRET_KEY'));
+if (!defined('R2_BUCKET'))     define('R2_BUCKET',     getenv('R2_BUCKET_NAME'));
+if (!defined('R2_ENDPOINT')) {
+    define('R2_ENDPOINT', "https://" . getenv('R2_ACCOUNT_ID') . ".r2.cloudflarestorage.com/" . R2_BUCKET);
+}
+
 // Instanciar R2
 $r2 = new R2Storage(R2_ACCESS_KEY, R2_SECRET_KEY, R2_BUCKET, R2_ENDPOINT);
 
