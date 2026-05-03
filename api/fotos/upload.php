@@ -3,6 +3,8 @@ require_once __DIR__.'/../config.php';
 $u = require_fotografo();
 
 $galeria_id = (int)($_POST['galeria_id'] ?? 0);
+error_log("Iniciando Upload: Galeria $galeria_id, Files: " . count($_FILES['fotos']['name'] ?? []));
+
 if (!$galeria_id) json_out(['status'=>'erro','mensagem'=>'galeria_id obrigatório.'], 400);
 
 // Verificar dono

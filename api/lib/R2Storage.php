@@ -22,8 +22,11 @@ class R2Storage {
      * Upload de arquivo para o R2
      */
     public function upload($filePath, $r2Path, $mimeType = 'application/octet-stream') {
-        $content = file_get_contents($filePath);
-        if ($content === false) return false;
+        $content = @file_get_contents($filePath);
+        if ($content === false) {
+            error_log("R2Storage Error: Não foi possível ler o arquivo $filePath");
+            return false;
+        }
 
         $host = parse_url($this->endpoint, PHP_URL_HOST);
         $url = $this->endpoint . '/' . ltrim($r2Path, '/');
@@ -75,6 +78,16 @@ class R2Storage {
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        
+        if ($response === false) {
+            $err = curl_error($ch);
+            error_log("R2Storage CURL Error: $err");
+        }
+        
+        if ($httpCode >= 400) {
+            error_log("R2Storage HTTP Error $httpCode: $response");
+        }
+        
         curl_close($ch);
 
         return ($httpCode === 200 || $httpCode === 204);
