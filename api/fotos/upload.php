@@ -13,8 +13,10 @@ if (!$chk->fetch()) json_out(['status'=>'erro','mensagem'=>'Galeria não encontr
 $files = $_FILES['fotos'] ?? null;
 if (!$files) json_out(['status'=>'erro','mensagem'=>'Nenhum arquivo enviado.'], 400);
 
-$uploadDir = __DIR__.'/../../uploads/fotos/';
-if (!is_dir($uploadDir)) mkdir($uploadDir, 0775, true);
+require_once __DIR__.'/../lib/R2Storage.php';
+
+// Instanciar R2
+$r2 = new R2Storage(R2_ACCESS_KEY, R2_SECRET_KEY, R2_BUCKET, R2_ENDPOINT);
 
 $allowed = ['image/jpeg','image/png','image/webp','image/gif'];
 $enviadas = 0;
@@ -34,10 +36,18 @@ for ($i = 0; $i < $total; $i++) {
 
     $ext      = strtolower(pathinfo($name, PATHINFO_EXTENSION));
     $filename = uniqid('foto_', true).'.'.$ext;
-    $dest     = $uploadDir.$filename;
-    $caminho  = 'uploads/fotos/'.$filename;
+    
+    // Caminho no R2: galerias/{id}/{filename}
+    $r2Path   = "galerias/{$galeria_id}/{$filename}";
+    
+    // Upload para o R2
+    if (!$r2->upload($tmp, $r2Path, $type)) {
+        $erros[] = "$name (Falha no R2)";
+        continue;
+    }
 
-    if (!move_uploaded_file($tmp, $dest)) { $erros[] = $name; continue; }
+    // URL Pública do R2
+    $caminho = R2_PUBLIC_URL . '/' . $r2Path;
 
     // ordenação: próximo número
     $ord = db()->prepare("SELECT COALESCE(MAX(ordem),0)+1 FROM imagens WHERE galeria_id=?");

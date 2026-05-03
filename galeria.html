@@ -525,6 +525,12 @@
           <span class="manager-tab" id="top-nome">Carregando...</span>
           <div class="manager-spacer"></div>
           <div class="manager-actions">
+            <!-- BUSCA POR NOME -->
+            <div class="search-bar" style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; padding: 0 12px; height: 36px; min-width: 200px;">
+              <i class="fa-solid fa-magnifying-glass" style="color:var(--muted); font-size: 0.8rem;"></i>
+              <input id="search-photos" type="text" placeholder="Buscar por nome..." style="background: none; border: none; color: var(--text); font-size: 0.85rem; padding-left: 8px; width: 100%; outline: none;" oninput="renderFotos()">
+            </div>
+            
             <a id="btn-ver" href="#" target="_blank" class="btn btn-secondary btn-sm">
               <i class="fa-solid fa-eye"></i> Ver Galeria
             </a>
@@ -733,7 +739,10 @@
   <div class="lightbox" id="lightbox" onclick="if(event.target===this)fecharLightbox()">
     <button class="lightbox-close" onclick="fecharLightbox()">&times;</button>
     <button class="lightbox-nav prev" onclick="navLightbox(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-    <img id="lb-img" src="" alt="">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+        <img id="lb-img" src="" alt="">
+        <div id="lb-filename" style="color: #fff; background: rgba(0,0,0,0.6); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.1);"></div>
+    </div>
     <button class="lightbox-nav next" onclick="navLightbox(1)"><i class="fa-solid fa-chevron-right"></i></button>
   </div>
 
@@ -853,11 +862,16 @@
     function renderFotos() {
       const grid = document.getElementById('photos-grid');
       const filtro = filtroAtual;
+      const busca = document.getElementById('search-photos')?.value.toLowerCase() || '';
 
-      fotosVisiveis = fotos.filter(f => filtro === 'todas' || f.orientacao === filtro);
+      fotosVisiveis = fotos.filter(f => {
+        const matchesFiltro = filtro === 'todas' || f.orientacao === filtro;
+        const matchesBusca = f.nome_arquivo.toLowerCase().includes(busca);
+        return matchesFiltro && matchesBusca;
+      });
 
       if (!fotosVisiveis.length) {
-        grid.innerHTML = '<div class="empty-state"><div class="icon"><i class="fa-solid fa-images"></i></div><p>Nenhuma foto encontrada neste filtro.</p></div>';
+        grid.innerHTML = '<div class="empty-state"><div class="icon"><i class="fa-solid fa-images"></i></div><p>Nenhuma foto encontrada.</p></div>';
         return;
       }
 
@@ -907,24 +921,58 @@
 
     async function uploadFotos(files) {
       if (!files || !files.length) return;
-      const prog = document.getElementById('prog-fill');
-      const txt = document.getElementById('prog-txt');
-      document.getElementById('prog-bg').style.display = '';
+      
+      const batchSize = 50; // Processar de 50 em 50 para estabilidade
+      const totalFiles = files.length;
       let done = 0;
-      for (const file of files) {
+      
+      const progBg = document.getElementById('prog-bg');
+      const progFill = document.getElementById('prog-fill');
+      const txt = document.getElementById('prog-txt');
+      
+      progBg.style.display = '';
+      const filesArray = Array.from(files);
+      const totalBatches = Math.ceil(totalFiles / batchSize);
+
+      for (let i = 0; i < filesArray.length; i += batchSize) {
+        const batch = filesArray.slice(i, i + batchSize);
+        const batchNum = Math.floor(i / batchSize) + 1;
+        
+        txt.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Enviando Lote <b>${batchNum} de ${totalBatches}</b>... (${done}/${totalFiles})`;
+        
         const fd = new FormData();
         fd.append('galeria_id', galeriaId);
-        fd.append('fotos[]', file);
-        await API.upload('/fotos/upload.php', fd);
-        done++;
-        prog.style.width = `${(done / files.length) * 100}%`;
-        txt.textContent = `${done}/${files.length} enviadas`;
+        batch.forEach(file => {
+          fd.append('fotos[]', file);
+        });
+
+        try {
+          // Upload do lote
+          const res = await API.upload('/fotos/upload.php', fd);
+          
+          if (res.status === 'ok') {
+            done += batch.length;
+            progFill.style.width = `${(done / totalFiles) * 100}%`;
+            
+            // Atualização progressiva: carregar fotos já enviadas para o fotógrafo conferir
+            await carregarFotos();
+          } else {
+            showToast(`Erro no lote ${batchNum}: ${res.mensagem}`, 'error');
+            // Opcional: break ou continue. Vamos parar para evitar mais erros em série.
+            break;
+          }
+        } catch (e) {
+          showToast(`Erro crítico no lote ${batchNum}: Verifique sua conexão.`, 'error');
+          break;
+        }
       }
-      showToast(`${done} foto(s) enviada(s)!`);
-      document.getElementById('prog-bg').style.display = 'none';
-      txt.textContent = '';
-      prog.style.width = '0%';
-      await carregarFotos();
+
+      txt.innerHTML = `<i class="fa-solid fa-check"></i> Processamento Concluído! (${done}/${totalFiles})`;
+      setTimeout(() => {
+        progBg.style.display = 'none';
+        txt.textContent = '';
+        progFill.style.width = '0%';
+      }, 5000);
     }
 
     async function excluirFoto(id) {
@@ -993,13 +1041,17 @@
     // ── Lightbox ─────────────────────────────────────────────
     function abrirLightbox(i) {
       lbIdx = i;
-      document.getElementById('lb-img').src = '/' + fotosVisiveis[i].caminho_arquivo;
+      const f = fotosVisiveis[i];
+      document.getElementById('lb-img').src = f.caminho_arquivo.startsWith('http') ? f.caminho_arquivo : '/' + f.caminho_arquivo;
+      document.getElementById('lb-filename').textContent = f.nome_arquivo;
       document.getElementById('lightbox').classList.add('open');
     }
     function fecharLightbox() { document.getElementById('lightbox').classList.remove('open'); }
     function navLightbox(d) {
       lbIdx = (lbIdx + d + fotosVisiveis.length) % fotosVisiveis.length;
-      document.getElementById('lb-img').src = '/' + fotosVisiveis[lbIdx].caminho_arquivo;
+      const f = fotosVisiveis[lbIdx];
+      document.getElementById('lb-img').src = f.caminho_arquivo.startsWith('http') ? f.caminho_arquivo : '/' + f.caminho_arquivo;
+      document.getElementById('lb-filename').textContent = f.nome_arquivo;
     }
     document.addEventListener('keydown', e => {
       if (!document.getElementById('lightbox').classList.contains('open')) return;
