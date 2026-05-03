@@ -9,8 +9,13 @@ class DotEnv {
             die("Erro Crítico: Arquivo .env não encontrado em: " . $path);
         }
 
-        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        error_log("DotEnv: Lendo arquivo. Total de linhas: " . count($lines));
+        $content = file_get_contents($path);
+        
+        // Remove UTF-8 BOM se existir
+        $content = str_replace("\xEF\xBB\xBF", '', $content);
+        
+        $lines = explode("\n", str_replace("\r", "", $content));
+        error_log("DotEnv: Lendo conteúdo. Total de linhas: " . count($lines));
 
         foreach ($lines as $line) {
             $line = trim($line);
