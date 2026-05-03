@@ -552,19 +552,14 @@
       animation: fadeInBadge .5s ease;
     }
 
-    /* ── GRID CLEANER (Oculta marcações na galeria) ── */
-    .foto-item .sel-check,
-    .foto-item .dl-btn,
-    .foto-item .foto-baixada-badge,
-    .foto-item.is-capa::before {
-      display: none !important;
-    }
-
-    /* Manter a borda apenas para CAPA */
     .foto-item.selected {
-      border-width: 1px;
-      /* Diminui a borda de seleção na grid */
-      border-color: rgba(59, 130, 246, 0.4);
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 2px #3b82f6, 0 0 20px rgba(59, 130, 246, 0.4) !important;
+    }
+    .foto-item.selected .sel-check {
+      background: #3b82f6 !important;
+      color: #fff !important;
+      opacity: 1 !important;
     }
 
     /* ── Efeito de Opacidade ao atingir o limite de seleção ── */
@@ -1188,7 +1183,7 @@
       <div class="hero-gradient"></div>
 
       <nav class="hero-nav">
-        <button onclick="location.reload()" title="Voltar/Sair"><i class="fa-solid fa-arrow-left"></i> Sair</button>
+        <button onclick="location.href='index.html'" title="Voltar/Sair"><i class="fa-solid fa-arrow-left"></i> Sair</button>
         <div class="hero-brand" id="logoToggle" title="Alternar Modo Escuro/Claro">
           <img src="/logo/logo-criavibe-fotografia.jpeg" alt="CriaVibe" class="hero-logo-img">
         </div>
@@ -1613,36 +1608,30 @@
       atualizarToolbar();
     }
 
+    let lastClickIdx = -1;
+
     function clicarFoto(e, idx) {
       if (e.target.classList.contains('dl-btn') || e.target.closest('.dl-btn')) return;
 
+      if (lastClickIdx !== idx) {
+        clearTimeout(clickTimer);
+        clickCount = 0;
+      }
+      lastClickIdx = idx;
       clickCount++;
 
       if (clickCount === 1) {
         clickTimer = setTimeout(() => {
-          // 1 Clique: Seleciona direto se GALERIA.selecao_ativa
-          if (GALERIA.selecao_ativa == 1) {
-            toggleSelecao(idx);
-          } else {
-            // Se seleção não habilitada, 1 clique amplia
-            abrirLightbox(idx);
-          }
+          if (isModoSelecao) toggleSelecao(idx);
+          else abrirLightbox(idx);
           clickCount = 0;
-        }, 280);
+          lastClickIdx = -1;
+        }, 250);
       } else if (clickCount === 2) {
         clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => {
-          // 2 Cliques: Amplia
-          abrirLightbox(idx);
-          clickCount = 0;
-        }, 280);
-      } else if (clickCount === 3) {
-        clearTimeout(clickTimer);
-        // 3 Cliques: Seleciona Todas
-        if (GALERIA.selecao_ativa) {
-          selecionarTodas();
-        }
         clickCount = 0;
+        lastClickIdx = -1;
+        abrirLightbox(idx);
       }
     }
 
