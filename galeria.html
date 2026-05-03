@@ -754,8 +754,10 @@
     let galeria = null;
     let fotos = [];
     let fotosVisiveis = [];
-    let lbIdx = 0;
     let filtroAtual = 'todas';
+    let lbIdx = 0;
+    let paginaAtual = 1;
+    const fotosPorPagina = 50;
 
     function toggleFiltro(e, btn) {
       e.preventDefault();
@@ -844,6 +846,9 @@
       const d = await API.get(`/fotos/list.php?galeria_id=${galeriaId}`);
       const rawFotos = d.fotos || [];
 
+      // Resetar página ao carregar novas fotos
+      paginaAtual = 1;
+
       // Detect orientaton to calculate spans properly
       fotos = await Promise.all(rawFotos.map(f => {
         return new Promise((resolve) => {
@@ -865,14 +870,24 @@
       const filtro = filtroAtual;
       const busca = document.getElementById('search-photos')?.value.toLowerCase() || '';
 
-      fotosVisiveis = fotos.filter(f => {
+      // 1. Filtrar
+      const fotosFiltradas = fotos.filter(f => {
         const matchesFiltro = filtro === 'todas' || f.orientacao === filtro;
         const matchesBusca = f.nome_arquivo.toLowerCase().includes(busca);
         return matchesFiltro && matchesBusca;
       });
 
-      if (!fotosVisiveis.length) {
+      // 2. Paginar
+      const totalPaginas = Math.ceil(fotosFiltradas.length / fotosPorPagina);
+      if (paginaAtual > totalPaginas) paginaAtual = totalPaginas || 1;
+
+      const inicio = (paginaAtual - 1) * fotosPorPagina;
+      const fim = inicio + fotosPorPagina;
+      fotosVisiveis = fotosFiltradas.slice(inicio, fim);
+
+      if (!fotosFiltradas.length) {
         grid.innerHTML = '<div class="empty-state"><div class="icon"><i class="fa-solid fa-images"></i></div><p>Nenhuma foto encontrada.</p></div>';
+        renderPagination(0);
         return;
       }
 
@@ -890,7 +905,7 @@
       <div class="photo-capa-badge">
         <i class="fa-solid fa-crown"></i> CAPA
       </div>` : ''}
-      <img src="/${f.caminho_arquivo}" alt="${f.nome_arquivo}" loading="lazy" onclick="abrirLightbox(${i})">
+      <img src="${f.caminho_arquivo.startsWith('http') ? f.caminho_arquivo : '/' + f.caminho_arquivo}" alt="${f.nome_arquivo}" loading="lazy" onclick="abrirLightbox(${i})">
       <div class="photo-overlay">
         <button class="photo-btn danger" onclick="excluirFoto(${f.id})" title="Excluir">
           <i class="fa-solid fa-trash"></i>
@@ -898,6 +913,38 @@
       </div>
     </div>
   `).join('');
+
+      renderPagination(totalPaginas);
+    }
+
+    function renderPagination(total) {
+      let html = '';
+      if (total > 1) {
+        html = `
+        <div class="pagination-container" style="display:flex; align-items:center; justify-content:center; gap:15px; margin: 40px 0; padding: 20px; border-top: 1px solid var(--border);">
+          <button class="btn btn-secondary btn-sm" ${paginaAtual === 1 ? 'disabled' : ''} onclick="mudarPagina(${paginaAtual - 1})">
+            <i class="fa-solid fa-chevron-left"></i> Anterior
+          </button>
+          <span style="font-size: 0.9rem; font-weight: 600; color: var(--muted)">Página ${paginaAtual} de ${total}</span>
+          <button class="btn btn-secondary btn-sm" ${paginaAtual === total ? 'disabled' : ''} onclick="mudarPagina(${paginaAtual + 1})">
+            Próximo <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      `;
+      }
+
+      // Remover paginação anterior se existir
+      const oldPag = document.querySelector('.pagination-container');
+      if (oldPag) oldPag.remove();
+
+      // Adicionar após o grid
+      document.getElementById('photos-grid').insertAdjacentHTML('afterend', html);
+    }
+
+    function mudarPagina(p) {
+      paginaAtual = p;
+      renderFotos();
+      window.scrollTo({ top: document.getElementById('search-photos').offsetTop - 100, behavior: 'smooth' });
     }
 
     // ── Upload de Fotos ───────────────────────────────────────
