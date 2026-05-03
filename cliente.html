@@ -554,12 +554,15 @@
 
     .foto-item.selected {
       border-color: #3b82f6 !important;
-      box-shadow: 0 0 0 2px #3b82f6, 0 0 20px rgba(59, 130, 246, 0.4) !important;
+      box-shadow: 0 0 0 3px #3b82f6, 0 10px 30px rgba(59, 130, 246, 0.5) !important;
+      transform: translateY(-5px);
+      z-index: 5;
     }
-    .foto-item.selected .sel-check {
-      background: #3b82f6 !important;
-      color: #fff !important;
-      opacity: 1 !important;
+    .foto-item.selected img {
+      filter: brightness(1.1);
+    }
+    .foto-item .sel-check {
+      display: none !important; /* Removido o checkbox quadrado como solicitado */
     }
 
     /* ── Efeito de Opacidade ao atingir o limite de seleção ── */
