@@ -970,7 +970,7 @@
     async function uploadFotos(files) {
       if (!files || !files.length) return;
       
-      const batchSize = 50; // Processar de 50 em 50 para estabilidade
+      const batchSize = 10; // Reduzido de 50 para 10 para evitar timeouts e limites de POST na Hostinger
       const totalFiles = files.length;
       let done = 0;
       
@@ -1010,8 +1010,9 @@
             break;
           }
         } catch (e) {
-          showToast(`Erro crítico no lote ${batchNum}: Verifique sua conexão.`, 'error');
-          break;
+            console.error(`Falha Crítica no Lote ${batchNum}:`, e);
+            showToast(`Erro no lote ${batchNum}: ${e.message}`, 'error');
+            break;
         }
       }
 

@@ -34,7 +34,9 @@ class R2Storage {
         $payloadHash = hash('sha256', $content);
         
         // 1. Canonical Request
-        $canonicalUri = '/' . ltrim($r2Path, '/');
+        // Para endpoints no formato account-id.r2.cloudflarestorage.com/bucket,
+        // o Canonical URI deve incluir o /bucket/
+        $canonicalUri = '/' . $this->bucket . '/' . ltrim($r2Path, '/');
         $canonicalQuery = '';
         $canonicalHeaders = "host:$host\nx-amz-content-sha256:$payloadHash\nx-amz-date:$timestamp\n";
         $signedHeaders = "host;x-amz-content-sha256;x-amz-date";

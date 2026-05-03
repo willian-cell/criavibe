@@ -26,12 +26,33 @@ const API = {
     });
   },
 
-  upload(path, formData) {
-    return fetch(this.base + path, {
-      method: 'POST',
-      credentials: 'include',
-      body: formData,
-    }).then(r => r.json());
+  async upload(path, formData) {
+    try {
+      const res = await fetch(this.base + path, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      const text = await res.text();
+      let data = {};
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error("Erro ao processar resposta do servidor (não é JSON):", text);
+        if (res.status === 413) throw new Error("Arquivos muito grandes para o servidor. Tente lotes menores.");
+        throw new Error(`Erro no servidor (${res.status}).`);
+      }
+
+      if (!res.ok || data.status === 'erro') {
+        throw new Error(data.mensagem || `Erro ${res.status}`);
+      }
+
+      return data;
+    } catch (err) {
+      console.error(`Falha no upload [${path}]:`, err);
+      throw err;
+    }
   },
 };
 

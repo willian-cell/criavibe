@@ -558,11 +558,13 @@
       transform: translateY(-5px);
       z-index: 5;
     }
+
     .foto-item.selected img {
       filter: brightness(1.1);
     }
+
     .foto-item .sel-check {
-      display: none !important; /* Removido o checkbox quadrado como solicitado */
+      display: none !important;
     }
 
     /* ── Efeito de Opacidade ao atingir o limite de seleção ── */
@@ -1034,7 +1036,7 @@
     body.light-mode .hero-bg {
       filter: brightness(0.9);
     }
-    
+
     body.light-mode .hero-gradient {
       background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0%, transparent 35%, rgba(0, 0, 0, 0.75) 100%);
     }
@@ -1186,7 +1188,8 @@
       <div class="hero-gradient"></div>
 
       <nav class="hero-nav">
-        <button onclick="location.href='index.html'" title="Voltar/Sair"><i class="fa-solid fa-arrow-left"></i> Sair</button>
+        <button onclick="location.href='index.html'" title="Voltar/Sair"><i class="fa-solid fa-arrow-left"></i>
+          Sair</button>
         <div class="hero-brand" id="logoToggle" title="Alternar Modo Escuro/Claro">
           <img src="/logo/logo-criavibe-fotografia.jpeg" alt="CriaVibe" class="hero-logo-img">
         </div>
