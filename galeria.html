@@ -525,12 +525,6 @@
           <span class="manager-tab" id="top-nome">Carregando...</span>
           <div class="manager-spacer"></div>
           <div class="manager-actions">
-            <!-- BUSCA POR NOME -->
-            <div class="search-bar" style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; padding: 0 12px; height: 36px; min-width: 200px;">
-              <i class="fa-solid fa-magnifying-glass" style="color:var(--muted); font-size: 0.8rem;"></i>
-              <input id="search-photos" type="text" placeholder="Buscar por nome..." style="background: none; border: none; color: var(--text); font-size: 0.85rem; padding-left: 8px; width: 100%; outline: none;" oninput="renderFotos()">
-            </div>
-            
             <a id="btn-ver" href="#" target="_blank" class="btn btn-secondary btn-sm">
               <i class="fa-solid fa-eye"></i> Ver Galeria
             </a>
@@ -595,6 +589,13 @@
             onchange="uploadFotos(this.files)">
           <input id="file-capa-input" type="file" accept="image/*" style="display:none"
             onchange="uploadCapaApresentacao(this.files)">
+          <div style="display: flex; justify-content: center; margin: 10px 24px 30px 24px;">
+            <div class="search-bar" style="background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; padding: 0 16px; height: 44px; width: 100%; max-width: 500px; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-magnifying-glass" style="color:var(--muted); font-size: 0.9rem;"></i>
+              <input id="search-photos" type="text" placeholder="Buscar por nome do arquivo..." style="background: none; border: none; color: var(--text); font-size: 0.95rem; padding-left: 10px; width: 100%; outline: none;" oninput="renderFotos()">
+            </div>
+          </div>
+
           <div class="photos-grid" id="photos-grid"></div>
         </div>
 
