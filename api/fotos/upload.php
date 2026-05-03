@@ -1,5 +1,12 @@
 <?php
 require_once __DIR__.'/../config.php';
+
+// Ativação de Logs Forçada (Ignorando o config.php do servidor)
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../error.log');
+error_reporting(E_ALL);
+
 $u = require_fotografo();
 
 $galeria_id = (int)($_POST['galeria_id'] ?? 0);
