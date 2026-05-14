@@ -1,0 +1,11 @@
+.env
+*.env
+CREDENCIAIS.md
+api/error.log
+*.log
+.git
+.gitignore
+uploads/fotos/*
+uploads/musicas/*
+!uploads/fotos/.gitkeep
+!uploads/musicas/.gitkeep

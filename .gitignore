@@ -3,9 +3,6 @@ CREDENCIAIS.md
 .env
 *.env
 
-# PHP
-api/config.php
-
 # Uploads dos clientes (ficam no servidor)
 uploads/fotos/*
 uploads/musicas/*
