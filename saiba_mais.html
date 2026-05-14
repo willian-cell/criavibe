@@ -256,6 +256,23 @@
       will-change: transform;
     }
 
+    .parallax-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.82) 100%);
+      pointer-events: none;
+    }
+
+    .parallax-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
     .hero-glass-card {
       position: relative;
       z-index: 2;
@@ -674,7 +691,11 @@
 
   <!-- PARALLAX HERO -->
   <header class="parallax-hero">
-    <div class="parallax-bg" id="parallax-bg"></div>
+    <div class="parallax-bg" id="parallax-bg">
+      <video class="parallax-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+        <source src="assets/videos/criavibe-parallax.mp4" type="video/mp4">
+      </video>
+    </div>
     <div class="hero-glass-card scroll-trigger">
       <h1 class="hero-title">A Arte da CriaVibe</h1>
       <p class="hero-text">
