@@ -17,7 +17,11 @@ class R2Presigner {
         $this->endpoint = rtrim($endpoint, '/');
     }
 
-    public function signedPutUrl(string $r2Path, int $expires = 900): string {
+    /**
+     * Gera URL de PUT assinada para upload direto de arquivos ao R2.
+     * O Content-Type do upload é incluído na assinatura, pois o navegador envia esse header.
+     */
+    public function signedPutUrl(string $r2Path, int $expires = 900, string $contentType = 'application/octet-stream'): string {
         $host = parse_url($this->endpoint, PHP_URL_HOST);
         $baseUrl = $this->endpoint . '/' . ltrim($r2Path, '/');
         $timestamp = gmdate('Ymd\THis\Z');
@@ -30,14 +34,14 @@ class R2Presigner {
             'X-Amz-Credential' => $credential,
             'X-Amz-Date' => $timestamp,
             'X-Amz-Expires' => (string)max(60, min($expires, 3600)),
-            'X-Amz-SignedHeaders' => 'host',
+            'X-Amz-SignedHeaders' => 'content-type;host',
             'X-Amz-Content-Sha256' => 'UNSIGNED-PAYLOAD',
         ];
 
         $canonicalQuery = $this->canonicalQuery($query);
         $canonicalUri = '/' . $this->bucket . '/' . ltrim($r2Path, '/');
-        $canonicalHeaders = "host:$host\n";
-        $canonicalRequest = "PUT\n$canonicalUri\n$canonicalQuery\n$canonicalHeaders\nhost\nUNSIGNED-PAYLOAD";
+        $canonicalHeaders = "content-type:$contentType\nhost:$host\n";
+        $canonicalRequest = "PUT\n$canonicalUri\n$canonicalQuery\n$canonicalHeaders\ncontent-type;host\nUNSIGNED-PAYLOAD";
 
         $stringToSign = "AWS4-HMAC-SHA256\n$timestamp\n$credentialScope\n" . hash('sha256', $canonicalRequest);
         $signature = $this->signature($date, $stringToSign);

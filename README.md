@@ -151,6 +151,7 @@ railway run php api/db_migrations.php
   - URLs `PUT` geradas pelo R2
   - `/api/fotos/direct_confirm.php`
 - Se algum PUT falhar, o problema está na assinatura R2/CORS ou credenciais.
+- Agora o `direct_prepare` também aceita HEIC/HEIF/AVIF/SVG/TIFF e outros formatos populares, usando fallback por extensão quando o navegador não envia um MIME type completo.
 
 ## Como validar logs do worker no Railway
 

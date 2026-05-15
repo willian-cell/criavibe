@@ -9,7 +9,7 @@ $files = $body['files'] ?? [];
 
 if (!$galeria_id) json_out(['status'=>'erro','mensagem'=>'galeria_id obrigatorio.'], 400);
 if (!is_array($files) || !$files) json_out(['status'=>'erro','mensagem'=>'Nenhum arquivo informado.'], 400);
-if (count($files) > 100) json_out(['status'=>'erro','mensagem'=>'Envie no maximo 100 arquivos por preparacao.'], 400);
+if (count($files) > 250) json_out(['status'=>'erro','mensagem'=>'Envie no maximo 250 arquivos por preparacao.'], 400);
 
 // Rate limiting: evitar abuse de preparacao (ex: 10 prepares por minuto)
 try {
@@ -40,7 +40,38 @@ if ($missing) {
     ], 500);
 }
 
-$allowed = ['image/jpeg'=>'jpg', 'image/png'=>'png', 'image/webp'=>'webp', 'image/gif'=>'gif'];
+$allowed = [
+    'image/jpeg' => 'jpg',
+    'image/png' => 'png',
+    'image/webp' => 'webp',
+    'image/gif' => 'gif',
+    'image/heic' => 'heic',
+    'image/heif' => 'heif',
+    'image/avif' => 'avif',
+    'image/svg+xml' => 'svg',
+    'image/tiff' => 'tiff',
+    'image/x-tiff' => 'tiff',
+    'image/bmp' => 'bmp',
+    'image/x-icon' => 'ico',
+    'application/octet-stream' => 'bin',
+];
+$extensionMap = [
+    'heic' => 'image/heic',
+    'heif' => 'image/heif',
+    'avif' => 'image/avif',
+    'svg' => 'image/svg+xml',
+    'tiff' => 'image/tiff',
+    'tif' => 'image/tiff',
+    'bmp' => 'image/bmp',
+    'ico' => 'image/x-icon',
+    'psd' => 'application/octet-stream',
+    'raw' => 'application/octet-stream',
+    'cr2' => 'application/octet-stream',
+    'nef' => 'application/octet-stream',
+    'arw' => 'application/octet-stream',
+    'dng' => 'application/octet-stream',
+];
+
 $presigner = new R2Presigner(R2_ACCESS_KEY, R2_SECRET_KEY, R2_BUCKET, R2_ENDPOINT);
 $uploads = [];
 
@@ -48,13 +79,19 @@ foreach ($files as $idx => $file) {
     $name = trim((string)($file['name'] ?? ''));
     $type = strtolower(trim((string)($file['type'] ?? '')));
     $size = (int)($file['size'] ?? 0);
+    $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
 
-    if (!$name || !isset($allowed[$type]) || $size <= 0) {
+    if ((!$type || !isset($allowed[$type])) && $ext && isset($extensionMap[$ext])) {
+        $type = $extensionMap[$ext];
+    }
+
+    if (!$name || $size <= 0 || !isset($allowed[$type])) {
         continue;
     }
 
-    $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-    if (!$ext || strlen($ext) > 5) $ext = $allowed[$type];
+    if (!$ext || strlen($ext) > 12 || !preg_match('/^[a-z0-9]+$/', $ext)) {
+        $ext = $allowed[$type];
+    }
 
     $filename = uniqid('foto_', true).'.'.$ext;
     $r2Path = "galerias/{$galeria_id}/{$filename}";
@@ -66,7 +103,7 @@ foreach ($files as $idx => $file) {
         'size' => $size,
         'r2_path' => $r2Path,
         'public_url' => R2_PUBLIC_URL . '/' . $r2Path,
-        'upload_url' => $presigner->signedPutUrl($r2Path, 900),
+        'upload_url' => $presigner->signedPutUrl($r2Path, 900, $type),
     ];
 }
 
