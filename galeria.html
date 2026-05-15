@@ -1082,7 +1082,8 @@
               body: file,
             });
             if (res.ok) return true;
-            lastError = new Error(`R2 respondeu ${res.status}`);
+            const detail = await res.text().catch(() => '');
+            lastError = new Error(`R2 respondeu ${res.status}${detail ? ': ' + detail.slice(0, 160) : ''}`);
           } catch (err) {
             lastError = err;
           }
@@ -1143,7 +1144,7 @@
           const uploaded = await uploadPool(jobs);
 
           if (uploaded.length) {
-            await API.post('/fotos/direct_confirm.php', {
+            const confirm = await API.post('/fotos/direct_confirm.php', {
               galeria_id: parseInt(galeriaId),
               items: uploaded.map(item => ({
                 r2_path: item.r2_path,
@@ -1151,7 +1152,10 @@
                 size: item.size,
               })),
             });
-            await carregarFotos();
+
+            if (Number(confirm.registradas || 0) !== uploaded.length) {
+              throw new Error(`Banco confirmou ${confirm.registradas || 0} de ${uploaded.length} fotos.`);
+            }
           }
         } catch (e) {
           console.error(`Falha no lote ${batchNum}:`, e);
@@ -1167,6 +1171,13 @@
       } else {
         txt.innerHTML = `<i class="fa-solid fa-check"></i> Upload concluido! (${done}/${totalFiles})`;
         showToast('Fotos enviadas com sucesso.');
+      }
+
+      try {
+        await carregarFotos();
+      } catch (err) {
+        console.warn('Upload finalizado, mas a grade nao recarregou automaticamente:', err);
+        showToast('Upload registrado, mas a grade nao recarregou automaticamente. Atualize a pagina.', 'error');
       }
 
       setTimeout(() => {

@@ -15,11 +15,11 @@ $chk->execute([$galeria_id, $u['email']]);
 if (!$chk->fetch()) json_out(['status'=>'erro','mensagem'=>'Galeria nao encontrada.'], 404);
 
 $allowedPrefix = "galerias/{$galeria_id}/";
-$db = db();
-$db->beginTransaction();
-
 try {
-    $ord = $db->prepare("SELECT COALESCE(MAX(ordem),0) FROM imagens WHERE galeria_id=? FOR UPDATE");
+    $db = db();
+    $db->beginTransaction();
+
+    $ord = $db->prepare("SELECT COALESCE(MAX(ordem),0) FROM imagens WHERE galeria_id=?");
     $ord->execute([$galeria_id]);
     $ordem = (int)$ord->fetchColumn();
 
@@ -38,7 +38,7 @@ try {
             continue;
         }
 
-        $publicUrl = R2_PUBLIC_URL . '/' . ltrim($r2Path, '/');
+        $publicUrl = rtrim(R2_PUBLIC_URL, '/') . '/' . ltrim($r2Path, '/');
         $ordem++;
         $stmt->execute([$galeria_id, $name, $publicUrl, max(0, $size), $ordem]);
         $registradas++;
@@ -47,7 +47,10 @@ try {
     $db->commit();
     json_out(['status'=>'ok','registradas'=>$registradas]);
 } catch (Throwable $e) {
-    if ($db->inTransaction()) $db->rollBack();
+    if (isset($db) && $db->inTransaction()) $db->rollBack();
     error_log('Erro ao confirmar uploads diretos: ' . $e->getMessage());
-    json_out(['status'=>'erro','mensagem'=>'Erro ao registrar fotos enviadas.'], 500);
+    json_out([
+        'status'=>'erro',
+        'mensagem'=>'Erro ao registrar fotos enviadas: '.$e->getMessage()
+    ], 500);
 }

@@ -31,6 +31,7 @@ class R2Presigner {
             'X-Amz-Date' => $timestamp,
             'X-Amz-Expires' => (string)max(60, min($expires, 3600)),
             'X-Amz-SignedHeaders' => 'host',
+            'X-Amz-Content-Sha256' => 'UNSIGNED-PAYLOAD',
         ];
 
         $canonicalQuery = $this->canonicalQuery($query);
