@@ -360,7 +360,8 @@
     .showroom-container {
       display: flex;
       flex-direction: column;
-      gap: 120px; /* Mais espaço para as animações respirarem */
+      gap: 120px;
+      /* Mais espaço para as animações respirarem */
       margin-top: 80px;
       padding-bottom: 100px;
     }
@@ -386,6 +387,7 @@
       opacity: 0;
       transition: all 1s .3s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
     .showroom-item.reveal-right.visible .showroom-info {
       transform: translateX(0);
       opacity: 1;
@@ -397,6 +399,7 @@
       opacity: 0;
       transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
     .showroom-item.reveal-right.visible .showroom-img-wrapper {
       transform: translateX(0);
       opacity: 1;
@@ -413,7 +416,8 @@
     /* Floating "Loose" Image Styles with Smooth Movement */
     .showroom-img-wrapper {
       position: relative;
-      max-width: 420px; /* Aumentado de 300px */
+      max-width: 420px;
+      /* Aumentado de 300px */
       margin: 0 auto;
       transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
@@ -426,24 +430,35 @@
 
     .showroom-img-wrapper img {
       width: 100%;
-      height: 650px; /* Aumentado de 550px */
+      height: 650px;
+      /* Aumentado de 550px */
       object-fit: contain;
       border-radius: 20px;
-      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.4));
+      filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.4));
       animation: float 6s ease-in-out infinite;
     }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-15px);
+      }
     }
 
     /* Destaque para a primeira imagem do Showroom (Ainda maior) */
     .showroom-item:first-child .showroom-img-wrapper {
-      max-width: 550px; /* Aumentado de 450px */
+      max-width: 550px;
+      /* Aumentado de 450px */
     }
+
     .showroom-item:first-child img {
-      height: 750px; /* Aumentado de 680px */
+      height: 750px;
+      /* Aumentado de 680px */
     }
 
 
@@ -474,9 +489,11 @@
         gap: 40px;
         text-align: center;
       }
+
       .showroom-info p {
         margin: 0 auto;
       }
+
       .showroom-item:nth-child(even) {
         direction: ltr;
       }
@@ -740,15 +757,12 @@
     <div class="hero-content">
       <img class="hero-logo" src="assets/images/telas/fundo-site.png" alt="CriaVibe Fotografia">
 
-      <div class="hero-copy">
-        
-        <div class="hero-actions">
-          <button class="btn-hero btn-hero-primary" onclick="location.href='/entrar.html'">
+      <div class="hero-actions">
+        <button class="btn-hero btn-hero-primary" onclick="location.href='/entrar.html'">
           Criar Conta Grátis
-          </button>
-        
-        </div>
+        </button>
       </div>
+
     </div>
   </section>
 
@@ -766,7 +780,8 @@
         </div>
         <div class="showroom-info">
           <h3>Crie Galerias em Segundos</h3>
-          <p>Organize seus ensaios de forma profissional com uma interface limpa e intuitiva. Defina nomes, descrições e prazos em poucos cliques.</p>
+          <p>Organize seus ensaios de forma profissional com uma interface limpa e intuitiva. Defina nomes, descrições e
+            prazos em poucos cliques.</p>
         </div>
       </div>
 
@@ -777,7 +792,8 @@
         </div>
         <div class="showroom-info">
           <h3>Experiência Visual Imersiva</h3>
-          <p>Seus clientes recebem um link exclusivo para visualizar as fotos com elegância, em um layout otimizado para qualquer dispositivo.</p>
+          <p>Seus clientes recebem um link exclusivo para visualizar as fotos com elegância, em um layout otimizado para
+            qualquer dispositivo.</p>
         </div>
       </div>
 
@@ -788,7 +804,8 @@
         </div>
         <div class="showroom-info">
           <h3>Curadoria Ágil e Inteligente</h3>
-          <p>Sistema de seleção simplificado onde o cliente escolhe as melhores fotos respeitando os limites que você definiu para o pacote.</p>
+          <p>Sistema de seleção simplificado onde o cliente escolhe as melhores fotos respeitando os limites que você
+            definiu para o pacote.</p>
         </div>
       </div>
 
@@ -799,7 +816,8 @@
         </div>
         <div class="showroom-info">
           <h3>Controle Total do Fotógrafo</h3>
-          <p>Gerencie downloads, quantidades de seleção e prazos de expiração de forma individualizada para cada trabalho realizado.</p>
+          <p>Gerencie downloads, quantidades de seleção e prazos de expiração de forma individualizada para cada
+            trabalho realizado.</p>
         </div>
       </div>
 
@@ -810,7 +828,8 @@
         </div>
         <div class="showroom-info">
           <h3>Trilha Sonora Personalizada</h3>
-          <p>Adicione uma camada extra de emoção às suas entregas com trilhas sonoras de fundo que tornam a visualização inesquecível.</p>
+          <p>Adicione uma camada extra de emoção às suas entregas com trilhas sonoras de fundo que tornam a visualização
+            inesquecível.</p>
         </div>
       </div>
 
@@ -821,7 +840,8 @@
         </div>
         <div class="showroom-info">
           <h3>Gestão e Entrega de Resultados</h3>
-          <p>Mantenha um controle rigoroso sobre quem acessou, baixou ou selecionou fotos, garantindo transparência total no seu fluxo de trabalho.</p>
+          <p>Mantenha um controle rigoroso sobre quem acessou, baixou ou selecionou fotos, garantindo transparência
+            total no seu fluxo de trabalho.</p>
         </div>
       </div>
 
