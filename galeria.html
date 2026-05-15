@@ -1077,9 +1077,12 @@
           galeria.capa_apresentacao = res.caminho;
           const preview = document.getElementById('preview-capa');
           if (preview) {
-            preview.src = '/' + res.caminho;
+            const capaPath = res.caminho;
+            preview.src = capaPath.startsWith('http') ? capaPath : '/' + capaPath;
             preview.style.display = 'block';
           }
+          // Sincroniza a grade localmente
+          await carregarFotos();
         } else {
           showToast(res.mensagem || 'Erro ao fazer upload da capa.', 'error');
         }
@@ -1091,12 +1094,19 @@
     }
 
     async function definirCapaDaGrade(fotoId) {
+      const btn = document.querySelector('.btn-capa-lb');
+      const original = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Definindo...';
+      }
+
       const fd = new FormData();
       fd.append('galeria_id', galeriaId);
       fd.append('foto_id', fotoId);
 
       const txt = document.getElementById('prog-txt-capa');
-      txt.textContent = 'Aplicando foto da grade...';
+      if (txt) txt.textContent = 'Aplicando foto da grade...';
       try {
         const res = await API.upload('/galerias/upload_capa.php', fd);
         if (res.status === 'ok') {
@@ -1117,7 +1127,11 @@
       } catch (e) {
         showToast('Erro: ' + e.message, 'error');
       } finally {
-        txt.textContent = '';
+        if (txt) txt.textContent = '';
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = original;
+        }
       }
     }
 

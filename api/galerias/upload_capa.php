@@ -50,8 +50,32 @@ if (!move_uploaded_file($file['tmp_name'], $dest)) {
     json_out(['status'=>'erro','mensagem'=>'Falha ao salvar a imagem no servidor.'], 500);
 }
 
-// Atualizar o banco de dados
+// Atualizar o banco de dados (Capa da Galeria)
 $stmt = db()->prepare("UPDATE galerias SET capa_apresentacao = ? WHERE id = ?");
 $stmt->execute([$caminho, $galeria_id]);
 
-json_out(['status'=>'ok', 'caminho' => $caminho, 'mensagem'=>'Capa de apresentação enviada com sucesso!']);
+// Sincronizar o selo de "Coroa" (is_capa) na tabela de imagens de forma ATÔMICA
+$db = db();
+try {
+    $db->beginTransaction();
+    
+    // 1. Remove de todas as fotos da galeria (Garante exclusividade)
+    $stmt1 = $db->prepare("UPDATE imagens SET is_capa = 0 WHERE galeria_id = ?");
+    $stmt1->execute([$galeria_id]);
+    
+    // 2. Marca a nova capa
+    if (isset($_POST['foto_id'])) {
+        $stmt2 = $db->prepare("UPDATE imagens SET is_capa = 1 WHERE id = ? AND galeria_id = ?");
+        $stmt2->execute([(int)$_POST['foto_id'], $galeria_id]);
+    } else {
+        $stmt3 = $db->prepare("UPDATE imagens SET is_capa = 1 WHERE caminho_arquivo = ? AND galeria_id = ?");
+        $stmt3->execute([$caminho, $galeria_id]);
+    }
+    
+    $db->commit();
+} catch (Exception $e) {
+    if ($db->inTransaction()) $db->rollBack();
+    json_out(['status'=>'erro','mensagem'=>'Erro ao sincronizar selo de capa: ' . $e->getMessage()], 500);
+}
+
+json_out(['status'=>'ok', 'caminho' => $caminho, 'mensagem'=>'Capa definida e sincronizada com sucesso!']);
