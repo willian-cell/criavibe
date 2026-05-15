@@ -9,8 +9,8 @@ class RateLimiter {
         if (!class_exists('Redis')) throw new Exception('phpredis required');
         $r = new Redis();
         $r->connect(REDIS_HOST, (int)REDIS_PORT);
-        if (REDIS_PASSWORD) $r->auth(REDIS_PASSWORD);
-        if (REDIS_DB) $r->select((int)REDIS_DB);
+        if (REDIS_PASSWORD !== '') $r->auth(REDIS_PASSWORD);
+        if (REDIS_DB !== '') $r->select((int)REDIS_DB);
         $this->redis = $r;
     }
 

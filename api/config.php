@@ -44,11 +44,23 @@ define('R2_BUCKET', env_val('R2_BUCKET_NAME'));
 define('R2_PUBLIC_URL', rtrim(env_val('R2_PUBLIC_URL', ''), '/'));
 define('R2_ENDPOINT', env_val('R2_ACCOUNT_ID') && R2_BUCKET ? "https://" . env_val('R2_ACCOUNT_ID') . ".r2.cloudflarestorage.com/" . R2_BUCKET : '');
 
+$redisUrl = env_val('REDIS_URL');
+if ($redisUrl) {
+    $parts = parse_url($redisUrl);
+    if (isset($parts['host'])) define('REDIS_HOST', $parts['host']);
+    if (isset($parts['port'])) define('REDIS_PORT', (string)$parts['port']);
+    if (isset($parts['pass'])) define('REDIS_PASSWORD', $parts['pass']);
+    if (isset($parts['path'])) {
+        $dbIndex = ltrim($parts['path'], '/');
+        if ($dbIndex !== '') define('REDIS_DB', $dbIndex);
+    }
+}
+
 // Redis configuration for job queue
-define('REDIS_HOST', env_val('REDIS_HOST', '127.0.0.1'));
-define('REDIS_PORT', env_val('REDIS_PORT', '6379'));
-define('REDIS_PASSWORD', env_val('REDIS_PASSWORD', ''));
-define('REDIS_DB', env_val('REDIS_DB', '0'));
+if (!defined('REDIS_HOST')) define('REDIS_HOST', env_val('REDIS_HOST', '127.0.0.1'));
+if (!defined('REDIS_PORT')) define('REDIS_PORT', env_val('REDIS_PORT', '6379'));
+if (!defined('REDIS_PASSWORD')) define('REDIS_PASSWORD', env_val('REDIS_PASSWORD', ''));
+if (!defined('REDIS_DB')) define('REDIS_DB', env_val('REDIS_DB', '0'));
 
 // Worker defaults
 define('WORKER_QUEUE_NAME', env_val('WORKER_QUEUE_NAME', 'image_jobs'));

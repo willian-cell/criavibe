@@ -11,8 +11,8 @@ class Queue {
         $r = new Redis();
         $connected = $r->connect(REDIS_HOST, (int)REDIS_PORT);
         if (!$connected) throw new Exception('Não foi possível conectar ao Redis em '.REDIS_HOST.':'.REDIS_PORT);
-        if (REDIS_PASSWORD) $r->auth(REDIS_PASSWORD);
-        if (REDIS_DB) $r->select((int)REDIS_DB);
+        if (REDIS_PASSWORD !== '') $r->auth(REDIS_PASSWORD);
+        if (REDIS_DB !== '') $r->select((int)REDIS_DB);
         $this->redis = $r;
     }
 

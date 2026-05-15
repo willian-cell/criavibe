@@ -1,46 +1,51 @@
 # CriaVibe
 
-CriaVibe e um sistema web para fotografos criarem galerias, enviarem fotos em alta resolucao, permitirem selecao de imagens pelos clientes e entregarem arquivos em uma experiencia visual profissional.
+CriaVibe é um sistema web para fotógrafos criarem galerias, enviarem fotos em alta resolução, permitirem seleção de imagens pelos clientes e entregarem uma experiência de visualização profissional.
 
-## Stack Atual
+## Arquitetura
 
-- Frontend: HTML, CSS e JavaScript Vanilla.
-- Backend: PHP nativo em endpoints dentro de `api/`.
+- Frontend: HTML, CSS, JavaScript vanilla.
+- Backend: PHP nativo (`api/`).
 - Banco de dados: MySQL.
+- Storage de mídia: Cloudflare R2.
+- Filas e worker: Redis + PHP worker.
 - Deploy principal: Railway com Docker.
-- Storage de midia: Cloudflare R2.
 
-## Estrutura Principal
+## Estrutura do Repositório
 
-| Caminho | Funcao |
+| Caminho | Função |
 |---|---|
-| `index.html` | Pagina inicial publica. |
-| `saiba_mais.html` | Pagina institucional com hero em video. |
-| `entrar.html` | Login e cadastro de fotografos. |
-| `painel.html` | Dashboard principal do fotografo. |
-| `galeria.html` | Gerenciamento de uma galeria. |
-| `cliente.html` | Experiencia de acesso do cliente. |
-| `clientes.html` | Gestao de clientes. |
-| `configuracoes.html` | Configuracoes do sistema. |
+| `index.html` | Página inicial pública. |
+| `saiba_mais.html` | Página institucional com hero em vídeo. |
+| `entrar.html` | Login e cadastro de fotógrafos. |
+| `painel.html` | Dashboard do fotógrafo. |
+| `galeria.html` | Gerenciamento de galeria e upload direto. |
+| `cliente.html` | Acesso do cliente para visualização e seleção. |
+| `clientes.html` | Gestão de clientes. |
+| `configuracoes.html` | Configurações do sistema. |
 | `api/` | Endpoints PHP do backend. |
-| `api/db_migrations.php` | Bootstrap e migracoes idempotentes do MySQL. |
-| `assets/` | CSS, JS, imagens e videos. |
-| `logo/` | Logo institucional. |
-| `uploads/` | Estrutura local/fallback, sem arquivos de clientes versionados. |
-| `Dockerfile` | Build de producao para Railway. |
-| `router.php` | Router do servidor PHP no container. |
+| `api/db_migrations.php` | Criação de schema e migrações idempotentes. |
+| `api/workers/image_worker.php` | Worker de processamento de imagem. |
+| `api/lib/Queue.php` | Wrapper Redis para fila. |
+| `api/lib/RateLimiter.php` | Limitação de taxa para preparações de upload. |
+| `assets/` | CSS, JS, imagens e vídeos. |
+| `Dockerfile` | Build do container para Railway. |
+| `Procfile` | Define processos `web` e `worker`. |
+| `docker-compose.yml` | Ambiente local com web, worker, Redis e MySQL. |
+| `scripts/` | Exemplos de supervisor, systemd, Nginx e k6. |
+| `DOCUMENTATION/` | Guias de deploy, testes e particionamento. |
 
-## Variaveis de Ambiente
+## Variáveis de Ambiente
 
-No Railway, configure as variaveis no servico da aplicacao CriaVibe.
+O projeto usa `.env` local para desenvolvimento e variáveis Railway em produção.
 
-Preferencial:
+### Banco
 
 ```env
-MYSQL_URL=${{MySQL.MYSQL_URL}}
+MYSQL_URL=
 ```
 
-Alternativas suportadas:
+Ou alternativa:
 
 ```env
 MYSQLHOST=
@@ -50,7 +55,7 @@ MYSQLUSER=
 MYSQLPASSWORD=
 ```
 
-Cloudflare R2:
+### Cloudflare R2
 
 ```env
 R2_ACCOUNT_ID=
@@ -60,35 +65,161 @@ R2_ACCESS_KEY_ID=
 R2_SECRET_KEY=
 ```
 
-Nao use `MYSQL_PUBLIC_URL` para conexao interna entre servicos Railway. Use o endpoint privado para evitar egress.
+### Redis / Worker
 
-## Deploy Railway
-
-1. Faça push para o repositorio conectado ao Railway.
-2. Garanta que o Railway use o `Dockerfile`.
-3. Configure `MYSQL_URL` no servico CriaVibe.
-4. Configure as variaveis do Cloudflare R2.
-5. Apos o primeiro deploy, execute:
-
-```text
-/api/db_migrations.php
+```env
+REDIS_URL=
+REDIS_HOST=
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+WORKER_QUEUE_NAME=image_jobs
+WORKER_POLL_TIMEOUT=5
 ```
 
-Esse endpoint cria o schema base quando o banco esta vazio e adiciona colunas faltantes em bancos existentes.
+### Feature flag
 
-## Desenvolvimento Local
+```env
+FORCE_DIRECT_UPLOAD=1
+```
 
-Crie um `.env` local a partir de `env_example.txt` e rode:
+## Deploy no Railway
+
+### 1. Conectar repositório
+
+- Crie um novo projeto Railway ou conecte o repo existente.
+- Configure o serviço para usar `Dockerfile` na raiz.
+- Garanta que o deploy esteja apontando para a branch correta.
+
+### 2. Variáveis de ambiente
+
+Adicione no Railway as mesmas variáveis listadas acima. Se usar um serviço Redis do Railway, use o `REDIS_URL` fornecido.
+
+### 3. Criar serviço web
+
+- Crie um serviço Railway para a aplicação web.
+- Ele deve usar o processo `web` do `Procfile`, que já está presente no repositório.
+- O comando padrão será:
 
 ```bash
-php -S localhost:8000 router.php
+sh -c "php -S 0.0.0.0:${PORT:-8080} router.php"
 ```
 
-O `.env` nunca deve ser versionado.
+### 4. Criar serviço worker
 
-## Seguranca e Limpeza
+No Railway, crie um segundo serviço a partir do mesmo repositório com o comando de start:
 
-- Arquivos publicos de diagnostico e reset foram removidos.
-- Credenciais reais ficam apenas em variaveis de ambiente ou `.env` local ignorado.
-- Logs, uploads e credenciais nao entram no Git.
-- O endpoint de migracao permite bootstrap em banco vazio; depois que houver usuarios, exige sessao de `admin` ou `fotografo`.
+```bash
+php api/workers/image_worker.php
+```
+
+Esse serviço consome jobs Redis e processa miniaturas/derivados de imagens.
+
+### 5. Executar migrações
+
+Após o deploy inicial, execute o endpoint de migração:
+
+```text
+https://<sua-app>.up.railway.app/api/db_migrations.php
+```
+
+Ou via Railway CLI, se preferir:
+
+```bash
+railway run php api/db_migrations.php
+```
+
+## Como testar uploads diretos
+
+### Fluxo esperado
+
+1. `galeria.html` pede `direct_prepare.php` para gerar URLs assinadas.
+2. O navegador faz `PUT` direto ao Cloudflare R2 usando `upload_url`.
+3. Em seguida, `direct_confirm.php` registra os metadados no banco e enfileira jobs.
+
+### Teste mínimo de validação
+
+- Abra a galeria no frontend.
+- Arraste/seleciona fotos e observe o progresso.
+- O cliente deve enviar apenas para R2, não para `/api/fotos/upload.php`.
+
+### Validar na rede do navegador
+
+- Abra DevTools → aba `Network`.
+- Verifique chamadas para:
+  - `/api/fotos/direct_prepare.php`
+  - URLs `PUT` geradas pelo R2
+  - `/api/fotos/direct_confirm.php`
+- Se algum PUT falhar, o problema está na assinatura R2/CORS ou credenciais.
+
+## Como validar logs do worker no Railway
+
+### Logs via Railway UI
+
+- Abra o projeto Railway.
+- Selecione o serviço `worker` criado.
+- Vá para a aba `Logs`.
+- Procure por mensagens com prefixo:
+
+```text
+[image_worker]
+```
+
+### Logs via Railway CLI
+
+```bash
+railway logs -s <worker-service-name>
+```
+
+### O que procurar
+
+- conexão Redis bem-sucedida
+- jobs consumidos
+- uploads de derivados com sucesso
+- erros de download/upload ou alteração de banco
+
+## Como validar logs de upload direto
+
+### No backend web
+
+- Verifique logs do serviço web Railway.
+- Procure pelos endpoints:
+  - `/api/fotos/direct_prepare.php`
+  - `/api/fotos/direct_confirm.php`
+
+### No navegador
+
+- Procure erros de CORS ou HTTP 4xx/5xx ao fazer o PUT direto ao R2.
+- Verifique se a resposta de `direct_prepare.php` contém `upload_url` válidos.
+- Verifique se o `.confirm` retorna `status: ok`.
+
+## Desenvolvimento local com Docker
+
+Use o `docker-compose.yml` para rodar tudo localmente:
+
+```bash
+docker-compose up --build
+```
+
+Isso sobe:
+- `web` (app PHP)
+- `worker` (processa jobs Redis)
+- `redis`
+- `db`
+
+## Comandos úteis
+
+```bash
+cp .env.example .env
+php api/db_migrations.php
+php api/workers/image_worker.php
+railway run php api/db_migrations.php
+docker-compose up --build
+```
+
+## Notas de produção
+
+- Use `FORCE_DIRECT_UPLOAD=1` para obrigar uploads apenas via R2.
+- Monitore Redis, conexões DB e largura de banda do R2.
+- Use partições de banco para tabelas maiores que 1M linhas.
+- O worker deve ser escalado separadamente do web.

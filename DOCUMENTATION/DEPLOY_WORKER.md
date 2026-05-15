@@ -29,6 +29,15 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now criaVibe_image_worker.service
 ```
 
+Railway / Docker deploy:
+- O repositório agora inclui um `Procfile` com processos `web` e `worker`.
+- Em Railway, crie dois serviços a partir do mesmo repo: um para `web` e outro para `worker`.
+- Para testes locais, use `docker-compose.yml`:
+
+```
+docker-compose up --build
+```
+
 Logs:
 - Supervisor logs configurados em `/var/log/supervisor/`
 - Systemd logs via `journalctl -u criaVibe_image_worker`

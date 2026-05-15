@@ -23,6 +23,15 @@ php api/workers/image_worker.php
 
 Or use Supervisor/systemd configurations in `scripts/`.
 
+Railway / Docker deploy
+- The repository includes a `Procfile` with `web` and `worker` processes.
+- On Railway, create two services from the same repo: one service for `web`, another for `worker`.
+- Locally, run both services with:
+
+```
+docker-compose up --build
+```
+
 5. Run a small k6 smoke test locally
 
 ```
