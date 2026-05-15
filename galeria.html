@@ -826,7 +826,8 @@
         if (galeria.capa_apresentacao) {
           const preview = document.getElementById('preview-capa');
           if (preview) {
-            preview.src = '/' + galeria.capa_apresentacao;
+            const capaPath = galeria.capa_apresentacao;
+            preview.src = capaPath.startsWith('http') ? capaPath : '/' + capaPath;
             preview.style.display = 'block';
           }
         }
@@ -1103,9 +1104,13 @@
           galeria.capa_apresentacao = res.caminho;
           const preview = document.getElementById('preview-capa');
           if (preview) {
-            preview.src = '/' + res.caminho;
+            const capaPath = res.caminho;
+            preview.src = capaPath.startsWith('http') ? capaPath : '/' + capaPath;
             preview.style.display = 'block';
           }
+          // Atualiza o estado das fotos localmente para refletir o selo de capa
+          fotos.forEach(f => f.is_capa = (f.id == fotoId ? 1 : 0));
+          renderFotos();
         } else {
           showToast(res.mensagem || 'Erro ao definir a capa.', 'error');
         }

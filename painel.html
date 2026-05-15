@@ -405,8 +405,8 @@
       <td>
         ${g.thumb
           ? `<div class="thumb-wrap">
-               <img class="gallery-thumb" src="/${g.thumb}" alt="${g.nome}">
-               <img class="zoom-preview" src="/${g.thumb}" alt="${g.nome}">
+               <img class="gallery-thumb" src="${g.thumb.startsWith('http') ? g.thumb : '/' + g.thumb}" alt="${g.nome}">
+               <img class="zoom-preview" src="${g.thumb.startsWith('http') ? g.thumb : '/' + g.thumb}" alt="${g.nome}">
              </div>`
           : `<div class="gallery-thumb-empty"><i class="fa-solid fa-image"></i></div>`}
       </td>
