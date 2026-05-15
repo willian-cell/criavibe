@@ -1,6 +1,6 @@
 # Manual Tecnico CriaVibe
 
-Gerado em: 14/05/2026 21:40:06
+Gerado em: 14/05/2026 22:07:27
 
 ## Stack
 
@@ -47,7 +47,7 @@ Gerado em: 14/05/2026 21:40:06
 | `api/fotos/list.php` | 16 | 678 bytes |
 | `api/fotos/set_capa.php` | 53 | 1918 bytes |
 | `api/fotos/toggle_selecao.php` | 13 | 451 bytes |
-| `api/fotos/upload.php` | 85 | 3422 bytes |
+| `api/fotos/upload.php` | 100 | 3978 bytes |
 | `api/galerias/create.php` | 23 | 836 bytes |
 | `api/galerias/delete.php` | 31 | 1201 bytes |
 | `api/galerias/get.php` | 37 | 1465 bytes |
@@ -66,18 +66,18 @@ Gerado em: 14/05/2026 21:40:06
 | `assets/css/main.css` | 308 | 18076 bytes |
 | `assets/js/api.js` | 123 | 3727 bytes |
 | `assets/js/auth.js` | 28 | 610 bytes |
-| `cliente.html` | 2064 | 63437 bytes |
+| `cliente.html` | 2069 | 63615 bytes |
 | `clientes.html` | 201 | 8504 bytes |
 | `configuracoes.html` | 82 | 4003 bytes |
 | `Dockerfile` | 10 | 163 bytes |
 | `documentacao/manual/Manual_Tecnico_CriaVibe.md` | 83 | 2998 bytes |
-| `documentacao/trabalho/trabalho_14_05_2026.md` | 208 | 7403 bytes |
+| `documentacao/trabalho/trabalho_14_05_2026.md` | 251 | 9986 bytes |
 | `entrar.html` | 119 | 5706 bytes |
 | `env_example.txt` | 19 | 435 bytes |
-| `galeria.html` | 1220 | 46177 bytes |
-| `index.html` | 985 | 26675 bytes |
+| `galeria.html` | 1220 | 46175 bytes |
+| `index.html` | 985 | 26671 bytes |
 | `infraestrutura.md` | 99 | 2196 bytes |
-| `painel.html` | 606 | 24254 bytes |
+| `painel.html` | 618 | 24656 bytes |
 | `README.md` | 94 | 2661 bytes |
 | `router.php` | 16 | 341 bytes |
 | `saiba_mais.html` | 942 | 26683 bytes |
