@@ -247,21 +247,12 @@
       left: 0;
       width: 100%;
       height: 120%;
-      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 1) 100%),
-        url('https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=2070&auto=format&fit=crop');
+      background: #000;
       background-size: cover;
       background-position: center;
       z-index: 1;
       transform: translateZ(0);
       will-change: transform;
-    }
-
-    .parallax-bg::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.82) 100%);
-      pointer-events: none;
     }
 
     .parallax-video {
@@ -271,6 +262,7 @@
       height: 100%;
       object-fit: cover;
       object-position: center;
+      filter: contrast(1.04) saturate(1.08) brightness(1.02);
     }
 
     .hero-glass-card {
@@ -692,16 +684,9 @@
   <!-- PARALLAX HERO -->
   <header class="parallax-hero">
     <div class="parallax-bg" id="parallax-bg">
-      <video class="parallax-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+      <video class="parallax-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
         <source src="assets/videos/criavibe-video-bg.mp4" type="video/mp4">
       </video>
-    </div>
-    <div class="hero-glass-card scroll-trigger">
-      <h1 class="hero-title">A Arte da CriaVibe</h1>
-      <p class="hero-text">
-        Capturamos a essência, eternizamos o momento. Na CriaVibe, nossa missão é transformar instantâneos em memórias
-        artísticas que atravessam gerações.
-      </p>
     </div>
   </header>
 
