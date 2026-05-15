@@ -88,8 +88,6 @@ class R2Storage {
             error_log("R2Storage HTTP Error $httpCode: $response");
         }
         
-        curl_close($ch);
-
         return ($httpCode === 200 || $httpCode === 204);
     }
 }

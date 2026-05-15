@@ -211,7 +211,7 @@
         <h2><i class="fa-solid fa-images" style="color:var(--primary)"></i> Minhas Galerias</h2>
         <div class="search-bar">
           <i class="fa-solid fa-magnifying-glass" style="color:var(--light)"></i>
-          <input id="search-input" type="search" name="criavibe-gallery-search" value="" placeholder="Buscar galeria..." autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="filtrar()">
+          <input id="search-input" type="text" name="q_search_cv" value="" placeholder="Buscar galeria..." autocomplete="one-time-code" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="filtrar()">
         </div>
         <button class="btn btn-primary" onclick="abrirModalNova()">
           <i class="fa-solid fa-plus"></i> Nova Galeria
@@ -358,7 +358,12 @@
 
     function limparBuscaGalerias() {
       const input = document.getElementById('search-input');
-      if (input) input.value = '';
+      if (input) {
+        input.value = '';
+        // Segundo reforço para browsers persistentes
+        setTimeout(() => { if (input.value !== '') input.value = ''; }, 100);
+        setTimeout(() => { if (input.value !== '') input.value = ''; }, 500);
+      }
     }
 
     // ── Init ──────────────────────────────────────────────────

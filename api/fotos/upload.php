@@ -33,16 +33,30 @@ function get_env_var($key) {
 if (!defined('R2_ACCESS_KEY')) define('R2_ACCESS_KEY', get_env_var('R2_ACCESS_KEY_ID'));
 if (!defined('R2_SECRET_KEY')) define('R2_SECRET_KEY', get_env_var('R2_SECRET_KEY'));
 if (!defined('R2_BUCKET'))     define('R2_BUCKET',     get_env_var('R2_BUCKET_NAME'));
+if (!defined('R2_PUBLIC_URL')) define('R2_PUBLIC_URL', rtrim(get_env_var('R2_PUBLIC_URL'), '/'));
+
 if (!defined('R2_ENDPOINT')) {
-    $accId = get_env_var('R2_ACCOUNT_ID') ?: 'a0ffb4ddf665d57e3a7295a45a99cd61';
-    define('R2_ENDPOINT', "https://{$accId}.r2.cloudflarestorage.com/" . R2_BUCKET);
+    $accId = get_env_var('R2_ACCOUNT_ID');
+    if ($accId && R2_BUCKET) {
+        define('R2_ENDPOINT', "https://{$accId}.r2.cloudflarestorage.com/" . R2_BUCKET);
+    } else {
+        define('R2_ENDPOINT', '');
+    }
 }
 
-// Instanciar R2
-if (!R2_ACCESS_KEY || !R2_SECRET_KEY || !R2_BUCKET || !R2_ENDPOINT || !R2_PUBLIC_URL) {
+// Instanciar R2 e validar cada variável para log preciso
+$missing = [];
+if (!R2_ACCESS_KEY) $missing[] = 'R2_ACCESS_KEY_ID';
+if (!R2_SECRET_KEY) $missing[] = 'R2_SECRET_KEY';
+if (!R2_BUCKET)     $missing[] = 'R2_BUCKET_NAME';
+if (!R2_ENDPOINT)   $missing[] = 'R2_ACCOUNT_ID';
+if (!R2_PUBLIC_URL) $missing[] = 'R2_PUBLIC_URL';
+
+if (!empty($missing)) {
+    error_log("ERRO UPLOAD: Variáveis R2 ausentes: " . implode(', ', $missing));
     json_out([
         'status' => 'erro',
-        'mensagem' => 'Storage R2 nao configurado. Verifique R2_ACCOUNT_ID, R2_BUCKET_NAME, R2_PUBLIC_URL, R2_ACCESS_KEY_ID e R2_SECRET_KEY no Railway.'
+        'mensagem' => 'Configuração incompleta: ' . implode(', ', $missing) . '. Verifique o painel do Railway.'
     ], 500);
 }
 
