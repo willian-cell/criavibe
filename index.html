@@ -156,7 +156,7 @@
     .hero-bg {
       position: absolute;
       inset: 0;
-      background: 
+      background:
         radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
       z-index: 1;
@@ -747,32 +747,23 @@
   <section class="hero">
 
     <div class="hero-bg"></div>
-    <div class="hero-dots"></div>
-    <div class="hero-aura"></div>
 
-    <div class="hero-content">
+    <div class="hero-overlay"></div>
 
-      <div class="hero-badge">
-        <i class="fa-solid fa-star"></i> O Novo Padrão de Entrega
-      </div>
+    <!-- BOTÕES MANTIDOS SOBRE A IMAGEM -->
+    <div class="hero-actions">
 
-      <h1 class="hero-title">
-        <span>CriaVibe</span> Fotografia
-      </h1>
+      <button class="btn-hero btn-hero-primary" onclick="location.href='/entrar.html#cadastro'">
 
-      <p class="hero-sub">
-        A plataforma definitiva para fotógrafos entregarem suas obras com elegância, 
-        segurança e a experiência premium que seus clientes merecem.
-      </p>
+        Começar Agora
 
-      <div class="hero-actions">
-        <button class="btn-hero btn-hero-primary" onclick="location.href='/entrar.html#cadastro'">
-          <i class="fa-solid fa-rocket"></i> Começar Agora
-        </button>
-        <button class="btn-hero btn-hero-ghost" onclick="location.href='/saiba_mais.html'">
-          Conhecer Mais
-        </button>
-      </div>
+      </button>
+
+      <button class="btn-hero btn-hero-ghost" onclick="location.href='/saiba_mais.html'">
+
+        Conhecer Mais
+
+      </button>
 
     </div>
 
