@@ -11,6 +11,18 @@ if (!$galeria_id) json_out(['status'=>'erro','mensagem'=>'galeria_id obrigatorio
 if (!is_array($files) || !$files) json_out(['status'=>'erro','mensagem'=>'Nenhum arquivo informado.'], 400);
 if (count($files) > 100) json_out(['status'=>'erro','mensagem'=>'Envie no maximo 100 arquivos por preparacao.'], 400);
 
+// Rate limiting: evitar abuse de preparacao (ex: 10 prepares por minuto)
+try {
+    require_once __DIR__ . '/../lib/RateLimiter.php';
+    $rl = new RateLimiter();
+    $key = 'prepare_'.$u['email'];
+    if (!$rl->allow($key, 10, 60)) {
+        json_out(['status'=>'erro','mensagem'=>'Limite de preparacao atingido. Tente novamente mais tarde.'], 429);
+    }
+} catch (Throwable $e) {
+    // Se RateLimiter falhar, não bloqueia o usuário (falta de Redis, etc.)
+}
+
 $chk = db()->prepare("SELECT id FROM galerias WHERE id=? AND usuario_email=? LIMIT 1");
 $chk->execute([$galeria_id, $u['email']]);
 if (!$chk->fetch()) json_out(['status'=>'erro','mensagem'=>'Galeria nao encontrada.'], 404);

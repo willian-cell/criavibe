@@ -44,6 +44,19 @@ define('R2_BUCKET', env_val('R2_BUCKET_NAME'));
 define('R2_PUBLIC_URL', rtrim(env_val('R2_PUBLIC_URL', ''), '/'));
 define('R2_ENDPOINT', env_val('R2_ACCOUNT_ID') && R2_BUCKET ? "https://" . env_val('R2_ACCOUNT_ID') . ".r2.cloudflarestorage.com/" . R2_BUCKET : '');
 
+// Redis configuration for job queue
+define('REDIS_HOST', env_val('REDIS_HOST', '127.0.0.1'));
+define('REDIS_PORT', env_val('REDIS_PORT', '6379'));
+define('REDIS_PASSWORD', env_val('REDIS_PASSWORD', ''));
+define('REDIS_DB', env_val('REDIS_DB', '0'));
+
+// Worker defaults
+define('WORKER_QUEUE_NAME', env_val('WORKER_QUEUE_NAME', 'image_jobs'));
+define('WORKER_POLL_TIMEOUT', (int)env_val('WORKER_POLL_TIMEOUT', '5'));
+
+// Feature flags
+define('FORCE_DIRECT_UPLOAD', (env_val('FORCE_DIRECT_UPLOAD', '0') === '1'));
+
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
 header("Access-Control-Allow-Origin: $origin");
 header("Access-Control-Allow-Credentials: true");

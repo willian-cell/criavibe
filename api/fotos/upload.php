@@ -19,6 +19,11 @@ $chk = db()->prepare("SELECT id FROM galerias WHERE id=? AND usuario_email=? LIM
 $chk->execute([$galeria_id, $u['email']]);
 if (!$chk->fetch()) json_out(['status'=>'erro','mensagem'=>'Galeria não encontrada.'], 404);
 
+// Se a flag FORCE_DIRECT_UPLOAD estiver ativa, recusamos uploads via servidor
+if (defined('FORCE_DIRECT_UPLOAD') && FORCE_DIRECT_UPLOAD) {
+    json_out(['status'=>'erro','mensagem'=>'Uploads via servidor desabilitados. Use upload direto para R2.'], 405);
+}
+
 $files = $_FILES['fotos'] ?? null;
 if (!$files) json_out(['status'=>'erro','mensagem'=>'Nenhum arquivo enviado.'], 400);
 

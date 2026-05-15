@@ -1,0 +1,21 @@
+name: Load Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  k6:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install k6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget -q -O - https://dl.k6.io/key.gpg | sudo apt-key add -
+          echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update && sudo apt-get install -y k6
+      - name: Run k6
+        env:
+          BASE_URL: ${{ inputs.base_url || 'http://localhost:8080' }}
+        run: k6 run scripts/k6/upload_test.js

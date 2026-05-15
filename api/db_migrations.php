@@ -21,6 +21,20 @@ function column_exists(PDO $db, string $table, string $column): bool {
     return (int)$stmt->fetchColumn() > 0;
 }
 
+function index_exists(PDO $db, string $table, string $index): bool {
+    $stmt = $db->prepare(
+        "SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?"
+    );
+    $stmt->execute([$table, $index]);
+    return (int)$stmt->fetchColumn() > 0;
+}
+
+function add_index_if_missing(PDO $db, string $table, string $indexName, string $definition): void {
+    if (!index_exists($db, $table, $indexName)) {
+        $db->exec("ALTER TABLE `$table` ADD INDEX `$indexName` ($definition)");
+    }
+}
+
 function add_column_if_missing(PDO $db, string $table, string $column, string $definition): void {
     if (!column_exists($db, $table, $column)) {
         $db->exec("ALTER TABLE `$table` ADD COLUMN `$column` $definition");
@@ -140,6 +154,26 @@ try {
     add_column_if_missing($db, 'imagens', 'is_capa', 'TINYINT(1) NOT NULL DEFAULT 0');
     add_column_if_missing($db, 'imagens', 'downloads', 'INT NOT NULL DEFAULT 0');
     add_column_if_missing($db, 'imagens', 'criado_em', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+
+    // Adicionar colunas para caminhos de thumbnails
+    add_column_if_missing($db, 'imagens', 'caminho_thumb_small', 'VARCHAR(1024) DEFAULT NULL');
+    add_column_if_missing($db, 'imagens', 'caminho_thumb_medium', 'VARCHAR(1024) DEFAULT NULL');
+    add_column_if_missing($db, 'imagens', 'caminho_thumb_large', 'VARCHAR(1024) DEFAULT NULL');
+
+    // Índice único para evitar duplicatas em caminho_arquivo (apenas se possível)
+    try {
+        // Tentar criar índice único para idempotência. Se houver duplicatas, a operação falhará e será logada.
+        $db->exec("ALTER TABLE imagens ADD UNIQUE INDEX uniq_caminho_arquivo (caminho_arquivo(255))");
+    } catch (Throwable $e) {
+        error_log('Não foi possível adicionar UNIQUE INDEX uniq_caminho_arquivo: ' . $e->getMessage());
+    }
+
+    // Índice para tamanho_bytes para acelerar buscas por tamanho e ordenações
+    try {
+        add_index_if_missing($db, 'imagens', 'idx_imagens_tamanho', 'tamanho_bytes');
+    } catch (Throwable $e) {
+        error_log('Não foi possível adicionar índice idx_imagens_tamanho: ' . $e->getMessage());
+    }
 
     json_out(['status' => 'ok', 'mensagem' => 'Banco verificado e schema preparado com sucesso.']);
 } catch (Throwable $e) {

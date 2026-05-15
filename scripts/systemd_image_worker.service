@@ -1,0 +1,17 @@
+[Unit]
+Description=CriaVibe Image Worker
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/criavibe
+ExecStart=/usr/bin/php /var/www/criavibe/api/workers/image_worker.php
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=criavibe_image_worker
+
+[Install]
+WantedBy=multi-user.target

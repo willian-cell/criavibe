@@ -998,64 +998,19 @@
     }
 
     async function uploadFotos(files) {
-      if (!files || !files.length) return;
-      
-      const batchSize = 10; // Lotes menores evitam timeouts e limites de POST em producao.
-      const totalFiles = files.length;
-      let done = 0;
-      
-      const progBg = document.getElementById('prog-bg');
-      const progFill = document.getElementById('prog-fill');
-      const txt = document.getElementById('prog-txt');
-      
-      progBg.style.display = '';
-      const filesArray = Array.from(files);
-      const totalBatches = Math.ceil(totalFiles / batchSize);
-
-      for (let i = 0; i < filesArray.length; i += batchSize) {
-        const batch = filesArray.slice(i, i + batchSize);
-        const batchNum = Math.floor(i / batchSize) + 1;
-        
-        txt.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Enviando Lote <b>${batchNum} de ${totalBatches}</b>... (${done}/${totalFiles})`;
-        
-        const fd = new FormData();
-        fd.append('galeria_id', galeriaId);
-        batch.forEach(file => {
-          fd.append('fotos[]', file);
-        });
-
-        try {
-          // Upload do lote
-          const res = await API.upload('/fotos/upload.php', fd);
-          
-          if (res.status === 'ok') {
-            done += Number(res.enviadas || 0);
-            progFill.style.width = `${(done / totalFiles) * 100}%`;
-            
-            // Atualização progressiva: carregar fotos já enviadas para o fotógrafo conferir
-            await carregarFotos();
-          } else {
-            showToast(`Erro no lote ${batchNum}: ${res.mensagem}`, 'error');
-            // Opcional: break ou continue. Vamos parar para evitar mais erros em série.
-            break;
-          }
-        } catch (e) {
-            console.error(`Falha Crítica no Lote ${batchNum}:`, e);
-            showToast(`Erro no lote ${batchNum}: ${e.message}`, 'error');
-            break;
-        }
-      }
-
-      txt.innerHTML = `<i class="fa-solid fa-check"></i> Processamento Concluído! (${done}/${totalFiles})`;
-      setTimeout(() => {
-        progBg.style.display = 'none';
-        txt.textContent = '';
-        progFill.style.width = '0%';
-      }, 5000);
+      // Wrapper: sempre encaminha para o upload direto ao R2
+      if (typeof uploadFotosDiretoR2 === 'function') return uploadFotosDiretoR2(files);
+      // Fallback: nada a fazer
+      return;
     }
 
     async function uploadFotosDiretoR2(files) {
       if (!files || !files.length) return;
+
+      // Resumable support: session id and progress persisted in localStorage
+      const sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+      const storageKey = `upload_progress_${galeriaId}_${sessionId}`;
+      const persisted = JSON.parse(localStorage.getItem(storageKey) || '{}');
 
       const prepareBatchSize = 50;
       const concurrency = 4;
@@ -1130,6 +1085,10 @@
             type: file.type,
             size: file.size,
           }));
+          // Save progress
+          persisted.currentBatch = batchNum;
+          persisted.totalBatches = totalBatches;
+          localStorage.setItem(storageKey, JSON.stringify(persisted));
 
           const prep = await API.post('/fotos/direct_prepare.php', {
             galeria_id: parseInt(galeriaId),
@@ -1142,6 +1101,10 @@
           })).filter(job => job.file);
 
           const uploaded = await uploadPool(jobs);
+
+          // mark uploaded in persisted state
+          persisted.uploaded = (persisted.uploaded || 0) + uploaded.length;
+          localStorage.setItem(storageKey, JSON.stringify(persisted));
 
           if (uploaded.length) {
             const confirm = await API.post('/fotos/direct_confirm.php', {
