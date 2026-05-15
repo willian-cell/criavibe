@@ -211,7 +211,7 @@
         <h2><i class="fa-solid fa-images" style="color:var(--primary)"></i> Minhas Galerias</h2>
         <div class="search-bar">
           <i class="fa-solid fa-magnifying-glass" style="color:var(--light)"></i>
-          <input id="search-input" type="text" placeholder="Buscar galeria..." autocomplete="off" oninput="filtrar()">
+          <input id="search-input" type="search" name="criavibe-gallery-search" value="" placeholder="Buscar galeria..." autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="filtrar()">
         </div>
         <button class="btn btn-primary" onclick="abrirModalNova()">
           <i class="fa-solid fa-plus"></i> Nova Galeria
@@ -356,12 +356,23 @@
   <script>
     let galerias = [];
 
+    function limparBuscaGalerias() {
+      const input = document.getElementById('search-input');
+      if (input) input.value = '';
+    }
+
     // ── Init ──────────────────────────────────────────────────
     (async () => {
+      limparBuscaGalerias();
       const u = await requireAuth();
       document.getElementById('nav-nome').textContent = u.nome;
       await carregarGalerias();
     })();
+
+    window.addEventListener('pageshow', () => {
+      limparBuscaGalerias();
+      filtrar();
+    });
 
     async function carregarGalerias(silencioso = false) {
       try {
@@ -451,7 +462,8 @@
     }
 
     function filtrar() {
-      const q = document.getElementById('search-input').value.toLowerCase();
+      const input = document.getElementById('search-input');
+      const q = (input?.value || '').toLowerCase();
       document.querySelectorAll('#gallery-tbody tr').forEach(tr => {
         tr.style.display = tr.dataset.nome.includes(q) ? '' : 'none';
       });
