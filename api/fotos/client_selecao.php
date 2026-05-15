@@ -6,7 +6,7 @@ $acao = $body['acao'] ?? 'toggle'; // 'toggle', 'all', 'clear'
 $galeria_id = (int)($body['galeria_id'] ?? 0);
 $token = $body['token'] ?? '';
 
-// Verifica acesso: via sessão OU via token (fallback para quando a sessão PHP expira no Hostinger)
+// Verifica acesso: via sessao OU via token, como fallback quando a sessao PHP expira.
 $acesso_ok = false;
 
 if (!empty($_SESSION['galeria_access'][$galeria_id])) {

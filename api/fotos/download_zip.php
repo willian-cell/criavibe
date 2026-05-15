@@ -58,7 +58,7 @@ if (!is_dir($tmpDir)) mkdir($tmpDir, 0775, true);
 
 $tmpZip = tempnam($tmpDir, 'criavibe_') . '_fotos.zip';
 
-if (!class_exists('ZipArchive')) json_out(['status'=>'erro','mensagem'=>'A extensão ZipArchive não está ativa na Hostinger.'], 500);
+if (!class_exists('ZipArchive')) json_out(['status'=>'erro','mensagem'=>'A extensao ZipArchive nao esta ativa no ambiente PHP.'], 500);
 
 $zip = new ZipArchive();
 if ($zip->open($tmpZip, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true)
