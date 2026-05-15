@@ -952,7 +952,7 @@ body.sidebar-open .sidebar-overlay {
        url('/static/img/banner.jpg')
     ===================================================== */
 
-  background-image: url('/static/img/banner.jpg');
+  background-image: url('/assets/images/telas/fundo-site.png');
 
   background-size: cover;
   background-position: center;
