@@ -919,26 +919,33 @@ body.sidebar-open .sidebar-overlay {
   display: none;
 }
 
-
 /* =========================================================
-   HERO SECTION — CRIAVIBE
+   HERO CRIAVIBE
 ========================================================= */
 
 .hero {
   position: relative;
   width: 100%;
   min-height: 100vh;
+
   overflow: hidden;
+
   background:
-    radial-gradient(circle at top left, rgba(124, 58, 237, .25), transparent 35%),
-    radial-gradient(circle at bottom right, rgba(236, 72, 153, .18), transparent 35%),
+    radial-gradient(circle at top left,
+      rgba(124, 58, 237, .18),
+      transparent 30%),
+
+    radial-gradient(circle at bottom right,
+      rgba(236, 72, 153, .14),
+      transparent 35%),
+
     #050510;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  padding: 120px 8%;
+  padding: 80px 24px;
 }
 
 /* FUNDO */
@@ -947,12 +954,8 @@ body.sidebar-open .sidebar-overlay {
   inset: 0;
 
   background:
-    linear-gradient(rgba(5, 5, 16, .85), rgba(5, 5, 16, .95)),
-    url("assets/images/telas/fundo-site.png");
-
-  background-size: cover;
-  background-position: center;
-  opacity: .22;
+    linear-gradient(rgba(5, 5, 16, .92),
+      rgba(5, 5, 16, .95));
 
   z-index: 1;
 }
@@ -963,13 +966,12 @@ body.sidebar-open .sidebar-overlay {
   inset: 0;
 
   background-image:
-    radial-gradient(rgba(255, 255, 255, .08) 1px, transparent 1px);
+    radial-gradient(rgba(255, 255, 255, .06) 1px,
+      transparent 1px);
 
   background-size: 28px 28px;
 
-  mask-image: linear-gradient(to bottom,
-      rgba(0, 0, 0, .9),
-      rgba(0, 0, 0, .2));
+  opacity: .4;
 
   z-index: 2;
 }
@@ -980,80 +982,38 @@ body.sidebar-open .sidebar-overlay {
   z-index: 10;
 
   width: 100%;
-  max-width: 1400px;
+  max-width: 1500px;
 
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 80px;
+  justify-content: center;
 }
 
-/* LOGO / IMAGEM */
-.hero-logo {
+/* IMAGEM */
+.hero-banner {
   width: 100%;
-  max-width: 580px;
+  max-width: 1200px;
 
   object-fit: contain;
 
   filter:
-    drop-shadow(0 0 20px rgba(139, 92, 246, .35)) drop-shadow(0 0 60px rgba(168, 85, 247, .25));
+    drop-shadow(0 0 30px rgba(139, 92, 246, .25)) drop-shadow(0 0 80px rgba(168, 85, 247, .15));
 
   animation: floatHero 6s ease-in-out infinite;
 }
 
-/* TEXTO */
-.hero-copy {
-  flex: 1;
-  max-width: 620px;
-}
-
-.hero-title {
-  font-size: clamp(3rem, 7vw, 7rem);
-  line-height: .95;
-  font-weight: 900;
-
-  color: #fff;
-
-  letter-spacing: -4px;
-
-  margin-bottom: 24px;
-}
-
-.hero-title span {
-  background: linear-gradient(90deg,
-      #7c3aed,
-      #8b5cf6,
-      #ec4899);
-
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* TEXTO PEQUENO */
-.hero-subtitle {
-  font-size: 1.2rem;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, .72);
-
-  max-width: 540px;
-
-  margin-bottom: 42px;
-}
-
-/* BOTÕES */
+/* BOTÃO */
 .hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
+  margin-top: -40px;
+  z-index: 20;
 }
 
 .btn-hero {
   border: none;
   cursor: pointer;
 
-  padding: 18px 34px;
+  padding: 18px 38px;
 
   border-radius: 18px;
 
@@ -1064,37 +1024,61 @@ body.sidebar-open .sidebar-overlay {
 }
 
 .btn-hero-primary {
-  background: linear-gradient(135deg,
+  color: white;
+
+  background:
+    linear-gradient(135deg,
       #7c3aed,
       #6366f1);
 
-  color: white;
-
   box-shadow:
-    0 10px 40px rgba(99, 102, 241, .35),
+    0 12px 40px rgba(99, 102, 241, .35),
     0 0 40px rgba(168, 85, 247, .25);
 }
 
 .btn-hero-primary:hover {
-  transform: translateY(-4px) scale(1.02);
+
+  transform:
+    translateY(-4px) scale(1.03);
 
   box-shadow:
-    0 16px 50px rgba(99, 102, 241, .45),
-    0 0 60px rgba(168, 85, 247, .35);
+    0 20px 60px rgba(99, 102, 241, .45),
+    0 0 80px rgba(168, 85, 247, .35);
 }
 
 /* ANIMAÇÃO */
 @keyframes floatHero {
+
   0% {
     transform: translateY(0px);
   }
 
   50% {
-    transform: translateY(-14px);
+    transform: translateY(-12px);
   }
 
   100% {
     transform: translateY(0px);
+  }
+}
+
+/* RESPONSIVO */
+@media(max-width:768px) {
+
+  .hero {
+    padding: 120px 18px 60px;
+  }
+
+  .hero-banner {
+    max-width: 100%;
+  }
+
+  .hero-actions {
+    margin-top: -10px;
+  }
+
+  .btn-hero {
+    width: 100%;
   }
 }
 
