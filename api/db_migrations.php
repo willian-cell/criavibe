@@ -1,36 +1,148 @@
 <?php
 require_once __DIR__.'/config.php';
 
-// Script seguro de migração.
-// IMPORTANTE: Deve ser executado apenas pelo Admin via requisição direta se houver autenticação (ou no terminal).
-// Por segurança, vamos exigir o cookie de admin se for via web (se existir essa distinção)
-// ou simplesmente checar se o tipo é admin (ou fotógrafo se num sistema monousuário).
-$u = me();
-if (!$u || !in_array($u['tipo'], ['admin', 'fotografo'])) {
-    json_out(['status' => 'erro', 'mensagem' => 'Acesso negado para migrações.'], 403);
+function table_exists(PDO $db, string $table): bool {
+    $stmt = $db->prepare("
+        SELECT COUNT(*)
+        FROM information_schema.tables
+        WHERE table_schema = DATABASE() AND table_name = ?
+    ");
+    $stmt->execute([$table]);
+    return (int)$stmt->fetchColumn() > 0;
+}
+
+function column_exists(PDO $db, string $table, string $column): bool {
+    $stmt = $db->prepare("
+        SELECT COUNT(*)
+        FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?
+    ");
+    $stmt->execute([$table, $column]);
+    return (int)$stmt->fetchColumn() > 0;
+}
+
+function add_column_if_missing(PDO $db, string $table, string $column, string $definition): void {
+    if (!column_exists($db, $table, $column)) {
+        $db->exec("ALTER TABLE `$table` ADD COLUMN `$column` $definition");
+    }
 }
 
 try {
     $db = db();
 
-    // Migrações em Galerias
-    $db->exec("ALTER TABLE galerias ADD COLUMN IF NOT EXISTS max_downloads INT DEFAULT 0");
-    $db->exec("ALTER TABLE galerias ADD COLUMN IF NOT EXISTS max_selecao INT DEFAULT 0");
-    $db->exec("ALTER TABLE galerias ADD COLUMN IF NOT EXISTS dl_count INT DEFAULT 0");
-    $db->exec("ALTER TABLE galerias ADD COLUMN IF NOT EXISTS capa_apresentacao VARCHAR(255) DEFAULT NULL");
-    $db->exec("ALTER TABLE galerias ADD COLUMN IF NOT EXISTS tema VARCHAR(10) DEFAULT 'escuro'");
-
-    // Migrações em Imagens
-    $db->exec("ALTER TABLE imagens ADD COLUMN IF NOT EXISTS is_capa TINYINT(1) DEFAULT 0");
-    $db->exec("ALTER TABLE imagens ADD COLUMN IF NOT EXISTS downloads INT DEFAULT 0");
-
-    json_out(['status' => 'ok', 'mensagem' => 'Migrações verificadas e estruturadas com sucesso.']);
-} catch (PDOException $e) {
-    // Para versões do MySQL/MariaDB que não suportam IF NOT EXISTS no ADD COLUMN (MariaDB < 10.0.2 e MySQL não tem), 
-    // a exceção "Duplicate column name" (1060) é esperada e ignorada:
-    if (isset($e->errorInfo[1]) && $e->errorInfo[1] == 1060) {
-        json_out(['status' => 'ok', 'mensagem' => 'Migrações ignoradas, as colunas já existem.']);
-    } else {
-        json_out(['status' => 'erro', 'mensagem' => 'Erro na migração: ' . $e->getMessage()]);
+    $usuariosExiste = table_exists($db, 'usuarios');
+    $temUsuarios = false;
+    if ($usuariosExiste) {
+        $temUsuarios = (int)$db->query("SELECT COUNT(*) FROM usuarios")->fetchColumn() > 0;
     }
+
+    if ($temUsuarios) {
+        $u = me();
+        if (!$u || !in_array($u['tipo'], ['admin', 'fotografo'])) {
+            json_out(['status' => 'erro', 'mensagem' => 'Acesso negado para migracoes.'], 403);
+        }
+    }
+
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nome VARCHAR(160) NOT NULL,
+            email VARCHAR(190) NOT NULL UNIQUE,
+            senha VARCHAR(255) NOT NULL,
+            tipo VARCHAR(30) NOT NULL DEFAULT 'fotografo',
+            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS clientes (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            fotografo_email VARCHAR(190) NOT NULL,
+            nome VARCHAR(160) NOT NULL,
+            email VARCHAR(190) DEFAULT NULL,
+            telefone VARCHAR(40) DEFAULT NULL,
+            senha_acesso VARCHAR(40) NOT NULL,
+            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_clientes_fotografo (fotografo_email)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS galerias (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            usuario_email VARCHAR(190) NOT NULL,
+            cliente_id INT DEFAULT NULL,
+            nome VARCHAR(180) NOT NULL,
+            descricao TEXT DEFAULT NULL,
+            privacidade VARCHAR(20) NOT NULL DEFAULT 'privada',
+            senha VARCHAR(255) DEFAULT NULL,
+            link_token VARCHAR(128) NOT NULL UNIQUE,
+            entrega_em_alta TINYINT(1) NOT NULL DEFAULT 1,
+            selecao_ativa TINYINT(1) NOT NULL DEFAULT 1,
+            musicas_ativas TINYINT(1) NOT NULL DEFAULT 0,
+            max_downloads INT NOT NULL DEFAULT 0,
+            max_selecao INT NOT NULL DEFAULT 0,
+            dl_count INT NOT NULL DEFAULT 0,
+            capa_apresentacao VARCHAR(512) DEFAULT NULL,
+            tema VARCHAR(10) NOT NULL DEFAULT 'escuro',
+            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_galerias_usuario (usuario_email),
+            INDEX idx_galerias_cliente (cliente_id),
+            INDEX idx_galerias_token (link_token)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS imagens (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            galeria_id INT NOT NULL,
+            nome_arquivo VARCHAR(255) NOT NULL,
+            caminho_arquivo VARCHAR(1024) NOT NULL,
+            tamanho_bytes BIGINT DEFAULT 0,
+            ordem INT NOT NULL DEFAULT 0,
+            selecionada TINYINT(1) NOT NULL DEFAULT 0,
+            eh_publica TINYINT(1) NOT NULL DEFAULT 1,
+            is_capa TINYINT(1) NOT NULL DEFAULT 0,
+            downloads INT NOT NULL DEFAULT 0,
+            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_imagens_galeria (galeria_id),
+            INDEX idx_imagens_ordem (ordem)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS musicas (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            galeria_id INT NOT NULL,
+            nome_arquivo VARCHAR(255) NOT NULL,
+            nome_exibicao VARCHAR(255) NOT NULL,
+            caminho_arquivo VARCHAR(1024) NOT NULL,
+            ordem INT NOT NULL DEFAULT 0,
+            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_musicas_galeria (galeria_id),
+            INDEX idx_musicas_ordem (ordem)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+
+    add_column_if_missing($db, 'usuarios', 'criado_em', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+    add_column_if_missing($db, 'clientes', 'criado_em', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+    add_column_if_missing($db, 'galerias', 'cliente_id', 'INT DEFAULT NULL');
+    add_column_if_missing($db, 'galerias', 'entrega_em_alta', 'TINYINT(1) NOT NULL DEFAULT 1');
+    add_column_if_missing($db, 'galerias', 'selecao_ativa', 'TINYINT(1) NOT NULL DEFAULT 1');
+    add_column_if_missing($db, 'galerias', 'musicas_ativas', 'TINYINT(1) NOT NULL DEFAULT 0');
+    add_column_if_missing($db, 'galerias', 'max_downloads', 'INT NOT NULL DEFAULT 0');
+    add_column_if_missing($db, 'galerias', 'max_selecao', 'INT NOT NULL DEFAULT 0');
+    add_column_if_missing($db, 'galerias', 'dl_count', 'INT NOT NULL DEFAULT 0');
+    add_column_if_missing($db, 'galerias', 'capa_apresentacao', 'VARCHAR(512) DEFAULT NULL');
+    add_column_if_missing($db, 'galerias', 'tema', "VARCHAR(10) NOT NULL DEFAULT 'escuro'");
+    add_column_if_missing($db, 'imagens', 'selecionada', 'TINYINT(1) NOT NULL DEFAULT 0');
+    add_column_if_missing($db, 'imagens', 'eh_publica', 'TINYINT(1) NOT NULL DEFAULT 1');
+    add_column_if_missing($db, 'imagens', 'is_capa', 'TINYINT(1) NOT NULL DEFAULT 0');
+    add_column_if_missing($db, 'imagens', 'downloads', 'INT NOT NULL DEFAULT 0');
+    add_column_if_missing($db, 'imagens', 'criado_em', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+
+    json_out(['status' => 'ok', 'mensagem' => 'Banco verificado e schema preparado com sucesso.']);
+} catch (Throwable $e) {
+    error_log('Erro na migracao: ' . $e->getMessage());
+    json_out(['status' => 'erro', 'mensagem' => 'Erro na migracao: ' . $e->getMessage()], 500);
 }

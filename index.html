@@ -169,7 +169,31 @@
     .hero-content {
       position: relative;
       z-index: 2;
-      max-width: 780px
+      max-width: 1120px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(320px, 500px) minmax(0, 1fr);
+      align-items: center;
+      gap: 64px;
+      text-align: left
+    }
+
+    .hero-logo {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      filter: drop-shadow(0 28px 54px rgba(0, 0, 0, .45));
+    }
+
+    .hero-copy {
+      min-width: 0
+    }
+
+    .hero-copy .hero-sub {
+      margin-left: 0;
+      margin-right: 0
     }
 
     .hero-badge {
@@ -213,7 +237,7 @@
     .hero-actions {
       display: flex;
       gap: 12px;
-      justify-content: center;
+      justify-content: flex-start;
       flex-wrap: wrap
     }
 
@@ -625,8 +649,23 @@
         padding-bottom: 60px;
       }
 
+      .hero-content {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        text-align: center;
+      }
+
+      .hero-copy .hero-sub {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
       .hero-title {
         font-size: clamp(2.2rem, 10vw, 3.2rem);
+      }
+
+      .hero-logo {
+        width: min(300px, 78vw);
       }
 
       .hero-badge {
@@ -639,6 +678,7 @@
         width: 100%;
         max-width: 320px;
         margin: 0 auto;
+        justify-content: center;
       }
 
       .btn-hero {
@@ -698,18 +738,21 @@
     <div class="hero-bg"></div>
     <div class="hero-dots"></div>
     <div class="hero-content">
+      <img class="hero-logo" src="logo/logo-criavibe-fotografia.png" alt="CriaVibe Fotografia">
 
-      <h1 class="hero-title">
+      <div class="hero-copy">
+        <h1 class="hero-title">
         Entregue suas obras<br><span>com elegância</span>
-      </h1>
-      <p class="hero-sub">
-        Galerias premium, entrega em alta resolução, seleção de fotos pelo cliente e muito mais — tudo em um só lugar.
-      </p>
-      <div class="hero-actions">
-        <button class="btn-hero btn-hero-primary" onclick="location.href='/entrar.html'">
+        </h1>
+        <p class="hero-sub">
+          Galerias premium, entrega em alta resolucao, selecao de fotos pelo cliente e muito mais - tudo em um so lugar.
+        </p>
+        <div class="hero-actions">
+          <button class="btn-hero btn-hero-primary" onclick="location.href='/entrar.html'">
           Criar Conta Grátis
-        </button>
+          </button>
         
+        </div>
       </div>
     </div>
   </section>
