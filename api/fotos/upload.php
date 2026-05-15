@@ -39,6 +39,13 @@ if (!defined('R2_ENDPOINT')) {
 }
 
 // Instanciar R2
+if (!R2_ACCESS_KEY || !R2_SECRET_KEY || !R2_BUCKET || !R2_ENDPOINT || !R2_PUBLIC_URL) {
+    json_out([
+        'status' => 'erro',
+        'mensagem' => 'Storage R2 nao configurado. Verifique R2_ACCOUNT_ID, R2_BUCKET_NAME, R2_PUBLIC_URL, R2_ACCESS_KEY_ID e R2_SECRET_KEY no Railway.'
+    ], 500);
+}
+
 $r2 = new R2Storage(R2_ACCESS_KEY, R2_SECRET_KEY, R2_BUCKET, R2_ENDPOINT);
 
 $allowed = ['image/jpeg','image/png','image/webp','image/gif'];
@@ -65,7 +72,7 @@ for ($i = 0; $i < $total; $i++) {
     
     // Upload para o R2
     if (!$r2->upload($tmp, $r2Path, $type)) {
-        $erros[] = "$name (Falha no R2)";
+        $erros[] = "$name (Falha no R2. Verifique as credenciais e permissoes do bucket.)";
         continue;
     }
 
@@ -80,6 +87,14 @@ for ($i = 0; $i < $total; $i++) {
     $stmt = db()->prepare("INSERT INTO imagens (galeria_id,nome_arquivo,caminho_arquivo,tamanho_bytes,ordem) VALUES (?,?,?,?,?)");
     $stmt->execute([$galeria_id, $name, $caminho, $size, $ordem]);
     $enviadas++;
+}
+
+if ($enviadas === 0 && $erros) {
+    json_out([
+        'status' => 'erro',
+        'mensagem' => 'Nenhuma foto foi enviada. Falha no envio para o Cloudflare R2.',
+        'erros' => $erros
+    ], 500);
 }
 
 json_out(['status'=>'ok','enviadas'=>$enviadas,'erros'=>$erros]);

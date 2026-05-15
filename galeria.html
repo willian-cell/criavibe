@@ -970,7 +970,7 @@
     async function uploadFotos(files) {
       if (!files || !files.length) return;
       
-      const batchSize = 10; // Reduzido de 50 para 10 para evitar timeouts e limites de POST na Hostinger
+      const batchSize = 10; // Lotes menores evitam timeouts e limites de POST em producao.
       const totalFiles = files.length;
       let done = 0;
       
@@ -999,7 +999,7 @@
           const res = await API.upload('/fotos/upload.php', fd);
           
           if (res.status === 'ok') {
-            done += batch.length;
+            done += Number(res.enviadas || 0);
             progFill.style.width = `${(done / totalFiles) * 100}%`;
             
             // Atualização progressiva: carregar fotos já enviadas para o fotógrafo conferir

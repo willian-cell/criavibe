@@ -1191,7 +1191,7 @@
         <button onclick="location.href='index.html'" title="Voltar/Sair"><i class="fa-solid fa-arrow-left"></i>
           Sair</button>
         <div class="hero-brand" id="logoToggle" title="Alternar Modo Escuro/Claro">
-          <img src="/logo/logo-criavibe-fotografia.jpeg" alt="CriaVibe" class="hero-logo-img">
+          <img src="/logo/logo-criavibe-fotografia.png" alt="CriaVibe" class="hero-logo-img">
         </div>
       </nav>
 
@@ -1321,6 +1321,11 @@
     let dlMax = 0;
     let isModoSelecao = false;
 
+    function mediaSrc(caminho) {
+      if (!caminho) return '';
+      return caminho.startsWith('http') ? caminho : '/' + caminho;
+    }
+
     // Configuração de Grade (Variáveis Globais)
     let QTD_V = 5; // Fotos verticais por linha
     let QTD_H = 3; // Fotos horizontais por linha
@@ -1390,7 +1395,7 @@
       }
 
       if (GALERIA.capa_apresentacao) {
-        document.getElementById('hero-bg').style.backgroundImage = `url('/${GALERIA.capa_apresentacao}')`;
+        document.getElementById('hero-bg').style.backgroundImage = `url('${mediaSrc(GALERIA.capa_apresentacao)}')`;
       }
 
       if (GALERIA.selecao_ativa == 1) {
@@ -1426,7 +1431,7 @@
         const rawFotos = d.fotos || [];
         if (rawFotos.length > 0 && !GALERIA.capa_apresentacao) {
           const fotoCapa = rawFotos.find(f => f.is_capa == 1) || rawFotos[0];
-          document.getElementById('hero-bg').style.backgroundImage = `url('/${fotoCapa.caminho_arquivo}')`;
+          document.getElementById('hero-bg').style.backgroundImage = `url('${mediaSrc(fotoCapa.caminho_arquivo)}')`;
         }
 
         if (!rawFotos.length) {
@@ -1456,7 +1461,7 @@
               resolve(f);
             };
             img.onerror = () => { f.orientacao = 'vertical'; resolve(f); };
-            img.src = '/' + f.caminho_arquivo;
+            img.src = mediaSrc(f.caminho_arquivo);
           });
         }));
 
@@ -1466,7 +1471,7 @@
         FOTOS.forEach((f, i) => { if (f.selecionada) selecionadas.add(f.id); });
 
         grid.innerHTML = FOTOS.map((f, i) => {
-          const src = '/' + f.caminho_arquivo;
+          const src = mediaSrc(f.caminho_arquivo);
           const nome = f.nome_arquivo || 'foto_' + f.id;
           const jaiBaixada = getBaixadas().has(String(f.id));
           return `
@@ -1934,7 +1939,7 @@
     // ── LIGHTBOX ───────────────────────────────────────────────
     function abrirLightbox(idx) {
       lbIndex = idx;
-      document.getElementById('lb-img').src = '/' + FOTOS[idx].caminho_arquivo;
+      document.getElementById('lb-img').src = mediaSrc(FOTOS[idx].caminho_arquivo);
       document.getElementById('lightbox').classList.add('open');
       atualizarControlesLightbox();
     }
@@ -1945,7 +1950,7 @@
 
     function navLightbox(dir) {
       lbIndex = (lbIndex + dir + FOTOS.length) % FOTOS.length;
-      document.getElementById('lb-img').src = '/' + FOTOS[lbIndex].caminho_arquivo;
+      document.getElementById('lb-img').src = mediaSrc(FOTOS[lbIndex].caminho_arquivo);
       atualizarControlesLightbox();
     }
 
