@@ -1027,6 +1027,7 @@
       progBg.style.display = '';
       progFill.style.width = '0%';
 
+      /*
       function debugR2UploadInfo(upload, file) {
         try {
           const host = new URL(upload.upload_url).host;
@@ -1054,12 +1055,13 @@
           console.warn('Falha ao montar debug de upload R2', e);
         }
       }
+      */
 
       async function putR2(upload, file) {
         let lastError = null;
         for (let attempt = 1; attempt <= 3; attempt++) {
           try {
-            debugR2UploadInfo(upload, file);
+            // debugR2UploadInfo(upload, file);
             const res = await fetch(upload.upload_url, {
               method: 'PUT',
               headers: { 'Content-Type': upload.mime_type || file.type || 'application/octet-stream' },
