@@ -153,6 +153,17 @@ railway run php api/db_migrations.php
 - Se algum PUT falhar, o problema está na assinatura R2/CORS ou credenciais.
 - Agora o `direct_prepare` também aceita HEIC/HEIF/AVIF/SVG/TIFF e outros formatos populares, usando fallback por extensão quando o navegador não envia um MIME type completo.
 
+## R2 CORS necessário para uploads diretos
+
+O bucket Cloudflare R2 deve permitir o `OPTIONS` de preflight e retornar `Access-Control-Allow-Origin` para o domínio do frontend.
+Configure o CORS do bucket com:
+- Origem: `https://criavibe-production.up.railway.app`
+- Métodos: `PUT`, `OPTIONS`, `GET`
+- Headers permitidos: `Content-Type`, `Authorization`, `X-Amz-Date`, `X-Amz-Algorithm`, `X-Amz-Credential`, `X-Amz-SignedHeaders`, `X-Amz-Signature`, `X-Amz-Content-Sha256`
+- Expor headers: `ETag`, `x-amz-request-id`
+
+Sem essa configuração, o navegador bloqueará o `PUT` direto mesmo que a URL assinada esteja correta.
+
 ## Como validar logs do worker no Railway
 
 ### Logs via Railway UI
