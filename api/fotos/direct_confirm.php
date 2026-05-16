@@ -63,9 +63,9 @@ try {
     // Filtrar apenas os novos
     $finalRows = [];
     foreach ($toInsert as $it) {
-        if (in_array($it['url'], $existing, true)) continue;
+        if (in_array($it['public_url'], $existing, true)) continue;
         $ordem++;
-        $finalRows[] = [$galeria_id, $it['name'], $it['url'], $it['size'], $ordem];
+        $finalRows[] = [$galeria_id, $it['name'], $it['public_url'], $it['size'], $ordem];
     }
 
     $registradas = 0;
